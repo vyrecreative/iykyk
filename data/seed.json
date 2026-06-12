@@ -1,16 +1,692 @@
 {
   "siteName": "CupEdge Match Signals",
   "timezone": "America/New_York",
-  "generatedAt": "2026-06-12T07:16:14Z",
+  "generatedAt": "2026-06-12T21:51:36Z",
+  "generatedAtEastern": "Jun 12, 2026 05:51 PM ET",
   "refreshPolicy": {
     "dailyRosterCheckUtc": "12:00",
     "dailyRosterCheckEasternJune": "8:00 AM ET",
     "matchWindow": "90 minutes before kickoff through 150 minutes after kickoff",
-    "matchWindowCadence": "15 minutes",
+    "matchWindowCadence": "15 minutes in-page during active match windows",
     "notes": [
       "Daily refresh checks official FIFA calendar and squad source status.",
       "Match-window refresh checks official status, score, tactics, and lineup exposure more aggressively.",
-      "Google probability widgets are never used as model truth."
+      "Google probability widgets are comparison only, not model truth."
+    ]
+  },
+  "modelNote": "Public-data v0.4 model. Probabilities are generated from collected source inputs; recent-form scores are derived from source-backed last-eight rows, and Google probability widgets are not copied as model output.",
+  "refreshStrategy": {
+    "cadence": "Every 30 minutes",
+    "lineup_window": "Roughly 75 to 60 minutes before kickoff; use visible official/team lineups first, then labeled secondary live-card or live-coverage lineups if official fields are inaccessible.",
+    "matchday_logic": "Identify today's fixtures in Eastern time and update only when source-backed changes are found."
+  },
+  "team_summaries": [
+    {
+      "team": "Canada",
+      "rank": 30,
+      "squad_size": 26,
+      "total_caps": 953,
+      "avg_caps": 36.7,
+      "total_goals": 133,
+      "avg_goals": 5.1,
+      "outfield_goals_per_player": 5.8,
+      "top_goals": [
+        {
+          "name": "Jonathan David",
+          "position": "FW",
+          "goals": 39,
+          "caps": 77,
+          "club": "Juventus"
+        },
+        {
+          "name": "Cyle Larin",
+          "position": "FW",
+          "goals": 30,
+          "caps": 90,
+          "club": "Southampton"
+        },
+        {
+          "name": "Alphonso Davies (captain)",
+          "position": "DF",
+          "goals": 15,
+          "caps": 58,
+          "club": "Bayern Munich"
+        },
+        {
+          "name": "Jonathan Osorio",
+          "position": "MF",
+          "goals": 10,
+          "caps": 90,
+          "club": "Toronto FC"
+        }
+      ],
+      "top_caps": [
+        {
+          "name": "Cyle Larin",
+          "position": "FW",
+          "caps": 90,
+          "goals": 30,
+          "club": "Southampton"
+        },
+        {
+          "name": "Jonathan Osorio",
+          "position": "MF",
+          "caps": 90,
+          "goals": 10,
+          "club": "Toronto FC"
+        },
+        {
+          "name": "Jonathan David",
+          "position": "FW",
+          "caps": 77,
+          "goals": 39,
+          "club": "Juventus"
+        }
+      ]
+    },
+    {
+      "team": "Bosnia and Herzegovina",
+      "rank": 64,
+      "squad_size": 26,
+      "total_caps": 591,
+      "avg_caps": 22.7,
+      "total_goals": 93,
+      "avg_goals": 3.6,
+      "outfield_goals_per_player": 4,
+      "top_goals": [
+        {
+          "name": "Edin Džeko (captain)",
+          "position": "FW",
+          "goals": 73,
+          "caps": 148,
+          "club": "Schalke 04"
+        },
+        {
+          "name": "Ermedin Demirović",
+          "position": "FW",
+          "goals": 4,
+          "caps": 40,
+          "club": "VfB Stuttgart"
+        },
+        {
+          "name": "Haris Tabaković",
+          "position": "FW",
+          "goals": 4,
+          "caps": 10,
+          "club": "Borussia Mönchengladbach"
+        },
+        {
+          "name": "Benjamin Tahirović",
+          "position": "MF",
+          "goals": 2,
+          "caps": 28,
+          "club": "Brøndby"
+        }
+      ],
+      "top_caps": [
+        {
+          "name": "Edin Džeko (captain)",
+          "position": "FW",
+          "caps": 148,
+          "goals": 73,
+          "club": "Schalke 04"
+        },
+        {
+          "name": "Sead Kolašinac",
+          "position": "DF",
+          "caps": 65,
+          "goals": 0,
+          "club": "Atalanta"
+        },
+        {
+          "name": "Ermedin Demirović",
+          "position": "FW",
+          "caps": 40,
+          "goals": 4,
+          "club": "VfB Stuttgart"
+        }
+      ]
+    },
+    {
+      "team": "United States",
+      "rank": 17,
+      "squad_size": 26,
+      "total_caps": 962,
+      "avg_caps": 37,
+      "total_goals": 125,
+      "avg_goals": 4.8,
+      "outfield_goals_per_player": 5.4,
+      "top_goals": [
+        {
+          "name": "Christian Pulisic",
+          "position": "FW",
+          "goals": 33,
+          "caps": 86,
+          "club": "Milan"
+        },
+        {
+          "name": "Ricardo Pepi",
+          "position": "FW",
+          "goals": 13,
+          "caps": 37,
+          "club": "PSV Eindhoven"
+        },
+        {
+          "name": "Weston McKennie",
+          "position": "MF",
+          "goals": 12,
+          "caps": 66,
+          "club": "Juventus"
+        },
+        {
+          "name": "Brenden Aaronson",
+          "position": "FW",
+          "goals": 9,
+          "caps": 58,
+          "club": "Leeds United"
+        }
+      ],
+      "top_caps": [
+        {
+          "name": "Christian Pulisic",
+          "position": "FW",
+          "caps": 86,
+          "goals": 33,
+          "club": "Milan"
+        },
+        {
+          "name": "Tim Ream (captain)",
+          "position": "DF",
+          "caps": 82,
+          "goals": 1,
+          "club": "Charlotte FC"
+        },
+        {
+          "name": "Weston McKennie",
+          "position": "MF",
+          "caps": 66,
+          "goals": 12,
+          "club": "Juventus"
+        }
+      ]
+    },
+    {
+      "team": "Paraguay",
+      "rank": 41,
+      "squad_size": 26,
+      "total_caps": 690,
+      "avg_caps": 26.5,
+      "total_goals": 53,
+      "avg_goals": 2,
+      "outfield_goals_per_player": 2.3,
+      "top_goals": [
+        {
+          "name": "Miguel Almirón",
+          "position": "MF",
+          "goals": 10,
+          "caps": 76,
+          "club": "Atlanta United FC"
+        },
+        {
+          "name": "Antonio Sanabria",
+          "position": "FW",
+          "goals": 7,
+          "caps": 48,
+          "club": "Cremonese"
+        },
+        {
+          "name": "Kaku",
+          "position": "FW",
+          "goals": 6,
+          "caps": 33,
+          "club": "Al Ain"
+        },
+        {
+          "name": "Gustavo Gómez (captain)",
+          "position": "DF",
+          "goals": 4,
+          "caps": 89,
+          "club": "Palmeiras"
+        }
+      ],
+      "top_caps": [
+        {
+          "name": "Gustavo Gómez (captain)",
+          "position": "DF",
+          "caps": 89,
+          "goals": 4,
+          "club": "Palmeiras"
+        },
+        {
+          "name": "Miguel Almirón",
+          "position": "MF",
+          "caps": 76,
+          "goals": 10,
+          "club": "Atlanta United FC"
+        },
+        {
+          "name": "Júnior Alonso",
+          "position": "DF",
+          "caps": 71,
+          "goals": 3,
+          "club": "Atlético Mineiro"
+        }
+      ]
+    }
+  ],
+  "recent_form": {
+    "Canada": {
+      "team": "Canada",
+      "source_label": "Canada men's national soccer team results",
+      "source_url": "https://en.wikipedia.org/wiki/Canada_men%27s_national_soccer_team_results_%282020%E2%80%93present%29",
+      "source_status": "Public results page checked for the last eight matches before the Bosnia and Herzegovina opener.",
+      "matches": [
+        {
+          "date": "2025 Oct 10",
+          "opponent": "vs Australia",
+          "score_for": 0,
+          "score_against": 1,
+          "result": "L",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2025 Oct 14",
+          "opponent": "at Colombia",
+          "score_for": 0,
+          "score_against": 0,
+          "result": "D",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2025 Nov 13",
+          "opponent": "vs Ecuador",
+          "score_for": 0,
+          "score_against": 0,
+          "result": "D",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2025 Nov 18",
+          "opponent": "at Venezuela",
+          "score_for": 2,
+          "score_against": 0,
+          "result": "W",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2026 Mar 28",
+          "opponent": "vs Iceland",
+          "score_for": 2,
+          "score_against": 2,
+          "result": "D",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2026 Mar 31",
+          "opponent": "vs Tunisia",
+          "score_for": 0,
+          "score_against": 0,
+          "result": "D",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2026 Jun 01",
+          "opponent": "vs Uzbekistan",
+          "score_for": 2,
+          "score_against": 0,
+          "result": "W",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2026 Jun 05",
+          "opponent": "vs Republic of Ireland",
+          "score_for": 1,
+          "score_against": 1,
+          "result": "D",
+          "competition": "Friendly"
+        }
+      ],
+      "wins": 2,
+      "draws": 5,
+      "losses": 1,
+      "record": "2W 5D 1L",
+      "goals_for": 7,
+      "goals_against": 4,
+      "goal_difference": 3,
+      "goal_difference_per_match": 0.375,
+      "ppg": 1.375,
+      "form_sequence": [
+        "L",
+        "D",
+        "D",
+        "W",
+        "D",
+        "D",
+        "W",
+        "D"
+      ]
+    },
+    "Bosnia and Herzegovina": {
+      "team": "Bosnia and Herzegovina",
+      "source_label": "Bosnia and Herzegovina national football team results",
+      "source_url": "https://en.wikipedia.org/wiki/Bosnia_and_Herzegovina_national_football_team_results_%282020%E2%80%93present%29",
+      "source_status": "Public results page checked for the last eight matches before the Canada opener; penalty wins are counted as draws for regulation-time form.",
+      "matches": [
+        {
+          "date": "2025 Oct 09",
+          "opponent": "at Cyprus",
+          "score_for": 2,
+          "score_against": 2,
+          "result": "D",
+          "competition": "WCQ"
+        },
+        {
+          "date": "2025 Oct 12",
+          "opponent": "at Malta",
+          "score_for": 4,
+          "score_against": 1,
+          "result": "W",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2025 Nov 15",
+          "opponent": "vs Romania",
+          "score_for": 3,
+          "score_against": 1,
+          "result": "W",
+          "competition": "WCQ"
+        },
+        {
+          "date": "2025 Nov 18",
+          "opponent": "at Austria",
+          "score_for": 1,
+          "score_against": 1,
+          "result": "D",
+          "competition": "WCQ"
+        },
+        {
+          "date": "2026 Mar 26",
+          "opponent": "at Wales",
+          "score_for": 1,
+          "score_against": 1,
+          "result": "D",
+          "competition": "WC playoff",
+          "note": "won 4-2 pens"
+        },
+        {
+          "date": "2026 Mar 31",
+          "opponent": "vs Italy",
+          "score_for": 1,
+          "score_against": 1,
+          "result": "D",
+          "competition": "WC playoff",
+          "note": "won 4-1 pens"
+        },
+        {
+          "date": "2026 May 29",
+          "opponent": "vs North Macedonia",
+          "score_for": 0,
+          "score_against": 0,
+          "result": "D",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2026 Jun 06",
+          "opponent": "vs Panama",
+          "score_for": 1,
+          "score_against": 1,
+          "result": "D",
+          "competition": "Friendly"
+        }
+      ],
+      "wins": 2,
+      "draws": 6,
+      "losses": 0,
+      "record": "2W 6D 0L",
+      "goals_for": 13,
+      "goals_against": 8,
+      "goal_difference": 5,
+      "goal_difference_per_match": 0.625,
+      "ppg": 1.5,
+      "form_sequence": [
+        "D",
+        "W",
+        "W",
+        "D",
+        "D",
+        "D",
+        "D",
+        "D"
+      ]
+    },
+    "United States": {
+      "team": "United States",
+      "source_label": "United States men's national soccer team results",
+      "source_url": "https://en.wikipedia.org/wiki/United_States_men%27s_national_soccer_team_results_%282020%E2%80%93present%29",
+      "source_status": "Public results page checked for the last eight matches before the Paraguay opener.",
+      "matches": [
+        {
+          "date": "2025 Oct 10",
+          "opponent": "vs Ecuador",
+          "score_for": 1,
+          "score_against": 1,
+          "result": "D",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2025 Oct 14",
+          "opponent": "vs Australia",
+          "score_for": 2,
+          "score_against": 1,
+          "result": "W",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2025 Nov 15",
+          "opponent": "vs Paraguay",
+          "score_for": 2,
+          "score_against": 1,
+          "result": "W",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2025 Nov 18",
+          "opponent": "vs Uruguay",
+          "score_for": 5,
+          "score_against": 1,
+          "result": "W",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2026 Mar 28",
+          "opponent": "vs Belgium",
+          "score_for": 2,
+          "score_against": 5,
+          "result": "L",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2026 Mar 31",
+          "opponent": "vs Portugal",
+          "score_for": 0,
+          "score_against": 2,
+          "result": "L",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2026 May 31",
+          "opponent": "vs Senegal",
+          "score_for": 3,
+          "score_against": 2,
+          "result": "W",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2026 Jun 06",
+          "opponent": "vs Germany",
+          "score_for": 1,
+          "score_against": 2,
+          "result": "L",
+          "competition": "Friendly"
+        }
+      ],
+      "wins": 4,
+      "draws": 1,
+      "losses": 3,
+      "record": "4W 1D 3L",
+      "goals_for": 16,
+      "goals_against": 15,
+      "goal_difference": 1,
+      "goal_difference_per_match": 0.125,
+      "ppg": 1.625,
+      "form_sequence": [
+        "D",
+        "W",
+        "W",
+        "W",
+        "L",
+        "L",
+        "W",
+        "L"
+      ]
+    },
+    "Paraguay": {
+      "team": "Paraguay",
+      "source_label": "Paraguay national football team results",
+      "source_url": "https://en.wikipedia.org/wiki/Paraguay_national_football_team_results_%282020%E2%80%93present%29",
+      "source_status": "Public results page checked for the last eight matches before the United States opener.",
+      "matches": [
+        {
+          "date": "2025 Sep 09",
+          "opponent": "vs Peru",
+          "score_for": 1,
+          "score_against": 0,
+          "result": "W",
+          "competition": "WCQ"
+        },
+        {
+          "date": "2025 Oct 10",
+          "opponent": "at Japan",
+          "score_for": 2,
+          "score_against": 2,
+          "result": "D",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2025 Oct 14",
+          "opponent": "at South Korea",
+          "score_for": 0,
+          "score_against": 2,
+          "result": "L",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2025 Nov 15",
+          "opponent": "at United States",
+          "score_for": 1,
+          "score_against": 2,
+          "result": "L",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2025 Nov 18",
+          "opponent": "vs Mexico",
+          "score_for": 2,
+          "score_against": 1,
+          "result": "W",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2026 Mar 27",
+          "opponent": "at Greece",
+          "score_for": 1,
+          "score_against": 0,
+          "result": "W",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2026 Mar 31",
+          "opponent": "at Morocco",
+          "score_for": 1,
+          "score_against": 2,
+          "result": "L",
+          "competition": "Friendly"
+        },
+        {
+          "date": "2026 Jun 05",
+          "opponent": "vs Nicaragua",
+          "score_for": 4,
+          "score_against": 0,
+          "result": "W",
+          "competition": "Friendly"
+        }
+      ],
+      "wins": 4,
+      "draws": 1,
+      "losses": 3,
+      "record": "4W 1D 3L",
+      "goals_for": 12,
+      "goals_against": 9,
+      "goal_difference": 3,
+      "goal_difference_per_match": 0.375,
+      "ppg": 1.625,
+      "form_sequence": [
+        "W",
+        "D",
+        "L",
+        "L",
+        "W",
+        "W",
+        "L",
+        "W"
+      ]
+    }
+  },
+  "head_to_head": {
+    "can-bih": {
+      "source_label": "Group B historical note",
+      "source_url": "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_B",
+      "summary": "Group B source says Canada and Bosnia and Herzegovina have never met before.",
+      "weight_note": "No direct history, so this is a context note rather than a model driver."
+    },
+    "usa-par": {
+      "source_label": "Group D historical note",
+      "source_url": "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_D",
+      "summary": "Group D source says the teams have met nine times, including a 1930 World Cup match won 3-0 by the United States and a 2025 friendly won 2-1 by the United States.",
+      "weight_note": "Small and partly old sample; this is context, not a high-weight model input."
+    }
+  },
+  "movementLayer": {
+    "status": "Public proxy, not private GPS tracking",
+    "summary": "The field heat map uses roster position, top scorer threat, recent team scoring, model pressure, official tactics when exposed, and match status. It will upgrade when official event, lineup, or public tracking fields are available.",
+    "unavailable": [
+      "Team GPS vest telemetry",
+      "Optical x-y player coordinates",
+      "Sprint load and high-intensity effort streams",
+      "Private coaching platform tracking exports"
+    ],
+    "publicInputs": [
+      "FIFA calendar status, score, venue, referee, and tactics when exposed",
+      "Official match centre and federation lineup releases",
+      "Roster position, caps, goals, and source-backed recent form",
+      "Future public event feeds if a reliable source exposes shots, touches, and average positions"
+    ],
+    "sources": [
+      {
+        "label": "FIFA player tracking and AI avatars reporting",
+        "url": "https://www.theguardian.com/football/2026/jan/07/world-cup-players-to-have-lifelike-ai-avatars-for-use-in-var-offside-decisions",
+        "use": "Public reporting says FIFA tracking and AI avatar systems support VAR and broadcast explainers. This is not an open public live player GPS feed."
+      },
+      {
+        "label": "Broadcast computer vision tracking validation",
+        "url": "https://arxiv.org/abs/2508.19477",
+        "use": "Research benchmark for deriving player position, speed, and distance from broadcast footage. Useful for roadmap context, not a live source for this site."
+      },
+      {
+        "label": "World Cup camera, sensor, and smart ball coverage",
+        "url": "https://www.wired.com/story/world-cup-tech-helping-eliminate-bad-calls-var-sensors-3d-body-scans/",
+        "use": "Public reporting on camera, sensor, and smart ball systems. The available article does not expose a public API for live betting models."
+      }
     ]
   },
   "matches": [
@@ -36,14 +712,342 @@
         "nonFavoriteShare": 48,
         "drawPressureIndex": 59,
         "lateGoalIndex": 38,
-        "stance": "Canada has the edge, but draw plus Bosnia and Herzegovina is high enough that first-goal and comeback paths matter."
+        "stance": "The favorite can still win, but draw/underdog share is high enough that first-goal and comeback paths matter.",
+        "signals": [
+          "Canada is the model favorite at 52%, but draw plus Bosnia and Herzegovina still totals 48%.",
+          "Source-score gap is 0.27; under roughly 0.32, treat the match as materially more mixed than a high-favorite game.",
+          "Recent combined goal environment is 2.0 total goals per match.",
+          "Canada conceded 0.5 per match recently; Bosnia and Herzegovina scored 1.62 per match recently.",
+          "Official lineups are still pending, so this pattern layer should be re-run when starters and formations are confirmed."
+        ]
       },
-      "readiness": "Pre-match baseline. Official lineups pending.",
+      "readiness": "Final: FIFA logged a 1-1 draw; pre-match probability archived",
       "drivers": [
-        "Canada grades stronger on FIFA rank and host venue context.",
-        "Bosnia and Herzegovina narrows the model through recent form and squad goal depth.",
-        "Lineups are not official until actual starter names or formations are exposed by an official/team source."
-      ]
+        "Canada graded stronger on FIFA rank and host venue context.",
+        "Bosnia and Herzegovina narrowed the model through recent form and squad goal depth.",
+        "The draw-pressure warning was the key read: draw plus Bosnia and Herzegovina totaled 48% before kickoff."
+      ],
+      "lineupWindow": "roughly 1:45-2:00 PM ET",
+      "contextNotes": [
+        "Official FIFA calendar API lists Canada vs Bosnia and Herzegovina as Match 3 at 3:00 PM ET in Toronto.",
+        "Official FIFA calendar API later logged the match as a 1-1 final at 97 minutes, with 4-4-2 tactics visible for both sides.",
+        "Canada received the host/venue lane, but Bosnia brought an unbeaten last-eight form record into this opener.",
+        "Group B source records FIFA June 2026 ranks as Canada 30 and Bosnia and Herzegovina 64.",
+        "The pre-match model kept Canada as favorite, but the 48% non-favorite share correctly marked the draw path as material."
+      ],
+      "recentForm": {
+        "home": {
+          "team": "Canada",
+          "source_label": "Canada men's national soccer team results",
+          "source_url": "https://en.wikipedia.org/wiki/Canada_men%27s_national_soccer_team_results_%282020%E2%80%93present%29",
+          "source_status": "Public results page checked for the last eight matches before the Bosnia and Herzegovina opener.",
+          "matches": [
+            {
+              "date": "2025 Oct 10",
+              "opponent": "vs Australia",
+              "score_for": 0,
+              "score_against": 1,
+              "result": "L",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2025 Oct 14",
+              "opponent": "at Colombia",
+              "score_for": 0,
+              "score_against": 0,
+              "result": "D",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2025 Nov 13",
+              "opponent": "vs Ecuador",
+              "score_for": 0,
+              "score_against": 0,
+              "result": "D",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2025 Nov 18",
+              "opponent": "at Venezuela",
+              "score_for": 2,
+              "score_against": 0,
+              "result": "W",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2026 Mar 28",
+              "opponent": "vs Iceland",
+              "score_for": 2,
+              "score_against": 2,
+              "result": "D",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2026 Mar 31",
+              "opponent": "vs Tunisia",
+              "score_for": 0,
+              "score_against": 0,
+              "result": "D",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2026 Jun 01",
+              "opponent": "vs Uzbekistan",
+              "score_for": 2,
+              "score_against": 0,
+              "result": "W",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2026 Jun 05",
+              "opponent": "vs Republic of Ireland",
+              "score_for": 1,
+              "score_against": 1,
+              "result": "D",
+              "competition": "Friendly"
+            }
+          ],
+          "wins": 2,
+          "draws": 5,
+          "losses": 1,
+          "record": "2W 5D 1L",
+          "goals_for": 7,
+          "goals_against": 4,
+          "goal_difference": 3,
+          "goal_difference_per_match": 0.375,
+          "ppg": 1.375,
+          "form_sequence": [
+            "L",
+            "D",
+            "D",
+            "W",
+            "D",
+            "D",
+            "W",
+            "D"
+          ]
+        },
+        "away": {
+          "team": "Bosnia and Herzegovina",
+          "source_label": "Bosnia and Herzegovina national football team results",
+          "source_url": "https://en.wikipedia.org/wiki/Bosnia_and_Herzegovina_national_football_team_results_%282020%E2%80%93present%29",
+          "source_status": "Public results page checked for the last eight matches before the Canada opener; penalty wins are counted as draws for regulation-time form.",
+          "matches": [
+            {
+              "date": "2025 Oct 09",
+              "opponent": "at Cyprus",
+              "score_for": 2,
+              "score_against": 2,
+              "result": "D",
+              "competition": "WCQ"
+            },
+            {
+              "date": "2025 Oct 12",
+              "opponent": "at Malta",
+              "score_for": 4,
+              "score_against": 1,
+              "result": "W",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2025 Nov 15",
+              "opponent": "vs Romania",
+              "score_for": 3,
+              "score_against": 1,
+              "result": "W",
+              "competition": "WCQ"
+            },
+            {
+              "date": "2025 Nov 18",
+              "opponent": "at Austria",
+              "score_for": 1,
+              "score_against": 1,
+              "result": "D",
+              "competition": "WCQ"
+            },
+            {
+              "date": "2026 Mar 26",
+              "opponent": "at Wales",
+              "score_for": 1,
+              "score_against": 1,
+              "result": "D",
+              "competition": "WC playoff",
+              "note": "won 4-2 pens"
+            },
+            {
+              "date": "2026 Mar 31",
+              "opponent": "vs Italy",
+              "score_for": 1,
+              "score_against": 1,
+              "result": "D",
+              "competition": "WC playoff",
+              "note": "won 4-1 pens"
+            },
+            {
+              "date": "2026 May 29",
+              "opponent": "vs North Macedonia",
+              "score_for": 0,
+              "score_against": 0,
+              "result": "D",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2026 Jun 06",
+              "opponent": "vs Panama",
+              "score_for": 1,
+              "score_against": 1,
+              "result": "D",
+              "competition": "Friendly"
+            }
+          ],
+          "wins": 2,
+          "draws": 6,
+          "losses": 0,
+          "record": "2W 6D 0L",
+          "goals_for": 13,
+          "goals_against": 8,
+          "goal_difference": 5,
+          "goal_difference_per_match": 0.625,
+          "ppg": 1.5,
+          "form_sequence": [
+            "D",
+            "W",
+            "W",
+            "D",
+            "D",
+            "D",
+            "D",
+            "D"
+          ]
+        },
+        "head_to_head": {
+          "source_label": "Group B historical note",
+          "source_url": "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_B",
+          "summary": "Group B source says Canada and Bosnia and Herzegovina have never met before.",
+          "weight_note": "No direct history, so this is a context note rather than a model driver."
+        }
+      },
+      "modelMethod": {
+        "version": "public-data v0.4",
+        "weights": {
+          "rank": 0.36,
+          "experience": 0.17,
+          "goals": 0.15,
+          "top_scorer": 0.07,
+          "venue": 0.1,
+          "form": 0.15
+        },
+        "home_score": 0.703,
+        "away_score": 0.433,
+        "score_diff": 0.27,
+        "draw_base": 0.263,
+        "form_lane": "Derived from the source-backed last-eight match rows using points-per-game and goal-difference-per-match.",
+        "components": [
+          {
+            "component": "FIFA rank prior",
+            "weight": 36,
+            "home_score": 0.707,
+            "away_score": 0.364,
+            "home_contribution": 0.255,
+            "away_contribution": 0.131
+          },
+          {
+            "component": "Squad avg caps",
+            "weight": 17,
+            "home_score": 0.612,
+            "away_score": 0.378,
+            "home_contribution": 0.104,
+            "away_contribution": 0.064
+          },
+          {
+            "component": "Squad goal depth",
+            "weight": 15,
+            "home_score": 0.829,
+            "away_score": 0.571,
+            "home_contribution": 0.124,
+            "away_contribution": 0.086
+          },
+          {
+            "component": "Top-scorer threat",
+            "weight": 7,
+            "home_score": 0.65,
+            "away_score": 1,
+            "home_contribution": 0.046,
+            "away_contribution": 0.07
+          },
+          {
+            "component": "Venue/host factor",
+            "weight": 10,
+            "home_score": 1,
+            "away_score": 0,
+            "home_contribution": 0.1,
+            "away_contribution": 0
+          },
+          {
+            "component": "Recent-form context",
+            "weight": 15,
+            "home_score": 0.499,
+            "away_score": 0.547,
+            "home_contribution": 0.075,
+            "away_contribution": 0.082
+          }
+        ],
+        "confidence": "medium-low",
+        "pattern_test": {
+          "label": "Korea-style mixed lane",
+          "favorite": "Canada",
+          "underdog": "Bosnia and Herzegovina",
+          "favorite_probability": 52,
+          "draw_probability": 26,
+          "underdog_probability": 22,
+          "non_favorite_share": 48,
+          "source_score_gap": 0.27,
+          "draw_pressure_index": 59,
+          "late_goal_index": 38,
+          "recent_total_goals_per_match": 2,
+          "favorite_conceded_per_match": 0.5,
+          "underdog_scored_per_match": 1.62,
+          "favorite_top_scorer_goals": 39,
+          "underdog_top_scorer_goals": 73,
+          "stance": "The favorite can still win, but draw/underdog share is high enough that first-goal and comeback paths matter.",
+          "signals": [
+            "Canada is the model favorite at 52%, but draw plus Bosnia and Herzegovina still totals 48%.",
+            "Source-score gap is 0.27; under roughly 0.32, treat the match as materially more mixed than a high-favorite game.",
+            "Recent combined goal environment is 2.0 total goals per match.",
+            "Canada conceded 0.5 per match recently; Bosnia and Herzegovina scored 1.62 per match recently.",
+            "Official lineups are still pending, so this pattern layer should be re-run when starters and formations are confirmed."
+          ]
+        },
+        "not_included_yet": [
+          "official starting XI",
+          "official live match-centre status",
+          "club-level xG/xA and minutes load",
+          "verified late injury or weather changes"
+        ],
+        "live_status": {
+          "source": "FIFA calendar API",
+          "observed_at_et": "Jun 12, 2026, 5:50 PM EDT",
+          "status": "Official FIFA calendar fields show a 1-1 final, match time 97 minutes, and 4-4-2 tactics visible for both sides.",
+          "home_score": 1,
+          "away_score": 1,
+          "match_time": "97'",
+          "home_tactics": "4-4-2",
+          "away_tactics": "4-4-2"
+        },
+        "probability_state": "Pre-match/lineup probability baseline. Do not use as a calibrated live in-play probability after kickoff."
+      },
+      "uncertaintyBand": 9,
+      "inputScores": {
+        "home": {
+          "venue": 1,
+          "form": 0.499
+        },
+        "away": {
+          "venue": 0,
+          "form": 0.547
+        },
+        "draw_adjustment": 0.01
+      }
     },
     {
       "id": "usa-par",
@@ -67,36 +1071,423 @@
         "nonFavoriteShare": 45,
         "drawPressureIndex": 44,
         "lateGoalIndex": 69,
-        "stance": "The United States is the clearer favorite, but recent scoring and concession data says the match can stay live late."
+        "stance": "The favorite is clearer than Korea was, but recent scoring/concession data says the match can stay live late.",
+        "signals": [
+          "United States is the model favorite at 55%, but draw plus Paraguay still totals 45%.",
+          "Source-score gap is 0.308; under roughly 0.32, treat the match as materially more mixed than a high-favorite game.",
+          "Recent combined goal environment is 3.25 total goals per match.",
+          "United States conceded 1.88 per match recently; Paraguay scored 1.5 per match recently.",
+          "Official lineups are still pending, so this pattern layer should be re-run when starters and formations are confirmed."
+        ]
       },
-      "readiness": "Pre-match baseline. Official lineups pending.",
+      "readiness": "Pre-match: fixture confirmed; lineups pending",
       "drivers": [
         "The United States grades stronger on FIFA rank, host venue context, average caps, and squad goal depth.",
-        "Paraguay recent form keeps the away outcome alive.",
-        "Lineups are not official until actual starter names or formations are exposed by an official/team source."
-      ]
+        "Paraguay's last-eight form keeps the away outcome alive, including wins over Mexico, Greece, and Nicaragua.",
+        "The probability is still a pre-lineup baseline and should be re-run when official starters are released."
+      ],
+      "lineupWindow": "roughly 7:45-8:00 PM ET",
+      "contextNotes": [
+        "Official FIFA calendar API lists USA vs Paraguay as Match 4 at 9:00 PM ET in Los Angeles.",
+        "The United States receives the host/venue lane and the stronger FIFA ranking, while Paraguay has comparable recent points per game.",
+        "Group D source records FIFA June 2026 ranks as United States 17 and Paraguay 41.",
+        "No official starting XI, formation, late injury, or live status fields were exposed in the official calendar snapshot at this refresh."
+      ],
+      "recentForm": {
+        "home": {
+          "team": "United States",
+          "source_label": "United States men's national soccer team results",
+          "source_url": "https://en.wikipedia.org/wiki/United_States_men%27s_national_soccer_team_results_%282020%E2%80%93present%29",
+          "source_status": "Public results page checked for the last eight matches before the Paraguay opener.",
+          "matches": [
+            {
+              "date": "2025 Oct 10",
+              "opponent": "vs Ecuador",
+              "score_for": 1,
+              "score_against": 1,
+              "result": "D",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2025 Oct 14",
+              "opponent": "vs Australia",
+              "score_for": 2,
+              "score_against": 1,
+              "result": "W",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2025 Nov 15",
+              "opponent": "vs Paraguay",
+              "score_for": 2,
+              "score_against": 1,
+              "result": "W",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2025 Nov 18",
+              "opponent": "vs Uruguay",
+              "score_for": 5,
+              "score_against": 1,
+              "result": "W",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2026 Mar 28",
+              "opponent": "vs Belgium",
+              "score_for": 2,
+              "score_against": 5,
+              "result": "L",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2026 Mar 31",
+              "opponent": "vs Portugal",
+              "score_for": 0,
+              "score_against": 2,
+              "result": "L",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2026 May 31",
+              "opponent": "vs Senegal",
+              "score_for": 3,
+              "score_against": 2,
+              "result": "W",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2026 Jun 06",
+              "opponent": "vs Germany",
+              "score_for": 1,
+              "score_against": 2,
+              "result": "L",
+              "competition": "Friendly"
+            }
+          ],
+          "wins": 4,
+          "draws": 1,
+          "losses": 3,
+          "record": "4W 1D 3L",
+          "goals_for": 16,
+          "goals_against": 15,
+          "goal_difference": 1,
+          "goal_difference_per_match": 0.125,
+          "ppg": 1.625,
+          "form_sequence": [
+            "D",
+            "W",
+            "W",
+            "W",
+            "L",
+            "L",
+            "W",
+            "L"
+          ]
+        },
+        "away": {
+          "team": "Paraguay",
+          "source_label": "Paraguay national football team results",
+          "source_url": "https://en.wikipedia.org/wiki/Paraguay_national_football_team_results_%282020%E2%80%93present%29",
+          "source_status": "Public results page checked for the last eight matches before the United States opener.",
+          "matches": [
+            {
+              "date": "2025 Sep 09",
+              "opponent": "vs Peru",
+              "score_for": 1,
+              "score_against": 0,
+              "result": "W",
+              "competition": "WCQ"
+            },
+            {
+              "date": "2025 Oct 10",
+              "opponent": "at Japan",
+              "score_for": 2,
+              "score_against": 2,
+              "result": "D",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2025 Oct 14",
+              "opponent": "at South Korea",
+              "score_for": 0,
+              "score_against": 2,
+              "result": "L",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2025 Nov 15",
+              "opponent": "at United States",
+              "score_for": 1,
+              "score_against": 2,
+              "result": "L",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2025 Nov 18",
+              "opponent": "vs Mexico",
+              "score_for": 2,
+              "score_against": 1,
+              "result": "W",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2026 Mar 27",
+              "opponent": "at Greece",
+              "score_for": 1,
+              "score_against": 0,
+              "result": "W",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2026 Mar 31",
+              "opponent": "at Morocco",
+              "score_for": 1,
+              "score_against": 2,
+              "result": "L",
+              "competition": "Friendly"
+            },
+            {
+              "date": "2026 Jun 05",
+              "opponent": "vs Nicaragua",
+              "score_for": 4,
+              "score_against": 0,
+              "result": "W",
+              "competition": "Friendly"
+            }
+          ],
+          "wins": 4,
+          "draws": 1,
+          "losses": 3,
+          "record": "4W 1D 3L",
+          "goals_for": 12,
+          "goals_against": 9,
+          "goal_difference": 3,
+          "goal_difference_per_match": 0.375,
+          "ppg": 1.625,
+          "form_sequence": [
+            "W",
+            "D",
+            "L",
+            "L",
+            "W",
+            "W",
+            "L",
+            "W"
+          ]
+        },
+        "head_to_head": {
+          "source_label": "Group D historical note",
+          "source_url": "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_D",
+          "summary": "Group D source says the teams have met nine times, including a 1930 World Cup match won 3-0 by the United States and a 2025 friendly won 2-1 by the United States.",
+          "weight_note": "Small and partly old sample; this is context, not a high-weight model input."
+        }
+      },
+      "modelMethod": {
+        "version": "public-data v0.4",
+        "weights": {
+          "rank": 0.36,
+          "experience": 0.17,
+          "goals": 0.15,
+          "top_scorer": 0.07,
+          "venue": 0.1,
+          "form": 0.15
+        },
+        "home_score": 0.742,
+        "away_score": 0.434,
+        "score_diff": 0.308,
+        "draw_base": 0.247,
+        "form_lane": "Derived from the source-backed last-eight match rows using points-per-game and goal-difference-per-match.",
+        "components": [
+          {
+            "component": "FIFA rank prior",
+            "weight": 36,
+            "home_score": 0.838,
+            "away_score": 0.596,
+            "home_contribution": 0.302,
+            "away_contribution": 0.215
+          },
+          {
+            "component": "Squad avg caps",
+            "weight": 17,
+            "home_score": 0.617,
+            "away_score": 0.442,
+            "home_contribution": 0.105,
+            "away_contribution": 0.075
+          },
+          {
+            "component": "Squad goal depth",
+            "weight": 15,
+            "home_score": 0.771,
+            "away_score": 0.329,
+            "home_contribution": 0.116,
+            "away_contribution": 0.049
+          },
+          {
+            "component": "Top-scorer threat",
+            "weight": 7,
+            "home_score": 0.55,
+            "away_score": 0.167,
+            "home_contribution": 0.039,
+            "away_contribution": 0.012
+          },
+          {
+            "component": "Venue/host factor",
+            "weight": 10,
+            "home_score": 1,
+            "away_score": 0,
+            "home_contribution": 0.1,
+            "away_contribution": 0
+          },
+          {
+            "component": "Recent-form context",
+            "weight": 15,
+            "home_score": 0.539,
+            "away_score": 0.557,
+            "home_contribution": 0.081,
+            "away_contribution": 0.084
+          }
+        ],
+        "confidence": "medium-low",
+        "pattern_test": {
+          "label": "Favorite edge with late-goal risk",
+          "favorite": "United States",
+          "underdog": "Paraguay",
+          "favorite_probability": 55,
+          "draw_probability": 25,
+          "underdog_probability": 20,
+          "non_favorite_share": 45,
+          "source_score_gap": 0.308,
+          "draw_pressure_index": 44,
+          "late_goal_index": 69,
+          "recent_total_goals_per_match": 3.25,
+          "favorite_conceded_per_match": 1.88,
+          "underdog_scored_per_match": 1.5,
+          "favorite_top_scorer_goals": 33,
+          "underdog_top_scorer_goals": 10,
+          "stance": "The favorite is clearer than Korea was, but recent scoring/concession data says the match can stay live late.",
+          "signals": [
+            "United States is the model favorite at 55%, but draw plus Paraguay still totals 45%.",
+            "Source-score gap is 0.308; under roughly 0.32, treat the match as materially more mixed than a high-favorite game.",
+            "Recent combined goal environment is 3.25 total goals per match.",
+            "United States conceded 1.88 per match recently; Paraguay scored 1.5 per match recently.",
+            "Official lineups are still pending, so this pattern layer should be re-run when starters and formations are confirmed."
+          ]
+        },
+        "not_included_yet": [
+          "official starting XI",
+          "official live match-centre status",
+          "club-level xG/xA and minutes load",
+          "verified late injury or weather changes"
+        ]
+      },
+      "uncertaintyBand": 9,
+      "inputScores": {
+        "home": {
+          "venue": 1,
+          "form": 0.539
+        },
+        "away": {
+          "venue": 0,
+          "form": 0.557
+        },
+        "draw_adjustment": 0.005
+      }
     }
   ],
   "sources": [
     {
       "label": "FIFA calendar API",
       "url": "https://api.fifa.com/api/v3/calendar/matches?IdCompetition=17&IdSeason=285023&language=en&count=500",
-      "use": "Official match schedule, status, score, venue, referee, tactics when exposed."
+      "use": "Official source used to identify today's Eastern-time fixtures, kickoff timestamps, match IDs, venue names, teams, and referee assignments.",
+      "status": "Refreshed Jun 12, 2026 at 5:50 PM ET; Match 3 Canada vs Bosnia and Herzegovina is logged 1-1 final at 97 minutes with 4-4-2 tactics visible for both sides. Match 4 USA vs Paraguay remains pre-match for 9:00 PM ET with no score or tactics exposed yet."
     },
     {
-      "label": "FIFA match centre Canada vs Bosnia",
+      "label": "June 11 Mexico path check",
+      "url": "https://www.theguardian.com/football/live/2026/jun/11/mexico-v-south-africa-world-cup-2026-opening-match-live",
+      "use": "Secondary live report used to interpret the controlled-favorite path: early Mexico goal, second goal, and South Africa discipline collapse.",
+      "status": "Pattern-calibration source only; official score remains FIFA calendar API."
+    },
+    {
+      "label": "June 11 Korea path check",
+      "url": "https://www.theguardian.com/football/live/2026/jun/12/fifa-world-cup-2026-live-south-korea-v-czechia-updates-kor-vs-cze-group-a-match-score-latest",
+      "use": "Secondary live report used to interpret the mixed-profile path: Czechia first goal, Korea equalizer, and late Korea winner.",
+      "status": "Pattern-calibration source only; official score remains FIFA calendar API."
+    },
+    {
+      "label": "FIFA match centre",
       "url": "https://www.fifa.com/en/match-centre/match/17/285023/289273/400021449",
-      "use": "Official match page for Canada vs Bosnia and Herzegovina."
+      "use": "Official match page for Canada vs Bosnia and Herzegovina; lineup/result status outranks all secondary sources.",
+      "status": "Pre-match source lane; official starting XI not exposed in accessible data yet."
     },
     {
-      "label": "FIFA match centre USA vs Paraguay",
+      "label": "FIFA match centre",
       "url": "https://www.fifa.com/en/match-centre/match/17/285023/289273/400021458",
-      "use": "Official match page for United States vs Paraguay."
+      "use": "Official match page for USA vs Paraguay; lineup/result status outranks all secondary sources.",
+      "status": "Pre-match source lane; official starting XI not exposed in accessible data yet."
     },
     {
-      "label": "Source-backed model seed",
+      "label": "Group B fixtures",
+      "url": "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_B",
+      "use": "Group composition, FIFA ranking snapshot, Canada vs Bosnia kickoff, venue, referee, and no-prior-meeting note.",
+      "status": "Secondary, source-linked schedule and context check."
+    },
+    {
+      "label": "Group D fixtures",
+      "url": "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_D",
+      "use": "Group composition, FIFA ranking snapshot, USA vs Paraguay kickoff, venue, referee, and head-to-head note.",
+      "status": "Secondary, source-linked schedule and context check."
+    },
+    {
+      "label": "Canada recent results",
+      "url": "https://en.wikipedia.org/wiki/Canada_men%27s_national_soccer_team_results_%282020%E2%80%93present%29",
+      "use": "Source-backed last-eight form rows for Canada; feeds the model form lane and final HTML history section.",
+      "status": "Public results page checked for the last eight matches before the Bosnia and Herzegovina opener."
+    },
+    {
+      "label": "Bosnia and Herzegovina recent results",
+      "url": "https://en.wikipedia.org/wiki/Bosnia_and_Herzegovina_national_football_team_results_%282020%E2%80%93present%29",
+      "use": "Source-backed last-eight form rows for Bosnia and Herzegovina; feeds the model form lane and final HTML history section.",
+      "status": "Public results page checked for the last eight matches before the Canada opener; penalty wins are counted as draws for regulation-time form."
+    },
+    {
+      "label": "United States recent results",
+      "url": "https://en.wikipedia.org/wiki/United_States_men%27s_national_soccer_team_results_%282020%E2%80%93present%29",
+      "use": "Source-backed last-eight form rows for the United States; feeds the model form lane and final HTML history section.",
+      "status": "Public results page checked for the last eight matches before the Paraguay opener."
+    },
+    {
+      "label": "Paraguay recent results",
+      "url": "https://en.wikipedia.org/wiki/Paraguay_national_football_team_results_%282020%E2%80%93present%29",
+      "use": "Source-backed last-eight form rows for Paraguay; feeds the model form lane and final HTML history section.",
+      "status": "Public results page checked for the last eight matches before the United States opener."
+    },
+    {
+      "label": "Final squads",
       "url": "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_squads",
-      "use": "Public squad table seed for caps, goals, and player layer."
+      "use": "Downloaded and parsed for player caps, goals, clubs, squad sizes, and top-scorer layers.",
+      "status": "Secondary, source-linked squad layer."
+    },
+    {
+      "label": "World Football Elo",
+      "url": "https://www.eloratings.net/",
+      "use": "Next strength prior to refresh; not pulled into this local v0 probability file yet.",
+      "status": "Public rating system; listed as a future calibration lane."
+    },
+    {
+      "label": "FIFA player tracking and AI avatars reporting",
+      "url": "https://www.theguardian.com/football/2026/jan/07/world-cup-players-to-have-lifelike-ai-avatars-for-use-in-var-offside-decisions",
+      "use": "Public reporting says FIFA tracking and AI avatar systems support VAR and broadcast explainers. This is not an open public live player GPS feed."
+    },
+    {
+      "label": "Broadcast computer vision tracking validation",
+      "url": "https://arxiv.org/abs/2508.19477",
+      "use": "Research benchmark for deriving player position, speed, and distance from broadcast footage. Useful for roadmap context, not a live source for this site."
+    },
+    {
+      "label": "World Cup camera, sensor, and smart ball coverage",
+      "url": "https://www.wired.com/story/world-cup-tech-helping-eliminate-bad-calls-var-sensors-3d-body-scans/",
+      "use": "Public reporting on camera, sensor, and smart ball systems. The available article does not expose a public API for live betting models."
     }
   ]
 }
