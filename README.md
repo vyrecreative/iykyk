@@ -6,9 +6,9 @@ CupEdge Match Signals is a standalone World Cup 2026 matchday probability site. 
 
 - `/api/matchday` fetches the official FIFA calendar API at request time and merges it with the source-backed model seed.
 - `/api/cron/daily-refresh` is scheduled daily at `12:00 UTC`, which is `8:00 AM ET` during June daylight time. It checks official schedule and roster/source status.
-- `/api/cron/match-window-refresh` is scheduled every 15 minutes. The endpoint identifies whether any match is within 90 minutes before kickoff through 150 minutes after kickoff and reports active windows.
+- `/api/cron/match-window-refresh` identifies whether any match is within 90 minutes before kickoff through 150 minutes after kickoff and reports active windows.
+- The public page polls `/api/matchday` every 15 minutes during active match windows. True background 15-minute cron requires a Vercel plan that allows sub-daily cron frequency.
 - Vercel Cron Jobs run only in production deployments.
-- The 15-minute cron requires a Vercel plan that allows sub-hourly cron frequency.
 
 ## Required Environment Variable
 

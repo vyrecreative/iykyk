@@ -5,10 +5,6 @@
     {
       "path": "/api/cron/daily-refresh",
       "schedule": "0 12 * * *"
-    },
-    {
-      "path": "/api/cron/match-window-refresh",
-      "schedule": "*/15 * * * *"
     }
   ],
   "headers": [
