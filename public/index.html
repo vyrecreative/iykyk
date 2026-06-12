@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CupEdge Match Signals</title>
+  <style>
+    :root {
+      --ink: #18251d;
+      --muted: #657269;
+      --line: #dfe9e2;
+      --paper: #fbfcf8;
+      --panel: #ffffff;
+      --green: #1f7a4c;
+      --green-dark: #135934;
+      --blue: #285f8f;
+      --gold: #c5952e;
+      --red: #b84b3f;
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+    a { color: inherit; }
+    .shell { width: min(1180px, calc(100% - 28px)); margin: 0 auto; padding: 18px 0 44px; }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+      min-height: 420px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--panel);
+    }
+    .hero-copy { padding: 28px; display: grid; align-content: center; gap: 16px; }
+    .eyebrow { display: inline-flex; width: fit-content; align-items: center; gap: 8px; color: var(--green-dark); font-size: 12px; font-weight: 900; text-transform: uppercase; }
+    .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--green); }
+    h1 { margin: 0; max-width: 680px; font-size: clamp(34px, 6vw, 68px); line-height: 0.95; letter-spacing: 0; }
+    .subtitle { max-width: 720px; color: var(--muted); font-size: 16px; line-height: 1.55; margin: 0; }
+    .hero-visual {
+      min-height: 360px;
+      background: #143a2a url("cupedge-hero.png") center / cover no-repeat;
+      border-left: 1px solid var(--line);
+    }
+    .hero-actions, .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .button, .chip, .status-pill {
+      display: inline-flex;
+      min-height: 36px;
+      align-items: center;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+    .button { background: var(--ink); color: #fff; }
+    .chip { color: var(--green-dark); background: #e5f2e9; border: 1px solid #cce5d4; }
+    .status-pill { width: fit-content; color: #785606; background: #fbefd0; border: 1px solid #efd48d; }
+    .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; margin-top: 14px; }
+    .panel, .match-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 16px;
+    }
+    .span-12 { grid-column: span 12; }
+    .span-7 { grid-column: span 7; }
+    .span-5 { grid-column: span 5; }
+    .panel-head, .match-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+    h2, h3, p { margin: 0; }
+    h2 { font-size: 20px; line-height: 1.1; }
+    h3 { font-size: 15px; line-height: 1.2; }
+    .small, li { color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .tag {
+      display: inline-flex;
+      width: fit-content;
+      min-height: 28px;
+      align-items: center;
+      padding: 6px 9px;
+      border-radius: 999px;
+      color: var(--green-dark);
+      background: #e3f3e9;
+      border: 1px solid #cae8d5;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      overflow-wrap: anywhere;
+    }
+    .match-list { display: grid; gap: 14px; }
+    .prob-bar {
+      display: flex;
+      overflow: hidden;
+      min-height: 62px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: #eef5ef;
+      margin-top: 12px;
+    }
+    .prob-segment { display: grid; place-items: center; min-width: 60px; color: #fff; text-align: center; padding: 8px 4px; }
+    .home { background: var(--green); }
+    .draw { background: var(--blue); }
+    .away { background: var(--gold); }
+    .prob-segment strong { display: block; font-size: 20px; line-height: 1; }
+    .prob-segment span { display: block; margin-top: 4px; font-size: 10px; font-weight: 900; text-transform: uppercase; }
+    .metric-grid, .pattern-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .metric, .pattern-grid div {
+      min-height: 78px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfcfa;
+      padding: 10px;
+    }
+    .metric b, .pattern-grid b { display: block; font-size: 22px; line-height: 1; }
+    .metric span, .pattern-grid span { display: block; margin-top: 7px; color: var(--muted); font-size: 11px; line-height: 1.25; font-weight: 900; text-transform: uppercase; overflow-wrap: anywhere; }
+    .driver-list { margin: 12px 0 0; padding-left: 18px; }
+    .source-grid { display: grid; gap: 10px; }
+    .source-item { border: 1px solid var(--line); border-radius: var(--radius); background: #fbfcfa; padding: 12px; }
+    .source-item a { overflow-wrap: anywhere; }
+    .live-note { display: grid; gap: 8px; }
+    .fineprint { color: var(--muted); font-size: 12px; line-height: 1.45; margin-top: 10px; }
+    .warn { color: #785606; background: #fff8e8; border-color: #efd48d; }
+
+    @media (max-width: 860px) {
+      .hero, .grid { grid-template-columns: 1fr; }
+      .span-12, .span-7, .span-5 { grid-column: auto; }
+      .hero-visual { min-height: 220px; border-left: 0; border-top: 1px solid var(--line); }
+      .metric-grid, .pattern-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 20px, 1180px); padding-top: 10px; }
+      .hero-copy, .panel, .match-card { padding: 14px; }
+      .match-head, .panel-head { display: grid; }
+      .metric-grid, .pattern-grid { grid-template-columns: 1fr; }
+      .prob-bar { display: grid; overflow: visible; }
+      .prob-segment { width: 100% !important; min-height: 54px; grid-template-columns: 58px minmax(0, 1fr); place-items: center start; justify-items: start; padding: 10px 12px; text-align: left; }
+      .prob-segment span { margin-top: 0; font-size: 11px; line-height: 1.2; overflow-wrap: anywhere; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="dot"></span> CupEdge Match Signals</div>
+        <h1>World Cup betting signals built from public match data.</h1>
+        <p class="subtitle">A source-backed matchday board for win, draw, loss probability, pattern risk, lineup readiness, and FIFA status checks. Analysis only. Not betting advice.</p>
+        <div class="hero-actions">
+          <a class="button" href="#matches">Today’s boards</a>
+          <a class="button" href="#refresh">Refresh logic</a>
+          <a class="button" href="#sources">Sources</a>
+        </div>
+        <div class="chip-row">
+          <span class="chip">Timezone: Eastern</span>
+          <span class="chip">Match window: 15 min checks</span>
+          <span class="chip">Roster watch: daily source check</span>
+        </div>
+      </div>
+      <div class="hero-visual" role="img" aria-label="Stylized football pitch with match signal lines"></div>
+    </section>
+
+    <section class="grid" id="refresh">
+      <div class="panel span-7">
+        <div class="panel-head">
+          <div>
+            <h2>Live Source Status</h2>
+            <p class="small">The public site fetches official FIFA calendar status and merges it with the model seed.</p>
+          </div>
+          <span class="status-pill" id="source-mode">Loading</span>
+        </div>
+        <div class="live-note" id="live-note">
+          <p class="small">Checking source freshness...</p>
+        </div>
+      </div>
+      <div class="panel span-5">
+        <div class="panel-head">
+          <div>
+            <h2>Refresh Cadence</h2>
+            <p class="small">Daily roster/source check plus faster checks around kickoff.</p>
+          </div>
+          <span class="tag">Vercel cron</span>
+        </div>
+        <p class="small">Daily source watch runs at 12:00 UTC. The match-window endpoint is scheduled every 15 minutes and only treats a match as active from 90 minutes before kickoff through 150 minutes after kickoff.</p>
+        <p class="fineprint">Set `CRON_SECRET` in Vercel to activate protected cron endpoints.</p>
+      </div>
+    </section>
+
+    <section class="grid" id="matches">
+      <div class="panel span-12">
+        <div class="panel-head">
+          <div>
+            <h2>Today’s Match Boards</h2>
+            <p class="small">Probabilities come from the source-backed seed. Official status is checked live.</p>
+          </div>
+          <span class="tag" id="generated-at">Seed loaded</span>
+        </div>
+        <div class="match-list" id="match-list"></div>
+      </div>
+    </section>
+
+    <section class="grid" id="sources">
+      <div class="panel span-12">
+        <div class="panel-head">
+          <div>
+            <h2>Source Ledger</h2>
+            <p class="small">Official FIFA sources are preferred. Public probability widgets are comparison only.</p>
+          </div>
+          <span class="tag">source-backed</span>
+        </div>
+        <div class="source-grid" id="source-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const fallback = {
+      generatedAtEastern: "Seed fallback",
+      liveSource: {
+        refreshMode: "Seed fallback. Live API unavailable in this view.",
+        sourceError: null,
+        officialMatchCount: 0,
+        activeWindows: []
+      },
+      matches: [
+        {
+          id: "can-bih",
+          group: "Group B",
+          home: "Canada",
+          away: "Bosnia and Herzegovina",
+          homeShort: "CAN",
+          awayShort: "BIH",
+          kickoffLabel: "3:00 PM ET",
+          venue: "BMO Field / Toronto Stadium, Toronto",
+          model: { home: 52, draw: 26, away: 22 },
+          pattern: { label: "Korea-style mixed lane", nonFavoriteShare: 48, drawPressureIndex: 59, lateGoalIndex: 38, stance: "Canada has the edge, but draw plus Bosnia and Herzegovina is high enough that first-goal and comeback paths matter." },
+          readiness: "Pre-match baseline. Official lineups pending.",
+          drivers: ["Canada grades stronger on FIFA rank and host venue context.", "Bosnia and Herzegovina narrows the model through recent form and squad goal depth."]
+        },
+        {
+          id: "usa-par",
+          group: "Group D",
+          home: "United States",
+          away: "Paraguay",
+          homeShort: "USA",
+          awayShort: "PAR",
+          kickoffLabel: "9:00 PM ET",
+          venue: "SoFi Stadium / Los Angeles Stadium, Inglewood",
+          model: { home: 55, draw: 25, away: 20 },
+          pattern: { label: "Favorite edge with late-goal risk", nonFavoriteShare: 45, drawPressureIndex: 44, lateGoalIndex: 69, stance: "The United States is the clearer favorite, but recent scoring and concession data says the match can stay live late." },
+          readiness: "Pre-match baseline. Official lineups pending.",
+          drivers: ["The United States grades stronger on FIFA rank, host venue context, average caps, and squad goal depth.", "Paraguay recent form keeps the away outcome alive."]
+        }
+      ],
+      sources: [
+        {
+          label: "FIFA calendar API",
+          url: "https://api.fifa.com/api/v3/calendar/matches?IdCompetition=17&IdSeason=285023&language=en&count=500",
+          use: "Official match schedule, status, score, venue, referee, tactics when exposed."
+        },
+        {
+          label: "FIFA match centre Canada vs Bosnia",
+          url: "https://www.fifa.com/en/match-centre/match/17/285023/289273/400021449",
+          use: "Official match page for Canada vs Bosnia and Herzegovina."
+        },
+        {
+          label: "FIFA match centre USA vs Paraguay",
+          url: "https://www.fifa.com/en/match-centre/match/17/285023/289273/400021458",
+          use: "Official match page for United States vs Paraguay."
+        }
+      ]
+    };
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function scoreText(match) {
+      const official = match.official || {};
+      if (official.homeScore === null || official.homeScore === undefined) {
+        return "Pre-match";
+      }
+      return `${official.homeScore}-${official.awayScore}`;
+    }
+
+    function renderMatches(matches) {
+      const root = document.getElementById("match-list");
+      root.innerHTML = matches.map((match) => `
+        <article class="match-card">
+          <div class="match-head">
+            <div>
+              <span class="tag">${escapeHtml(match.group)}</span>
+              <h2>${escapeHtml(match.home)} vs ${escapeHtml(match.away)}</h2>
+              <p class="small">${escapeHtml(match.venue)} · ${escapeHtml(match.kickoffLabel)} · ${escapeHtml(scoreText(match))}</p>
+            </div>
+            <span class="status-pill">${escapeHtml(match.readiness)}</span>
+          </div>
+          <div class="prob-bar" aria-label="${escapeHtml(match.home)} ${match.model.home} percent, draw ${match.model.draw} percent, ${escapeHtml(match.away)} ${match.model.away} percent">
+            <div class="prob-segment home" style="width:${match.model.home}%"><strong>${match.model.home}%</strong><span>${escapeHtml(match.home)}</span></div>
+            <div class="prob-segment draw" style="width:${match.model.draw}%"><strong>${match.model.draw}%</strong><span>Draw</span></div>
+            <div class="prob-segment away" style="width:${match.model.away}%"><strong>${match.model.away}%</strong><span>${escapeHtml(match.away)}</span></div>
+          </div>
+          <div class="metric-grid">
+            <div class="metric"><b>${match.pattern.nonFavoriteShare}%</b><span>Draw plus underdog</span></div>
+            <div class="metric"><b>${match.pattern.drawPressureIndex}</b><span>Draw pressure</span></div>
+            <div class="metric"><b>${match.pattern.lateGoalIndex}</b><span>Late-goal risk</span></div>
+            <div class="metric"><b>${escapeHtml(match.pattern.label)}</b><span>Pattern lane</span></div>
+          </div>
+          <div class="pattern-grid">
+            <div><b>${escapeHtml(match.official && match.official.officialLineupStatus ? "FIFA" : "Pending")}</b><span>${escapeHtml(match.official && match.official.officialLineupStatus ? match.official.officialLineupStatus : "Official lineup fields pending")}</span></div>
+            <div><b>${escapeHtml(match.official && match.official.matchTime ? match.official.matchTime : "0'")}</b><span>Official match time field</span></div>
+            <div><b>${escapeHtml(match.official && match.official.homeTactics ? match.official.homeTactics : "Pending")}</b><span>${escapeHtml(match.home)} tactics</span></div>
+            <div><b>${escapeHtml(match.official && match.official.awayTactics ? match.official.awayTactics : "Pending")}</b><span>${escapeHtml(match.away)} tactics</span></div>
+          </div>
+          <p class="small" style="margin-top:12px">${escapeHtml(match.pattern.stance)}</p>
+          <ul class="driver-list">
+            ${(match.drivers || []).map((driver) => `<li>${escapeHtml(driver)}</li>`).join("")}
+          </ul>
+        </article>
+      `).join("");
+    }
+
+    function renderSources(sources) {
+      const root = document.getElementById("source-list");
+      root.innerHTML = (sources || fallback.sources).map((source) => `
+        <div class="source-item">
+          <h3><a href="${escapeHtml(source.url)}">${escapeHtml(source.label)}</a></h3>
+          <p class="small">${escapeHtml(source.use)}</p>
+        </div>
+      `).join("");
+    }
+
+    function renderStatus(payload) {
+      const source = payload.liveSource || fallback.liveSource;
+      document.getElementById("generated-at").textContent = payload.generatedAtEastern || "Seed fallback";
+      document.getElementById("source-mode").textContent = source.activeWindows && source.activeWindows.length ? "Match window" : "Daily watch";
+      document.getElementById("live-note").innerHTML = `
+        <p class="small"><b>Checked:</b> ${escapeHtml(source.checkedAtEastern || payload.generatedAtEastern || "Seed fallback")}</p>
+        <p class="small"><b>Mode:</b> ${escapeHtml(source.refreshMode || "Seed fallback")}</p>
+        <p class="small"><b>Official matches found today:</b> ${escapeHtml(source.officialMatchCount ?? 0)}</p>
+        ${source.sourceError ? `<p class="small warn"><b>Source warning:</b> ${escapeHtml(source.sourceError)}</p>` : ""}
+      `;
+    }
+
+    async function load() {
+      let payload = fallback;
+      try {
+        const response = await fetch("/api/matchday", { headers: { accept: "application/json" } });
+        if (response.ok) {
+          payload = await response.json();
+        }
+      } catch (error) {
+        payload.liveSource.sourceError = error.message;
+      }
+      renderStatus(payload);
+      renderMatches(payload.matches || fallback.matches);
+      renderSources(payload.sources || fallback.sources);
+      const active = payload.liveSource && payload.liveSource.activeWindows && payload.liveSource.activeWindows.length > 0;
+      window.setTimeout(load, active ? 15 * 60 * 1000 : 60 * 60 * 1000);
+    }
+
+    load();
+  </script>
+</body>
+</html>
