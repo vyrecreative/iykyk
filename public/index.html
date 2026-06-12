@@ -6,376 +6,738 @@
   <title>CupEdge Match Signals</title>
   <style>
     :root {
-      --ink: #18251d;
-      --muted: #657269;
-      --line: #dfe9e2;
-      --paper: #fbfcf8;
+      --bg: #f5f7f2;
+      --ink: #18211f;
+      --muted: #61716d;
+      --line: #d7ded8;
       --panel: #ffffff;
-      --green: #1f7a4c;
-      --green-dark: #135934;
-      --blue: #285f8f;
-      --gold: #c5952e;
-      --red: #b84b3f;
+      --green: #0f6b43;
+      --green-dark: #143f32;
+      --blue: #276b8f;
+      --gold: #d59c16;
+      --red: #b23a48;
+      --soft: #edf4ef;
+      --shadow: 0 18px 55px rgba(20, 36, 32, 0.12);
       --radius: 8px;
+      --mono: "SFMono-Regular", "Roboto Mono", Consolas, monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
+      min-height: 100vh;
       color: var(--ink);
-      background: var(--paper);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: var(--sans);
       letter-spacing: 0;
+      background:
+        linear-gradient(90deg, rgba(15, 107, 67, 0.055) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(15, 107, 67, 0.045) 1px, transparent 1px),
+        var(--bg);
+      background-size: 34px 34px, 34px 34px, auto;
     }
     a { color: inherit; }
-    .shell { width: min(1180px, calc(100% - 28px)); margin: 0 auto; padding: 18px 0 44px; }
+    h1, h2, h3, h4, p { margin: 0; }
+    button, select { font: inherit; }
+    .shell { width: min(1220px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 46px; }
     .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-      min-height: 420px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
+      position: relative;
       overflow: hidden;
-      background: var(--panel);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 28px;
+      min-height: 400px;
+      padding: clamp(22px, 4vw, 44px);
+      color: #f7fff8;
+      background: linear-gradient(120deg, rgba(20, 63, 50, 0.98), rgba(12, 32, 29, 0.96));
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
     }
-    .hero-copy { padding: 28px; display: grid; align-content: center; gap: 16px; }
-    .eyebrow { display: inline-flex; width: fit-content; align-items: center; gap: 8px; color: var(--green-dark); font-size: 12px; font-weight: 900; text-transform: uppercase; }
-    .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--green); }
-    h1 { margin: 0; max-width: 680px; font-size: clamp(34px, 6vw, 68px); line-height: 0.95; letter-spacing: 0; }
-    .subtitle { max-width: 720px; color: var(--muted); font-size: 16px; line-height: 1.55; margin: 0; }
-    .hero-visual {
-      min-height: 360px;
-      background: #143a2a url("cupedge-hero.png") center / cover no-repeat;
-      border-left: 1px solid var(--line);
+    .hero:after {
+      content: "";
+      position: absolute;
+      right: -180px;
+      bottom: -190px;
+      width: 620px;
+      height: 420px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 50%;
+      transform: rotate(-12deg);
     }
-    .hero-actions, .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
-    .button, .chip, .status-pill {
+    .hero > * { position: relative; z-index: 1; }
+    .eyebrow {
       display: inline-flex;
-      min-height: 36px;
+      gap: 8px;
       align-items: center;
+      width: fit-content;
+      padding: 7px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
       border-radius: 999px;
-      padding: 8px 12px;
       font-size: 12px;
       font-weight: 900;
       text-transform: uppercase;
-      text-decoration: none;
     }
-    .button { background: var(--ink); color: #fff; }
-    .chip { color: var(--green-dark); background: #e5f2e9; border: 1px solid #cce5d4; }
-    .status-pill { width: fit-content; color: #785606; background: #fbefd0; border: 1px solid #efd48d; }
-    .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; margin-top: 14px; }
-    .panel, .match-card {
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--panel);
-      padding: 16px;
-    }
-    .span-12 { grid-column: span 12; }
-    .span-7 { grid-column: span 7; }
-    .span-5 { grid-column: span 5; }
-    .panel-head, .match-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
-    h2, h3, p { margin: 0; }
-    h2 { font-size: 20px; line-height: 1.1; }
-    h3 { font-size: 15px; line-height: 1.2; }
-    .small, li { color: var(--muted); font-size: 13px; line-height: 1.45; }
-    .tag {
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #68d391; box-shadow: 0 0 0 5px rgba(104, 211, 145, 0.14); }
+    h1 { max-width: 820px; margin-top: 18px; font-size: clamp(40px, 7vw, 78px); line-height: 0.98; letter-spacing: 0; }
+    .subtitle { max-width: 780px; margin-top: 18px; color: #d6e6dd; font-size: clamp(16px, 2vw, 20px); line-height: 1.5; }
+    .hero-actions, .chip-row, .control-row, .tab-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .hero-actions, .chip-row { margin-top: 22px; }
+    .button, .chip, .tab-button, .toggle-button {
+      min-height: 38px;
       display: inline-flex;
-      width: fit-content;
-      min-height: 28px;
       align-items: center;
-      padding: 6px 9px;
-      border-radius: 999px;
-      color: var(--green-dark);
-      background: #e3f3e9;
-      border: 1px solid #cae8d5;
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      overflow-wrap: anywhere;
-    }
-    .match-list { display: grid; gap: 14px; }
-    .prob-bar {
-      display: flex;
-      overflow: hidden;
-      min-height: 62px;
+      justify-content: center;
+      padding: 9px 12px;
       border-radius: var(--radius);
-      border: 1px solid var(--line);
-      background: #eef5ef;
-      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 900;
+      text-decoration: none;
+      line-height: 1;
+      cursor: pointer;
     }
-    .prob-segment { display: grid; place-items: center; min-width: 60px; color: #fff; text-align: center; padding: 8px 4px; }
-    .home { background: var(--green); }
-    .draw { background: var(--blue); }
-    .away { background: var(--gold); }
+    .button { color: #10231b; background: #fff; border: 1px solid rgba(255, 255, 255, 0.75); }
+    .chip { color: #dcefe6; background: rgba(255, 255, 255, 0.09); border: 1px solid rgba(255, 255, 255, 0.18); }
+    .refresh-card {
+      position: relative;
+      z-index: 1;
+      align-self: stretch;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: var(--radius);
+      padding: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .status-pill { width: fit-content; color: #0f3b2b; background: #dff4e8; border: 1px solid #bfe5ce; border-radius: 999px; padding: 7px 10px; font-size: 12px; font-weight: 900; }
+    .status-pill.warn { color: #785606; background: #fbefd0; border-color: #efd48d; }
+    .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .time-box { min-height: 82px; display: grid; place-items: center; text-align: center; padding: 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--soft); }
+    .time-box strong { display: block; font-size: 22px; line-height: 1; }
+    .time-box span { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; font-weight: 900; text-transform: uppercase; }
+    .small { color: var(--muted); margin-top: 5px; font-size: 13px; line-height: 1.45; }
+    .section { margin-top: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px; }
+    .span-4 { grid-column: span 4; }
+    .span-5 { grid-column: span 5; }
+    .span-6 { grid-column: span 6; }
+    .span-7 { grid-column: span 7; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+    .panel, .match-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 32px rgba(20, 36, 32, 0.06);
+      padding: 18px;
+      min-width: 0;
+    }
+    .panel-header, .match-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
+    .tag { display: inline-flex; width: fit-content; min-height: 28px; align-items: center; padding: 6px 9px; border-radius: 999px; color: var(--green-dark); background: #e3f3e9; border: 1px solid #cae8d5; font-size: 11px; font-weight: 900; line-height: 1.2; text-align: center; text-transform: uppercase; overflow-wrap: anywhere; }
+    .tag.warn { color: #785606; background: #fbefd0; border-color: #efd48d; }
+    .readiness { max-width: 260px; color: #785606; background: #fbefd0; border: 1px solid #efd48d; border-radius: var(--radius); padding: 10px; font-size: 12px; font-weight: 900; line-height: 1.35; }
+    .tab-button, .toggle-button { color: var(--green-dark); background: #f5faf6; border: 1px solid var(--line); }
+    .tab-button.active, .toggle-button.active { color: #fff; background: var(--green-dark); border-color: var(--green-dark); }
+    .tab-row { margin-top: 12px; }
+    .prob-bar { display: flex; overflow: hidden; min-height: 62px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--soft); }
+    .prob-segment { display: grid; place-items: center; min-width: 58px; color: #fff; text-align: center; padding: 8px 4px; }
+    .prob-segment.home { background: var(--green); }
+    .prob-segment.draw { background: var(--blue); }
+    .prob-segment.away { background: var(--gold); }
     .prob-segment strong { display: block; font-size: 20px; line-height: 1; }
     .prob-segment span { display: block; margin-top: 4px; font-size: 10px; font-weight: 900; text-transform: uppercase; }
-    .metric-grid, .pattern-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 12px;
-    }
-    .metric, .pattern-grid div {
-      min-height: 78px;
-      border: 1px solid var(--line);
+    .model-strip, .metric-grid, .pattern-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+    .model-strip div, .metric, .pattern-grid div { min-height: 74px; padding: 11px; border: 1px solid var(--line); border-radius: var(--radius); background: #f8fbf7; min-width: 0; }
+    .model-strip b, .metric b, .pattern-grid b { display: block; font-size: 20px; line-height: 1.05; overflow-wrap: anywhere; }
+    .model-strip span, .metric span, .pattern-grid span { display: block; margin-top: 6px; color: var(--muted); font-size: 11px; line-height: 1.3; text-transform: uppercase; font-weight: 900; overflow-wrap: anywhere; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .subpanel { border: 1px solid var(--line); border-radius: var(--radius); background: #fbfcfa; padding: 13px; min-width: 0; }
+    .subpanel p, li { color: var(--muted); font-size: 13px; line-height: 1.45; margin-top: 7px; overflow-wrap: anywhere; }
+    .result-panel { margin-top: 12px; border-color: #cfe5d9; background: #f3fbf6; }
+    .result-score { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 12px; align-items: center; margin: 10px 0; }
+    .result-score b { overflow-wrap: anywhere; }
+    .result-score b:last-child { text-align: right; }
+    .result-score strong { display: inline-flex; min-width: 86px; min-height: 44px; align-items: center; justify-content: center; border-radius: var(--radius); background: var(--ink); color: #fff; font-size: 22px; }
+    ul { margin: 6px 0 0; padding-left: 18px; }
+    .form-grid, .player-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+    .form-card, .player-card { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; padding: 12px; }
+    .form-title { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .form-title h4 { margin: 0; font-size: 16px; line-height: 1.2; }
+    .form-title span { color: var(--muted); font-size: 12px; font-weight: 900; line-height: 1.3; text-align: right; }
+    .form-strip { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .result-pill { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 999px; color: #fff; font-size: 12px; font-weight: 900; }
+    .result-pill.w { background: var(--green); }
+    .result-pill.d { background: var(--blue); }
+    .result-pill.l { background: var(--red); }
+    .form-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+    .form-stats div { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); background: #f8fbf7; padding: 9px; }
+    .form-stats b { display: block; font-size: 16px; }
+    .form-stats span { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; font-weight: 900; line-height: 1.25; text-transform: uppercase; }
+    .match-list { display: grid; gap: 6px; margin-top: 10px; }
+    .match-row { display: grid; grid-template-columns: 86px minmax(0, 1fr) 50px; gap: 8px; align-items: center; min-height: 42px; padding: 7px 8px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbfcfa; }
+    .match-row span { min-width: 0; overflow-wrap: anywhere; }
+    .match-row b { font-size: 13px; }
+    .match-row small { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; line-height: 1.25; }
+    .match-date, .match-score { color: var(--muted); font-size: 11px; font-weight: 900; text-transform: uppercase; }
+    .match-score { color: var(--ink); text-align: right; }
+    .source-list { display: grid; gap: 10px; }
+    .source-item { display: grid; grid-template-columns: minmax(112px, 170px) minmax(0, 1fr); align-items: start; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbfcfa; }
+    .source-item h3, .source-item a { overflow-wrap: anywhere; }
+    .source-item p { color: var(--muted); font-size: 13px; line-height: 1.55; margin-top: 4px; overflow-wrap: anywhere; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; border-bottom: 1px solid var(--line); padding: 10px 8px; vertical-align: top; }
+    th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0; }
+    .fineprint { color: var(--muted); font-size: 12px; line-height: 1.5; margin-top: 14px; }
+    .pitch-wrap { display: grid; gap: 10px; margin-top: 12px; }
+    .pitch {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 105 / 68;
+      min-height: 320px;
+      border: 2px solid rgba(255, 255, 255, 0.86);
       border-radius: var(--radius);
-      background: #fbfcfa;
-      padding: 10px;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.06) 50%),
+        linear-gradient(0deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        #17613f;
+      background-size: 50% 100%, 100% 16.66%, auto;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
     }
-    .metric b, .pattern-grid b { display: block; font-size: 22px; line-height: 1; }
-    .metric span, .pattern-grid span { display: block; margin-top: 7px; color: var(--muted); font-size: 11px; line-height: 1.25; font-weight: 900; text-transform: uppercase; overflow-wrap: anywhere; }
-    .driver-list { margin: 12px 0 0; padding-left: 18px; }
-    .source-grid { display: grid; gap: 10px; }
-    .source-item { border: 1px solid var(--line); border-radius: var(--radius); background: #fbfcfa; padding: 12px; }
-    .source-item a { overflow-wrap: anywhere; }
-    .live-note { display: grid; gap: 8px; }
-    .fineprint { color: var(--muted); font-size: 12px; line-height: 1.45; margin-top: 10px; }
-    .warn { color: #785606; background: #fff8e8; border-color: #efd48d; }
-
-    @media (max-width: 860px) {
-      .hero, .grid { grid-template-columns: 1fr; }
-      .span-12, .span-7, .span-5 { grid-column: auto; }
-      .hero-visual { min-height: 220px; border-left: 0; border-top: 1px solid var(--line); }
-      .metric-grid, .pattern-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pitch:before {
+      content: "";
+      position: absolute;
+      inset: 9%;
+      border: 2px solid rgba(255, 255, 255, 0.76);
+      border-radius: 4px;
+      pointer-events: none;
     }
-    @media (max-width: 560px) {
-      .shell { width: min(100% - 20px, 1180px); padding-top: 10px; }
-      .hero-copy, .panel, .match-card { padding: 14px; }
-      .match-head, .panel-head { display: grid; }
-      .metric-grid, .pattern-grid { grid-template-columns: 1fr; }
-      .prob-bar { display: grid; overflow: visible; }
+    .pitch:after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 9%;
+      width: 2px;
+      height: 82%;
+      background: rgba(255, 255, 255, 0.72);
+      transform: translateX(-1px);
+      pointer-events: none;
+    }
+    .center-circle {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 18%;
+      aspect-ratio: 1;
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .box-left, .box-right {
+      position: absolute;
+      top: 30%;
+      width: 14%;
+      height: 40%;
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      pointer-events: none;
+    }
+    .box-left { left: 9%; border-left: 0; }
+    .box-right { right: 9%; border-right: 0; }
+    .heat-spot {
+      position: absolute;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+      background: radial-gradient(circle, rgba(255, 229, 112, 0.9) 0%, rgba(213, 156, 22, 0.42) 38%, rgba(178, 58, 72, 0.08) 70%, transparent 72%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .player-dot {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border: 2px solid var(--gold);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+    }
+    .player-dot.active { width: 17px; height: 17px; border-color: var(--red); }
+    .pitch-label {
+      position: absolute;
+      left: 12px;
+      bottom: 10px;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+    .field-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .field-legend div { min-height: 68px; padding: 10px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
+    .field-legend b { display: block; font-size: 18px; }
+    .field-legend span { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.3; font-weight: 900; text-transform: uppercase; }
+    select { min-height: 38px; max-width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius); color: var(--ink); background: #fff; font-weight: 800; }
+    @media (max-width: 960px) {
+      .hero, .grid, .split, .form-grid, .player-grid { grid-template-columns: 1fr; }
+      .span-4, .span-5, .span-6, .span-7, .span-8, .span-12 { grid-column: auto; }
+      .model-strip, .metric-grid, .pattern-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 20px, 1220px); padding-top: 10px; }
+      .hero, .panel, .match-card, .refresh-card { padding: 16px; }
+      .time-grid, .model-strip, .metric-grid, .pattern-grid, .form-stats, .field-legend { grid-template-columns: 1fr; }
+      .source-item, .match-head, .panel-header { grid-template-columns: 1fr; display: grid; }
+      .form-title { display: grid; }
+      .form-title span { text-align: left; }
+      .prob-bar { display: grid; overflow: visible; min-height: 0; }
       .prob-segment { width: 100% !important; min-height: 54px; grid-template-columns: 58px minmax(0, 1fr); place-items: center start; justify-items: start; padding: 10px 12px; text-align: left; }
+      .prob-segment strong { font-size: 18px; }
       .prob-segment span { margin-top: 0; font-size: 11px; line-height: 1.2; overflow-wrap: anywhere; }
+      .match-row { grid-template-columns: 72px minmax(0, 1fr) 44px; }
+      .readiness { max-width: none; }
+      table { table-layout: fixed; white-space: normal; }
+      th, td { overflow-wrap: anywhere; }
+      .pitch { width: 100%; min-height: 0; }
     }
   </style>
 </head>
 <body>
   <main class="shell">
     <section class="hero">
-      <div class="hero-copy">
+      <div>
         <div class="eyebrow"><span class="dot"></span> CupEdge Match Signals</div>
-        <h1>World Cup betting signals built from public match data.</h1>
-        <p class="subtitle">A source-backed matchday board for win, draw, loss probability, pattern risk, lineup readiness, and FIFA status checks. Analysis only. Not betting advice.</p>
+        <h1>World Cup probabilities with a live movement lens.</h1>
+        <p class="subtitle">A source-backed matchday hub for win, draw, loss probability, recent form, player averages, official readiness, and a field map that separates public evidence from private tracking data.</p>
         <div class="hero-actions">
-          <a class="button" href="#matches">Today’s boards</a>
-          <a class="button" href="#refresh">Refresh logic</a>
+          <a class="button" href="#matches">Match boards</a>
+          <a class="button" href="#movement">Movement map</a>
+          <a class="button" href="#players">Player layer</a>
           <a class="button" href="#sources">Sources</a>
         </div>
         <div class="chip-row">
           <span class="chip">Timezone: Eastern</span>
-          <span class="chip">Match window: 15 min checks</span>
-          <span class="chip">Roster watch: daily source check</span>
+          <span class="chip">Official first, secondary labeled</span>
+          <span class="chip">Private GPS never invented</span>
         </div>
       </div>
-      <div class="hero-visual" role="img" aria-label="Stylized football pitch with match signal lines"></div>
+      <aside class="refresh-card">
+        <span class="status-pill" id="source-mode">Loading</span>
+        <h2>Today&apos;s Windows</h2>
+        <p class="small" id="hero-note">Checking official matchday source state...</p>
+        <div class="time-grid" id="window-grid"></div>
+        <p class="fineprint" id="generated-at">Seed loading</p>
+      </aside>
     </section>
 
-    <section class="grid" id="refresh">
-      <div class="panel span-7">
-        <div class="panel-head">
+    <section class="section grid">
+      <article class="panel span-7">
+        <div class="panel-header">
           <div>
-            <h2>Live Source Status</h2>
-            <p class="small">The public site fetches official FIFA calendar status and merges it with the model seed.</p>
+            <h2>How The Data Helps</h2>
+            <p class="small">The default view shows probability quality, source readiness, and which inputs are still missing before kickoff.</p>
           </div>
-          <span class="status-pill" id="source-mode">Loading</span>
+          <span class="tag">decision logic</span>
         </div>
-        <div class="live-note" id="live-note">
-          <p class="small">Checking source freshness...</p>
-        </div>
-      </div>
-      <div class="panel span-5">
-        <div class="panel-head">
+        <div class="model-strip" id="quality-strip"></div>
+      </article>
+      <article class="panel span-5">
+        <div class="panel-header">
           <div>
-            <h2>Refresh Cadence</h2>
-            <p class="small">Daily roster/source check plus faster checks around kickoff.</p>
+            <h2>Tracking Reality</h2>
+            <p class="small">The player vest and optical tracking concept is real, but the live raw stream is not publicly exposed for this model.</p>
           </div>
-          <span class="tag">Vercel cron</span>
+          <span class="tag warn">source caveat</span>
         </div>
-        <p class="small">Daily source watch runs at 12:00 UTC. The match-window endpoint is scheduled every 15 minutes and only treats a match as active from 90 minutes before kickoff through 150 minutes after kickoff.</p>
-        <p class="fineprint">Set `CRON_SECRET` in Vercel to activate protected cron endpoints.</p>
-      </div>
+        <p class="small" id="tracking-summary"></p>
+      </article>
     </section>
 
-    <section class="grid" id="matches">
-      <div class="panel span-12">
-        <div class="panel-head">
-          <div>
-            <h2>Today’s Match Boards</h2>
-            <p class="small">Probabilities come from the source-backed seed. Official status is checked live.</p>
-          </div>
-          <span class="tag" id="generated-at">Seed loaded</span>
+    <section class="section panel" id="matches">
+      <div class="panel-header">
+        <div>
+          <h2>Today&apos;s Match Boards</h2>
+          <p class="small">Select a fixture to inspect probability, recent form, player averages, and movement pressure.</p>
         </div>
-        <div class="match-list" id="match-list"></div>
+        <span class="tag" id="match-count">0 matches</span>
       </div>
+      <div class="tab-row" id="match-tabs"></div>
+      <div id="match-board" class="section"></div>
     </section>
 
-    <section class="grid" id="sources">
-      <div class="panel span-12">
-        <div class="panel-head">
+    <section class="section grid" id="movement">
+      <article class="panel span-8">
+        <div class="panel-header">
           <div>
-            <h2>Source Ledger</h2>
-            <p class="small">Official FIFA sources are preferred. Public probability widgets are comparison only.</p>
+            <h2>Movement Intelligence Map</h2>
+            <p class="small">A field view of public movement proxies: role, scoring threat, recent goal environment, and model pressure.</p>
           </div>
-          <span class="tag">source-backed</span>
+          <span class="tag" id="movement-status">public proxy</span>
         </div>
-        <div class="source-grid" id="source-list"></div>
+        <div class="control-row">
+          <button class="toggle-button active" data-side="home" type="button" id="side-home">Home</button>
+          <button class="toggle-button" data-side="away" type="button" id="side-away">Away</button>
+          <button class="toggle-button active" data-phase="attack" type="button">Attack</button>
+          <button class="toggle-button" data-phase="build" type="button">Build</button>
+          <button class="toggle-button" data-phase="defense" type="button">Defense</button>
+          <select id="player-select" aria-label="Player focus"></select>
+        </div>
+        <div class="pitch-wrap">
+          <div class="pitch" id="pitch">
+            <span class="center-circle"></span>
+            <span class="box-left"></span>
+            <span class="box-right"></span>
+            <span class="pitch-label" id="pitch-label">Public movement proxy</span>
+          </div>
+          <div class="field-legend" id="field-legend"></div>
+        </div>
+      </article>
+      <article class="panel span-4" id="players">
+        <div class="panel-header">
+          <div>
+            <h2>Player Stat Layer</h2>
+            <p class="small">Squad averages, top scorers, and top caps from the source-backed seed.</p>
+          </div>
+          <span class="tag">roster lens</span>
+        </div>
+        <div id="player-panel"></div>
+      </article>
+    </section>
+
+    <section class="section grid">
+      <article class="panel span-7">
+        <div class="panel-header">
+          <div>
+            <h2>Recent Form</h2>
+            <p class="small">Last-eight match rows used in the model&apos;s form lane.</p>
+          </div>
+          <span class="tag">last matches</span>
+        </div>
+        <div id="recent-form"></div>
+      </article>
+      <article class="panel span-5">
+        <div class="panel-header">
+          <div>
+            <h2>Model Formula</h2>
+            <p class="small">Component weights and contributions from the public-data v0 model.</p>
+          </div>
+          <span class="tag">formula</span>
+        </div>
+        <div id="formula-panel"></div>
+      </article>
+    </section>
+
+    <section class="section panel" id="sources">
+      <div class="panel-header">
+        <div>
+          <h2>Source Ledger</h2>
+          <p class="small">Official FIFA sources control match status. Tracking research is included only to explain what is possible and what is not public.</p>
+        </div>
+        <span class="tag">source-backed</span>
       </div>
+      <div class="source-list" id="source-list"></div>
+      <p class="fineprint">Analysis only. This dashboard is not betting advice and does not guarantee outcomes.</p>
     </section>
   </main>
 
+  <script id="seed-data" type="application/json">{"siteName":"CupEdge Match Signals","timezone":"America/New_York","generatedAt":"2026-06-12T21:51:36Z","generatedAtEastern":"Jun 12, 2026 05:51 PM ET","refreshPolicy":{"dailyRosterCheckUtc":"12:00","dailyRosterCheckEasternJune":"8:00 AM ET","matchWindow":"90 minutes before kickoff through 150 minutes after kickoff","matchWindowCadence":"15 minutes in-page during active match windows","notes":["Daily refresh checks official FIFA calendar and squad source status.","Match-window refresh checks official status, score, tactics, and lineup exposure more aggressively.","Google probability widgets are comparison only, not model truth."]},"modelNote":"Public-data v0.4 model. Probabilities are generated from collected source inputs; recent-form scores are derived from source-backed last-eight rows, and Google probability widgets are not copied as model output.","refreshStrategy":{"cadence":"Every 30 minutes","lineup_window":"Roughly 75 to 60 minutes before kickoff; use visible official/team lineups first, then labeled secondary live-card or live-coverage lineups if official fields are inaccessible.","matchday_logic":"Identify today's fixtures in Eastern time and update only when source-backed changes are found."},"team_summaries":[{"team":"Canada","rank":30,"squad_size":26,"total_caps":953,"avg_caps":36.7,"total_goals":133,"avg_goals":5.1,"outfield_goals_per_player":5.8,"top_goals":[{"name":"Jonathan David","position":"FW","goals":39,"caps":77,"club":"Juventus"},{"name":"Cyle Larin","position":"FW","goals":30,"caps":90,"club":"Southampton"},{"name":"Alphonso Davies (captain)","position":"DF","goals":15,"caps":58,"club":"Bayern Munich"},{"name":"Jonathan Osorio","position":"MF","goals":10,"caps":90,"club":"Toronto FC"}],"top_caps":[{"name":"Cyle Larin","position":"FW","caps":90,"goals":30,"club":"Southampton"},{"name":"Jonathan Osorio","position":"MF","caps":90,"goals":10,"club":"Toronto FC"},{"name":"Jonathan David","position":"FW","caps":77,"goals":39,"club":"Juventus"}]},{"team":"Bosnia and Herzegovina","rank":64,"squad_size":26,"total_caps":591,"avg_caps":22.7,"total_goals":93,"avg_goals":3.6,"outfield_goals_per_player":4,"top_goals":[{"name":"Edin Džeko (captain)","position":"FW","goals":73,"caps":148,"club":"Schalke 04"},{"name":"Ermedin Demirović","position":"FW","goals":4,"caps":40,"club":"VfB Stuttgart"},{"name":"Haris Tabaković","position":"FW","goals":4,"caps":10,"club":"Borussia Mönchengladbach"},{"name":"Benjamin Tahirović","position":"MF","goals":2,"caps":28,"club":"Brøndby"}],"top_caps":[{"name":"Edin Džeko (captain)","position":"FW","caps":148,"goals":73,"club":"Schalke 04"},{"name":"Sead Kolašinac","position":"DF","caps":65,"goals":0,"club":"Atalanta"},{"name":"Ermedin Demirović","position":"FW","caps":40,"goals":4,"club":"VfB Stuttgart"}]},{"team":"United States","rank":17,"squad_size":26,"total_caps":962,"avg_caps":37,"total_goals":125,"avg_goals":4.8,"outfield_goals_per_player":5.4,"top_goals":[{"name":"Christian Pulisic","position":"FW","goals":33,"caps":86,"club":"Milan"},{"name":"Ricardo Pepi","position":"FW","goals":13,"caps":37,"club":"PSV Eindhoven"},{"name":"Weston McKennie","position":"MF","goals":12,"caps":66,"club":"Juventus"},{"name":"Brenden Aaronson","position":"FW","goals":9,"caps":58,"club":"Leeds United"}],"top_caps":[{"name":"Christian Pulisic","position":"FW","caps":86,"goals":33,"club":"Milan"},{"name":"Tim Ream (captain)","position":"DF","caps":82,"goals":1,"club":"Charlotte FC"},{"name":"Weston McKennie","position":"MF","caps":66,"goals":12,"club":"Juventus"}]},{"team":"Paraguay","rank":41,"squad_size":26,"total_caps":690,"avg_caps":26.5,"total_goals":53,"avg_goals":2,"outfield_goals_per_player":2.3,"top_goals":[{"name":"Miguel Almirón","position":"MF","goals":10,"caps":76,"club":"Atlanta United FC"},{"name":"Antonio Sanabria","position":"FW","goals":7,"caps":48,"club":"Cremonese"},{"name":"Kaku","position":"FW","goals":6,"caps":33,"club":"Al Ain"},{"name":"Gustavo Gómez (captain)","position":"DF","goals":4,"caps":89,"club":"Palmeiras"}],"top_caps":[{"name":"Gustavo Gómez (captain)","position":"DF","caps":89,"goals":4,"club":"Palmeiras"},{"name":"Miguel Almirón","position":"MF","caps":76,"goals":10,"club":"Atlanta United FC"},{"name":"Júnior Alonso","position":"DF","caps":71,"goals":3,"club":"Atlético Mineiro"}]}],"recent_form":{"Canada":{"team":"Canada","source_label":"Canada men's national soccer team results","source_url":"https://en.wikipedia.org/wiki/Canada_men%27s_national_soccer_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the Bosnia and Herzegovina opener.","matches":[{"date":"2025 Oct 10","opponent":"vs Australia","score_for":0,"score_against":1,"result":"L","competition":"Friendly"},{"date":"2025 Oct 14","opponent":"at Colombia","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2025 Nov 13","opponent":"vs Ecuador","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2025 Nov 18","opponent":"at Venezuela","score_for":2,"score_against":0,"result":"W","competition":"Friendly"},{"date":"2026 Mar 28","opponent":"vs Iceland","score_for":2,"score_against":2,"result":"D","competition":"Friendly"},{"date":"2026 Mar 31","opponent":"vs Tunisia","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2026 Jun 01","opponent":"vs Uzbekistan","score_for":2,"score_against":0,"result":"W","competition":"Friendly"},{"date":"2026 Jun 05","opponent":"vs Republic of Ireland","score_for":1,"score_against":1,"result":"D","competition":"Friendly"}],"wins":2,"draws":5,"losses":1,"record":"2W 5D 1L","goals_for":7,"goals_against":4,"goal_difference":3,"goal_difference_per_match":0.375,"ppg":1.375,"form_sequence":["L","D","D","W","D","D","W","D"]},"Bosnia and Herzegovina":{"team":"Bosnia and Herzegovina","source_label":"Bosnia and Herzegovina national football team results","source_url":"https://en.wikipedia.org/wiki/Bosnia_and_Herzegovina_national_football_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the Canada opener; penalty wins are counted as draws for regulation-time form.","matches":[{"date":"2025 Oct 09","opponent":"at Cyprus","score_for":2,"score_against":2,"result":"D","competition":"WCQ"},{"date":"2025 Oct 12","opponent":"at Malta","score_for":4,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2025 Nov 15","opponent":"vs Romania","score_for":3,"score_against":1,"result":"W","competition":"WCQ"},{"date":"2025 Nov 18","opponent":"at Austria","score_for":1,"score_against":1,"result":"D","competition":"WCQ"},{"date":"2026 Mar 26","opponent":"at Wales","score_for":1,"score_against":1,"result":"D","competition":"WC playoff","note":"won 4-2 pens"},{"date":"2026 Mar 31","opponent":"vs Italy","score_for":1,"score_against":1,"result":"D","competition":"WC playoff","note":"won 4-1 pens"},{"date":"2026 May 29","opponent":"vs North Macedonia","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2026 Jun 06","opponent":"vs Panama","score_for":1,"score_against":1,"result":"D","competition":"Friendly"}],"wins":2,"draws":6,"losses":0,"record":"2W 6D 0L","goals_for":13,"goals_against":8,"goal_difference":5,"goal_difference_per_match":0.625,"ppg":1.5,"form_sequence":["D","W","W","D","D","D","D","D"]},"United States":{"team":"United States","source_label":"United States men's national soccer team results","source_url":"https://en.wikipedia.org/wiki/United_States_men%27s_national_soccer_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the Paraguay opener.","matches":[{"date":"2025 Oct 10","opponent":"vs Ecuador","score_for":1,"score_against":1,"result":"D","competition":"Friendly"},{"date":"2025 Oct 14","opponent":"vs Australia","score_for":2,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2025 Nov 15","opponent":"vs Paraguay","score_for":2,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2025 Nov 18","opponent":"vs Uruguay","score_for":5,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2026 Mar 28","opponent":"vs Belgium","score_for":2,"score_against":5,"result":"L","competition":"Friendly"},{"date":"2026 Mar 31","opponent":"vs Portugal","score_for":0,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2026 May 31","opponent":"vs Senegal","score_for":3,"score_against":2,"result":"W","competition":"Friendly"},{"date":"2026 Jun 06","opponent":"vs Germany","score_for":1,"score_against":2,"result":"L","competition":"Friendly"}],"wins":4,"draws":1,"losses":3,"record":"4W 1D 3L","goals_for":16,"goals_against":15,"goal_difference":1,"goal_difference_per_match":0.125,"ppg":1.625,"form_sequence":["D","W","W","W","L","L","W","L"]},"Paraguay":{"team":"Paraguay","source_label":"Paraguay national football team results","source_url":"https://en.wikipedia.org/wiki/Paraguay_national_football_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the United States opener.","matches":[{"date":"2025 Sep 09","opponent":"vs Peru","score_for":1,"score_against":0,"result":"W","competition":"WCQ"},{"date":"2025 Oct 10","opponent":"at Japan","score_for":2,"score_against":2,"result":"D","competition":"Friendly"},{"date":"2025 Oct 14","opponent":"at South Korea","score_for":0,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2025 Nov 15","opponent":"at United States","score_for":1,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2025 Nov 18","opponent":"vs Mexico","score_for":2,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2026 Mar 27","opponent":"at Greece","score_for":1,"score_against":0,"result":"W","competition":"Friendly"},{"date":"2026 Mar 31","opponent":"at Morocco","score_for":1,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2026 Jun 05","opponent":"vs Nicaragua","score_for":4,"score_against":0,"result":"W","competition":"Friendly"}],"wins":4,"draws":1,"losses":3,"record":"4W 1D 3L","goals_for":12,"goals_against":9,"goal_difference":3,"goal_difference_per_match":0.375,"ppg":1.625,"form_sequence":["W","D","L","L","W","W","L","W"]}},"head_to_head":{"can-bih":{"source_label":"Group B historical note","source_url":"https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_B","summary":"Group B source says Canada and Bosnia and Herzegovina have never met before.","weight_note":"No direct history, so this is a context note rather than a model driver."},"usa-par":{"source_label":"Group D historical note","source_url":"https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_D","summary":"Group D source says the teams have met nine times, including a 1930 World Cup match won 3-0 by the United States and a 2025 friendly won 2-1 by the United States.","weight_note":"Small and partly old sample; this is context, not a high-weight model input."}},"movementLayer":{"status":"Public proxy, not private GPS tracking","summary":"The field heat map uses roster position, top scorer threat, recent team scoring, model pressure, official tactics when exposed, and match status. It will upgrade when official event, lineup, or public tracking fields are available.","unavailable":["Team GPS vest telemetry","Optical x-y player coordinates","Sprint load and high-intensity effort streams","Private coaching platform tracking exports"],"publicInputs":["FIFA calendar status, score, venue, referee, and tactics when exposed","Official match centre and federation lineup releases","Roster position, caps, goals, and source-backed recent form","Future public event feeds if a reliable source exposes shots, touches, and average positions"],"sources":[{"label":"FIFA player tracking and AI avatars reporting","url":"https://www.theguardian.com/football/2026/jan/07/world-cup-players-to-have-lifelike-ai-avatars-for-use-in-var-offside-decisions","use":"Public reporting says FIFA tracking and AI avatar systems support VAR and broadcast explainers. This is not an open public live player GPS feed."},{"label":"Broadcast computer vision tracking validation","url":"https://arxiv.org/abs/2508.19477","use":"Research benchmark for deriving player position, speed, and distance from broadcast footage. Useful for roadmap context, not a live source for this site."},{"label":"World Cup camera, sensor, and smart ball coverage","url":"https://www.wired.com/story/world-cup-tech-helping-eliminate-bad-calls-var-sensors-3d-body-scans/","use":"Public reporting on camera, sensor, and smart ball systems. The available article does not expose a public API for live betting models."}]},"matches":[{"id":"can-bih","fifaMatchId":"400021449","matchNo":3,"group":"Group B","home":"Canada","away":"Bosnia and Herzegovina","homeShort":"CAN","awayShort":"BIH","kickoffEt":"2026-06-12T15:00:00-04:00","kickoffLabel":"3:00 PM ET","venue":"BMO Field / Toronto Stadium, Toronto","model":{"home":52,"draw":26,"away":22},"pattern":{"label":"Korea-style mixed lane","nonFavoriteShare":48,"drawPressureIndex":59,"lateGoalIndex":38,"stance":"The favorite can still win, but draw/underdog share is high enough that first-goal and comeback paths matter.","signals":["Canada is the model favorite at 52%, but draw plus Bosnia and Herzegovina still totals 48%.","Source-score gap is 0.27; under roughly 0.32, treat the match as materially more mixed than a high-favorite game.","Recent combined goal environment is 2.0 total goals per match.","Canada conceded 0.5 per match recently; Bosnia and Herzegovina scored 1.62 per match recently.","Official lineups are still pending, so this pattern layer should be re-run when starters and formations are confirmed."]},"readiness":"Final: FIFA logged a 1-1 draw; pre-match probability archived","drivers":["Canada graded stronger on FIFA rank and host venue context.","Bosnia and Herzegovina narrowed the model through recent form and squad goal depth.","The draw-pressure warning was the key read: draw plus Bosnia and Herzegovina totaled 48% before kickoff."],"lineupWindow":"roughly 1:45-2:00 PM ET","contextNotes":["Official FIFA calendar API lists Canada vs Bosnia and Herzegovina as Match 3 at 3:00 PM ET in Toronto.","Official FIFA calendar API later logged the match as a 1-1 final at 97 minutes, with 4-4-2 tactics visible for both sides.","Canada received the host/venue lane, but Bosnia brought an unbeaten last-eight form record into this opener.","Group B source records FIFA June 2026 ranks as Canada 30 and Bosnia and Herzegovina 64.","The pre-match model kept Canada as favorite, but the 48% non-favorite share correctly marked the draw path as material."],"recentForm":{"home":{"team":"Canada","source_label":"Canada men's national soccer team results","source_url":"https://en.wikipedia.org/wiki/Canada_men%27s_national_soccer_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the Bosnia and Herzegovina opener.","matches":[{"date":"2025 Oct 10","opponent":"vs Australia","score_for":0,"score_against":1,"result":"L","competition":"Friendly"},{"date":"2025 Oct 14","opponent":"at Colombia","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2025 Nov 13","opponent":"vs Ecuador","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2025 Nov 18","opponent":"at Venezuela","score_for":2,"score_against":0,"result":"W","competition":"Friendly"},{"date":"2026 Mar 28","opponent":"vs Iceland","score_for":2,"score_against":2,"result":"D","competition":"Friendly"},{"date":"2026 Mar 31","opponent":"vs Tunisia","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2026 Jun 01","opponent":"vs Uzbekistan","score_for":2,"score_against":0,"result":"W","competition":"Friendly"},{"date":"2026 Jun 05","opponent":"vs Republic of Ireland","score_for":1,"score_against":1,"result":"D","competition":"Friendly"}],"wins":2,"draws":5,"losses":1,"record":"2W 5D 1L","goals_for":7,"goals_against":4,"goal_difference":3,"goal_difference_per_match":0.375,"ppg":1.375,"form_sequence":["L","D","D","W","D","D","W","D"]},"away":{"team":"Bosnia and Herzegovina","source_label":"Bosnia and Herzegovina national football team results","source_url":"https://en.wikipedia.org/wiki/Bosnia_and_Herzegovina_national_football_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the Canada opener; penalty wins are counted as draws for regulation-time form.","matches":[{"date":"2025 Oct 09","opponent":"at Cyprus","score_for":2,"score_against":2,"result":"D","competition":"WCQ"},{"date":"2025 Oct 12","opponent":"at Malta","score_for":4,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2025 Nov 15","opponent":"vs Romania","score_for":3,"score_against":1,"result":"W","competition":"WCQ"},{"date":"2025 Nov 18","opponent":"at Austria","score_for":1,"score_against":1,"result":"D","competition":"WCQ"},{"date":"2026 Mar 26","opponent":"at Wales","score_for":1,"score_against":1,"result":"D","competition":"WC playoff","note":"won 4-2 pens"},{"date":"2026 Mar 31","opponent":"vs Italy","score_for":1,"score_against":1,"result":"D","competition":"WC playoff","note":"won 4-1 pens"},{"date":"2026 May 29","opponent":"vs North Macedonia","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2026 Jun 06","opponent":"vs Panama","score_for":1,"score_against":1,"result":"D","competition":"Friendly"}],"wins":2,"draws":6,"losses":0,"record":"2W 6D 0L","goals_for":13,"goals_against":8,"goal_difference":5,"goal_difference_per_match":0.625,"ppg":1.5,"form_sequence":["D","W","W","D","D","D","D","D"]},"head_to_head":{"source_label":"Group B historical note","source_url":"https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_B","summary":"Group B source says Canada and Bosnia and Herzegovina have never met before.","weight_note":"No direct history, so this is a context note rather than a model driver."}},"modelMethod":{"version":"public-data v0.4","weights":{"rank":0.36,"experience":0.17,"goals":0.15,"top_scorer":0.07,"venue":0.1,"form":0.15},"home_score":0.703,"away_score":0.433,"score_diff":0.27,"draw_base":0.263,"form_lane":"Derived from the source-backed last-eight match rows using points-per-game and goal-difference-per-match.","components":[{"component":"FIFA rank prior","weight":36,"home_score":0.707,"away_score":0.364,"home_contribution":0.255,"away_contribution":0.131},{"component":"Squad avg caps","weight":17,"home_score":0.612,"away_score":0.378,"home_contribution":0.104,"away_contribution":0.064},{"component":"Squad goal depth","weight":15,"home_score":0.829,"away_score":0.571,"home_contribution":0.124,"away_contribution":0.086},{"component":"Top-scorer threat","weight":7,"home_score":0.65,"away_score":1,"home_contribution":0.046,"away_contribution":0.07},{"component":"Venue/host factor","weight":10,"home_score":1,"away_score":0,"home_contribution":0.1,"away_contribution":0},{"component":"Recent-form context","weight":15,"home_score":0.499,"away_score":0.547,"home_contribution":0.075,"away_contribution":0.082}],"confidence":"medium-low","pattern_test":{"label":"Korea-style mixed lane","favorite":"Canada","underdog":"Bosnia and Herzegovina","favorite_probability":52,"draw_probability":26,"underdog_probability":22,"non_favorite_share":48,"source_score_gap":0.27,"draw_pressure_index":59,"late_goal_index":38,"recent_total_goals_per_match":2,"favorite_conceded_per_match":0.5,"underdog_scored_per_match":1.62,"favorite_top_scorer_goals":39,"underdog_top_scorer_goals":73,"stance":"The favorite can still win, but draw/underdog share is high enough that first-goal and comeback paths matter.","signals":["Canada is the model favorite at 52%, but draw plus Bosnia and Herzegovina still totals 48%.","Source-score gap is 0.27; under roughly 0.32, treat the match as materially more mixed than a high-favorite game.","Recent combined goal environment is 2.0 total goals per match.","Canada conceded 0.5 per match recently; Bosnia and Herzegovina scored 1.62 per match recently.","Official lineups are still pending, so this pattern layer should be re-run when starters and formations are confirmed."]},"not_included_yet":["official starting XI","official live match-centre status","club-level xG/xA and minutes load","verified late injury or weather changes"],"live_status":{"source":"FIFA calendar API","observed_at_et":"Jun 12, 2026, 5:50 PM EDT","status":"Official FIFA calendar fields show a 1-1 final, match time 97 minutes, and 4-4-2 tactics visible for both sides.","home_score":1,"away_score":1,"match_time":"97'","home_tactics":"4-4-2","away_tactics":"4-4-2"},"probability_state":"Pre-match/lineup probability baseline. Do not use as a calibrated live in-play probability after kickoff."},"uncertaintyBand":9,"inputScores":{"home":{"venue":1,"form":0.499},"away":{"venue":0,"form":0.547},"draw_adjustment":0.01}},{"id":"usa-par","fifaMatchId":"400021458","matchNo":4,"group":"Group D","home":"United States","away":"Paraguay","homeShort":"USA","awayShort":"PAR","kickoffEt":"2026-06-12T21:00:00-04:00","kickoffLabel":"9:00 PM ET","venue":"SoFi Stadium / Los Angeles Stadium, Inglewood","model":{"home":55,"draw":25,"away":20},"pattern":{"label":"Favorite edge with late-goal risk","nonFavoriteShare":45,"drawPressureIndex":44,"lateGoalIndex":69,"stance":"The favorite is clearer than Korea was, but recent scoring/concession data says the match can stay live late.","signals":["United States is the model favorite at 55%, but draw plus Paraguay still totals 45%.","Source-score gap is 0.308; under roughly 0.32, treat the match as materially more mixed than a high-favorite game.","Recent combined goal environment is 3.25 total goals per match.","United States conceded 1.88 per match recently; Paraguay scored 1.5 per match recently.","Official lineups are still pending, so this pattern layer should be re-run when starters and formations are confirmed."]},"readiness":"Pre-match: fixture confirmed; lineups pending","drivers":["The United States grades stronger on FIFA rank, host venue context, average caps, and squad goal depth.","Paraguay's last-eight form keeps the away outcome alive, including wins over Mexico, Greece, and Nicaragua.","The probability is still a pre-lineup baseline and should be re-run when official starters are released."],"lineupWindow":"roughly 7:45-8:00 PM ET","contextNotes":["Official FIFA calendar API lists USA vs Paraguay as Match 4 at 9:00 PM ET in Los Angeles.","The United States receives the host/venue lane and the stronger FIFA ranking, while Paraguay has comparable recent points per game.","Group D source records FIFA June 2026 ranks as United States 17 and Paraguay 41.","No official starting XI, formation, late injury, or live status fields were exposed in the official calendar snapshot at this refresh."],"recentForm":{"home":{"team":"United States","source_label":"United States men's national soccer team results","source_url":"https://en.wikipedia.org/wiki/United_States_men%27s_national_soccer_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the Paraguay opener.","matches":[{"date":"2025 Oct 10","opponent":"vs Ecuador","score_for":1,"score_against":1,"result":"D","competition":"Friendly"},{"date":"2025 Oct 14","opponent":"vs Australia","score_for":2,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2025 Nov 15","opponent":"vs Paraguay","score_for":2,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2025 Nov 18","opponent":"vs Uruguay","score_for":5,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2026 Mar 28","opponent":"vs Belgium","score_for":2,"score_against":5,"result":"L","competition":"Friendly"},{"date":"2026 Mar 31","opponent":"vs Portugal","score_for":0,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2026 May 31","opponent":"vs Senegal","score_for":3,"score_against":2,"result":"W","competition":"Friendly"},{"date":"2026 Jun 06","opponent":"vs Germany","score_for":1,"score_against":2,"result":"L","competition":"Friendly"}],"wins":4,"draws":1,"losses":3,"record":"4W 1D 3L","goals_for":16,"goals_against":15,"goal_difference":1,"goal_difference_per_match":0.125,"ppg":1.625,"form_sequence":["D","W","W","W","L","L","W","L"]},"away":{"team":"Paraguay","source_label":"Paraguay national football team results","source_url":"https://en.wikipedia.org/wiki/Paraguay_national_football_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the United States opener.","matches":[{"date":"2025 Sep 09","opponent":"vs Peru","score_for":1,"score_against":0,"result":"W","competition":"WCQ"},{"date":"2025 Oct 10","opponent":"at Japan","score_for":2,"score_against":2,"result":"D","competition":"Friendly"},{"date":"2025 Oct 14","opponent":"at South Korea","score_for":0,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2025 Nov 15","opponent":"at United States","score_for":1,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2025 Nov 18","opponent":"vs Mexico","score_for":2,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2026 Mar 27","opponent":"at Greece","score_for":1,"score_against":0,"result":"W","competition":"Friendly"},{"date":"2026 Mar 31","opponent":"at Morocco","score_for":1,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2026 Jun 05","opponent":"vs Nicaragua","score_for":4,"score_against":0,"result":"W","competition":"Friendly"}],"wins":4,"draws":1,"losses":3,"record":"4W 1D 3L","goals_for":12,"goals_against":9,"goal_difference":3,"goal_difference_per_match":0.375,"ppg":1.625,"form_sequence":["W","D","L","L","W","W","L","W"]},"head_to_head":{"source_label":"Group D historical note","source_url":"https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_D","summary":"Group D source says the teams have met nine times, including a 1930 World Cup match won 3-0 by the United States and a 2025 friendly won 2-1 by the United States.","weight_note":"Small and partly old sample; this is context, not a high-weight model input."}},"modelMethod":{"version":"public-data v0.4","weights":{"rank":0.36,"experience":0.17,"goals":0.15,"top_scorer":0.07,"venue":0.1,"form":0.15},"home_score":0.742,"away_score":0.434,"score_diff":0.308,"draw_base":0.247,"form_lane":"Derived from the source-backed last-eight match rows using points-per-game and goal-difference-per-match.","components":[{"component":"FIFA rank prior","weight":36,"home_score":0.838,"away_score":0.596,"home_contribution":0.302,"away_contribution":0.215},{"component":"Squad avg caps","weight":17,"home_score":0.617,"away_score":0.442,"home_contribution":0.105,"away_contribution":0.075},{"component":"Squad goal depth","weight":15,"home_score":0.771,"away_score":0.329,"home_contribution":0.116,"away_contribution":0.049},{"component":"Top-scorer threat","weight":7,"home_score":0.55,"away_score":0.167,"home_contribution":0.039,"away_contribution":0.012},{"component":"Venue/host factor","weight":10,"home_score":1,"away_score":0,"home_contribution":0.1,"away_contribution":0},{"component":"Recent-form context","weight":15,"home_score":0.539,"away_score":0.557,"home_contribution":0.081,"away_contribution":0.084}],"confidence":"medium-low","pattern_test":{"label":"Favorite edge with late-goal risk","favorite":"United States","underdog":"Paraguay","favorite_probability":55,"draw_probability":25,"underdog_probability":20,"non_favorite_share":45,"source_score_gap":0.308,"draw_pressure_index":44,"late_goal_index":69,"recent_total_goals_per_match":3.25,"favorite_conceded_per_match":1.88,"underdog_scored_per_match":1.5,"favorite_top_scorer_goals":33,"underdog_top_scorer_goals":10,"stance":"The favorite is clearer than Korea was, but recent scoring/concession data says the match can stay live late.","signals":["United States is the model favorite at 55%, but draw plus Paraguay still totals 45%.","Source-score gap is 0.308; under roughly 0.32, treat the match as materially more mixed than a high-favorite game.","Recent combined goal environment is 3.25 total goals per match.","United States conceded 1.88 per match recently; Paraguay scored 1.5 per match recently.","Official lineups are still pending, so this pattern layer should be re-run when starters and formations are confirmed."]},"not_included_yet":["official starting XI","official live match-centre status","club-level xG/xA and minutes load","verified late injury or weather changes"]},"uncertaintyBand":9,"inputScores":{"home":{"venue":1,"form":0.539},"away":{"venue":0,"form":0.557},"draw_adjustment":0.005}}],"sources":[{"label":"FIFA calendar API","url":"https://api.fifa.com/api/v3/calendar/matches?IdCompetition=17&IdSeason=285023&language=en&count=500","use":"Official source used to identify today's Eastern-time fixtures, kickoff timestamps, match IDs, venue names, teams, and referee assignments.","status":"Refreshed Jun 12, 2026 at 5:50 PM ET; Match 3 Canada vs Bosnia and Herzegovina is logged 1-1 final at 97 minutes with 4-4-2 tactics visible for both sides. Match 4 USA vs Paraguay remains pre-match for 9:00 PM ET with no score or tactics exposed yet."},{"label":"June 11 Mexico path check","url":"https://www.theguardian.com/football/live/2026/jun/11/mexico-v-south-africa-world-cup-2026-opening-match-live","use":"Secondary live report used to interpret the controlled-favorite path: early Mexico goal, second goal, and South Africa discipline collapse.","status":"Pattern-calibration source only; official score remains FIFA calendar API."},{"label":"June 11 Korea path check","url":"https://www.theguardian.com/football/live/2026/jun/12/fifa-world-cup-2026-live-south-korea-v-czechia-updates-kor-vs-cze-group-a-match-score-latest","use":"Secondary live report used to interpret the mixed-profile path: Czechia first goal, Korea equalizer, and late Korea winner.","status":"Pattern-calibration source only; official score remains FIFA calendar API."},{"label":"FIFA match centre","url":"https://www.fifa.com/en/match-centre/match/17/285023/289273/400021449","use":"Official match page for Canada vs Bosnia and Herzegovina; lineup/result status outranks all secondary sources.","status":"Pre-match source lane; official starting XI not exposed in accessible data yet."},{"label":"FIFA match centre","url":"https://www.fifa.com/en/match-centre/match/17/285023/289273/400021458","use":"Official match page for USA vs Paraguay; lineup/result status outranks all secondary sources.","status":"Pre-match source lane; official starting XI not exposed in accessible data yet."},{"label":"Group B fixtures","url":"https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_B","use":"Group composition, FIFA ranking snapshot, Canada vs Bosnia kickoff, venue, referee, and no-prior-meeting note.","status":"Secondary, source-linked schedule and context check."},{"label":"Group D fixtures","url":"https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_D","use":"Group composition, FIFA ranking snapshot, USA vs Paraguay kickoff, venue, referee, and head-to-head note.","status":"Secondary, source-linked schedule and context check."},{"label":"Canada recent results","url":"https://en.wikipedia.org/wiki/Canada_men%27s_national_soccer_team_results_%282020%E2%80%93present%29","use":"Source-backed last-eight form rows for Canada; feeds the model form lane and final HTML history section.","status":"Public results page checked for the last eight matches before the Bosnia and Herzegovina opener."},{"label":"Bosnia and Herzegovina recent results","url":"https://en.wikipedia.org/wiki/Bosnia_and_Herzegovina_national_football_team_results_%282020%E2%80%93present%29","use":"Source-backed last-eight form rows for Bosnia and Herzegovina; feeds the model form lane and final HTML history section.","status":"Public results page checked for the last eight matches before the Canada opener; penalty wins are counted as draws for regulation-time form."},{"label":"United States recent results","url":"https://en.wikipedia.org/wiki/United_States_men%27s_national_soccer_team_results_%282020%E2%80%93present%29","use":"Source-backed last-eight form rows for the United States; feeds the model form lane and final HTML history section.","status":"Public results page checked for the last eight matches before the Paraguay opener."},{"label":"Paraguay recent results","url":"https://en.wikipedia.org/wiki/Paraguay_national_football_team_results_%282020%E2%80%93present%29","use":"Source-backed last-eight form rows for Paraguay; feeds the model form lane and final HTML history section.","status":"Public results page checked for the last eight matches before the United States opener."},{"label":"Final squads","url":"https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_squads","use":"Downloaded and parsed for player caps, goals, clubs, squad sizes, and top-scorer layers.","status":"Secondary, source-linked squad layer."},{"label":"World Football Elo","url":"https://www.eloratings.net/","use":"Next strength prior to refresh; not pulled into this local v0 probability file yet.","status":"Public rating system; listed as a future calibration lane."},{"label":"FIFA player tracking and AI avatars reporting","url":"https://www.theguardian.com/football/2026/jan/07/world-cup-players-to-have-lifelike-ai-avatars-for-use-in-var-offside-decisions","use":"Public reporting says FIFA tracking and AI avatar systems support VAR and broadcast explainers. This is not an open public live player GPS feed."},{"label":"Broadcast computer vision tracking validation","url":"https://arxiv.org/abs/2508.19477","use":"Research benchmark for deriving player position, speed, and distance from broadcast footage. Useful for roadmap context, not a live source for this site."},{"label":"World Cup camera, sensor, and smart ball coverage","url":"https://www.wired.com/story/world-cup-tech-helping-eliminate-bad-calls-var-sensors-3d-body-scans/","use":"Public reporting on camera, sensor, and smart ball systems. The available article does not expose a public API for live betting models."}]}</script>
   <script>
-    const fallback = {
-      generatedAtEastern: "Seed fallback",
-      liveSource: {
-        refreshMode: "Seed fallback. Live API unavailable in this view.",
-        sourceError: null,
-        officialMatchCount: 0,
-        activeWindows: []
-      },
-      matches: [
-        {
-          id: "can-bih",
-          group: "Group B",
-          home: "Canada",
-          away: "Bosnia and Herzegovina",
-          homeShort: "CAN",
-          awayShort: "BIH",
-          kickoffLabel: "3:00 PM ET",
-          venue: "BMO Field / Toronto Stadium, Toronto",
-          model: { home: 52, draw: 26, away: 22 },
-          pattern: { label: "Korea-style mixed lane", nonFavoriteShare: 48, drawPressureIndex: 59, lateGoalIndex: 38, stance: "Canada has the edge, but draw plus Bosnia and Herzegovina is high enough that first-goal and comeback paths matter." },
-          readiness: "Pre-match baseline. Official lineups pending.",
-          drivers: ["Canada grades stronger on FIFA rank and host venue context.", "Bosnia and Herzegovina narrows the model through recent form and squad goal depth."]
-        },
-        {
-          id: "usa-par",
-          group: "Group D",
-          home: "United States",
-          away: "Paraguay",
-          homeShort: "USA",
-          awayShort: "PAR",
-          kickoffLabel: "9:00 PM ET",
-          venue: "SoFi Stadium / Los Angeles Stadium, Inglewood",
-          model: { home: 55, draw: 25, away: 20 },
-          pattern: { label: "Favorite edge with late-goal risk", nonFavoriteShare: 45, drawPressureIndex: 44, lateGoalIndex: 69, stance: "The United States is the clearer favorite, but recent scoring and concession data says the match can stay live late." },
-          readiness: "Pre-match baseline. Official lineups pending.",
-          drivers: ["The United States grades stronger on FIFA rank, host venue context, average caps, and squad goal depth.", "Paraguay recent form keeps the away outcome alive."]
-        }
-      ],
-      sources: [
-        {
-          label: "FIFA calendar API",
-          url: "https://api.fifa.com/api/v3/calendar/matches?IdCompetition=17&IdSeason=285023&language=en&count=500",
-          use: "Official match schedule, status, score, venue, referee, tactics when exposed."
-        },
-        {
-          label: "FIFA match centre Canada vs Bosnia",
-          url: "https://www.fifa.com/en/match-centre/match/17/285023/289273/400021449",
-          use: "Official match page for Canada vs Bosnia and Herzegovina."
-        },
-        {
-          label: "FIFA match centre USA vs Paraguay",
-          url: "https://www.fifa.com/en/match-centre/match/17/285023/289273/400021458",
-          use: "Official match page for United States vs Paraguay."
-        }
-      ]
-    };
+    (function () {
+      const fallback = JSON.parse(document.getElementById("seed-data").textContent);
+      let payload = fallback;
+      let selectedMatchId = fallback.matches[0] ? fallback.matches[0].id : null;
+      let selectedSide = "home";
+      let selectedPhase = "attack";
+      let selectedPlayer = "";
+      let refreshTimer = null;
 
-    function escapeHtml(value) {
-      return String(value).replace(/[&<>"']/g, (char) => ({
+      const $ = (id) => document.getElementById(id);
+      const safe = (value) => String(value === undefined || value === null ? "" : value).replace(/[&<>"']/g, (char) => ({
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
         '"': "&quot;",
         "'": "&#039;"
       }[char]));
-    }
+      const pct = (value) => Number.isFinite(Number(value)) ? Number(value) : 0;
+      const teamSummary = (name) => (payload.team_summaries || []).find((team) => team.team === name) || {};
+      const matchById = (id) => (payload.matches || []).find((match) => match.id === id) || (payload.matches || [])[0];
+      const currentMatch = () => matchById(selectedMatchId);
+      const formFor = (match, side) => match && match.recentForm ? match.recentForm[side] : null;
+      const liveStatus = (match) => match && match.modelMethod && match.modelMethod.live_status ? match.modelMethod.live_status : null;
+      const scoreText = (match) => {
+        const archived = liveStatus(match);
+        if (archived) return String(archived.home_score) + "-" + String(archived.away_score) + " final";
+        const official = match && match.official ? match.official : {};
+        if (official.homeScore === null || official.homeScore === undefined) return "Pre-match";
+        return String(official.homeScore) + "-" + String(official.awayScore);
+      };
+      const lineupText = (match) => {
+        const archived = liveStatus(match);
+        if (archived) return archived.status || "Official result logged.";
+        if (!match || !match.official) return "Official lineup fields pending.";
+        return match.official.officialLineupStatus || "Official lineup fields pending.";
+      };
+      const prettyCheck = () => {
+        const source = payload.liveSource || {};
+        return source.checkedAtEastern || payload.generatedAtEastern || "Seed fallback";
+      };
 
-    function scoreText(match) {
-      const official = match.official || {};
-      if (official.homeScore === null || official.homeScore === undefined) {
-        return "Pre-match";
+      function renderHero() {
+        const source = payload.liveSource || {};
+        const active = source.activeWindows && source.activeWindows.length;
+        $("source-mode").textContent = active ? "Match window" : "Daily watch";
+        $("source-mode").className = active ? "status-pill" : "status-pill warn";
+        $("hero-note").textContent = source.refreshMode || fallback.refreshStrategy && fallback.refreshStrategy.matchday_logic || "Source-backed daily watch.";
+        $("generated-at").textContent = "Checked: " + prettyCheck();
+        $("match-count").textContent = String((payload.matches || []).length) + " matches";
+
+        $("window-grid").innerHTML = (payload.matches || []).map((match) =>
+          '<div class="time-box"><strong>' + safe(match.kickoffLabel || match.kickoff_label || "") + '</strong><span>' + safe((match.homeShort || match.home || "").slice(0, 3)) + ' vs ' + safe((match.awayShort || match.away || "").slice(0, 3)) + '</span></div>'
+        ).join("") + '<div class="time-box"><strong>15m</strong><span>active page poll</span></div>';
+
+        $("quality-strip").innerHTML = [
+          ["Official matches", source.officialMatchCount === undefined ? "Seed" : source.officialMatchCount, "FIFA calendar count for today"],
+          ["Active windows", active ? source.activeWindows.join(", ") : "None", "90 min before through 150 min after kickoff"],
+          ["Source error", source.sourceError ? "Yes" : "No", source.sourceError || "Live source reachable"],
+          ["Lineups", "Pending", "Upgrade only when starter names or tactics are exposed"]
+        ].map((item) => '<div><b>' + safe(item[1]) + '</b><span>' + safe(item[0]) + ': ' + safe(item[2]) + '</span></div>').join("");
+
+        $("tracking-summary").textContent = payload.movementLayer && payload.movementLayer.summary ? payload.movementLayer.summary : "";
       }
-      return `${official.homeScore}-${official.awayScore}`;
-    }
 
-    function renderMatches(matches) {
-      const root = document.getElementById("match-list");
-      root.innerHTML = matches.map((match) => `
-        <article class="match-card">
-          <div class="match-head">
-            <div>
-              <span class="tag">${escapeHtml(match.group)}</span>
-              <h2>${escapeHtml(match.home)} vs ${escapeHtml(match.away)}</h2>
-              <p class="small">${escapeHtml(match.venue)} · ${escapeHtml(match.kickoffLabel)} · ${escapeHtml(scoreText(match))}</p>
-            </div>
-            <span class="status-pill">${escapeHtml(match.readiness)}</span>
-          </div>
-          <div class="prob-bar" aria-label="${escapeHtml(match.home)} ${match.model.home} percent, draw ${match.model.draw} percent, ${escapeHtml(match.away)} ${match.model.away} percent">
-            <div class="prob-segment home" style="width:${match.model.home}%"><strong>${match.model.home}%</strong><span>${escapeHtml(match.home)}</span></div>
-            <div class="prob-segment draw" style="width:${match.model.draw}%"><strong>${match.model.draw}%</strong><span>Draw</span></div>
-            <div class="prob-segment away" style="width:${match.model.away}%"><strong>${match.model.away}%</strong><span>${escapeHtml(match.away)}</span></div>
-          </div>
-          <div class="metric-grid">
-            <div class="metric"><b>${match.pattern.nonFavoriteShare}%</b><span>Draw plus underdog</span></div>
-            <div class="metric"><b>${match.pattern.drawPressureIndex}</b><span>Draw pressure</span></div>
-            <div class="metric"><b>${match.pattern.lateGoalIndex}</b><span>Late-goal risk</span></div>
-            <div class="metric"><b>${escapeHtml(match.pattern.label)}</b><span>Pattern lane</span></div>
-          </div>
-          <div class="pattern-grid">
-            <div><b>${escapeHtml(match.official && match.official.officialLineupStatus ? "FIFA" : "Pending")}</b><span>${escapeHtml(match.official && match.official.officialLineupStatus ? match.official.officialLineupStatus : "Official lineup fields pending")}</span></div>
-            <div><b>${escapeHtml(match.official && match.official.matchTime ? match.official.matchTime : "0'")}</b><span>Official match time field</span></div>
-            <div><b>${escapeHtml(match.official && match.official.homeTactics ? match.official.homeTactics : "Pending")}</b><span>${escapeHtml(match.home)} tactics</span></div>
-            <div><b>${escapeHtml(match.official && match.official.awayTactics ? match.official.awayTactics : "Pending")}</b><span>${escapeHtml(match.away)} tactics</span></div>
-          </div>
-          <p class="small" style="margin-top:12px">${escapeHtml(match.pattern.stance)}</p>
-          <ul class="driver-list">
-            ${(match.drivers || []).map((driver) => `<li>${escapeHtml(driver)}</li>`).join("")}
-          </ul>
-        </article>
-      `).join("");
-    }
+      function renderTabs() {
+        $("match-tabs").innerHTML = (payload.matches || []).map((match) => {
+          const active = match.id === selectedMatchId ? " active" : "";
+          return '<button type="button" class="tab-button' + active + '" data-match="' + safe(match.id) + '">' + safe(match.home) + ' vs ' + safe(match.away) + '</button>';
+        }).join("");
+        document.querySelectorAll("[data-match]").forEach((button) => {
+          button.addEventListener("click", () => {
+            selectedMatchId = button.getAttribute("data-match");
+            selectedPlayer = "";
+            render();
+          });
+        });
+      }
 
-    function renderSources(sources) {
-      const root = document.getElementById("source-list");
-      root.innerHTML = (sources || fallback.sources).map((source) => `
-        <div class="source-item">
-          <h3><a href="${escapeHtml(source.url)}">${escapeHtml(source.label)}</a></h3>
-          <p class="small">${escapeHtml(source.use)}</p>
-        </div>
-      `).join("");
-    }
+      function probabilityBar(match) {
+        return '<div class="prob-bar" aria-label="Win draw loss probability">' +
+          '<div class="prob-segment home" style="width:' + pct(match.model.home) + '%"><strong>' + pct(match.model.home) + '%</strong><span>' + safe(match.home) + '</span></div>' +
+          '<div class="prob-segment draw" style="width:' + pct(match.model.draw) + '%"><strong>' + pct(match.model.draw) + '%</strong><span>Draw</span></div>' +
+          '<div class="prob-segment away" style="width:' + pct(match.model.away) + '%"><strong>' + pct(match.model.away) + '%</strong><span>' + safe(match.away) + '</span></div>' +
+          '</div>';
+      }
 
-    function renderStatus(payload) {
-      const source = payload.liveSource || fallback.liveSource;
-      document.getElementById("generated-at").textContent = payload.generatedAtEastern || "Seed fallback";
-      document.getElementById("source-mode").textContent = source.activeWindows && source.activeWindows.length ? "Match window" : "Daily watch";
-      document.getElementById("live-note").innerHTML = `
-        <p class="small"><b>Checked:</b> ${escapeHtml(source.checkedAtEastern || payload.generatedAtEastern || "Seed fallback")}</p>
-        <p class="small"><b>Mode:</b> ${escapeHtml(source.refreshMode || "Seed fallback")}</p>
-        <p class="small"><b>Official matches found today:</b> ${escapeHtml(source.officialMatchCount ?? 0)}</p>
-        ${source.sourceError ? `<p class="small warn"><b>Source warning:</b> ${escapeHtml(source.sourceError)}</p>` : ""}
-      `;
-    }
+      function renderMatchBoard() {
+        const match = currentMatch();
+        if (!match) return;
+        const official = match.official || {};
+        const archived = liveStatus(match);
+        const pattern = match.pattern || {};
+        const components = match.modelMethod && match.modelMethod.components ? match.modelMethod.components : [];
+        const resultPanel = archived
+          ? '<div class="subpanel result-panel"><h3>Official Result Audit</h3><div class="result-score"><b>' + safe(match.home) + '</b><strong>' + safe(archived.home_score) + '-' + safe(archived.away_score) + '</strong><b>' + safe(match.away) + '</b></div><p>' + safe(archived.status) + '</p><p>Observed: ' + safe(archived.observed_at_et) + ' | Time: ' + safe(archived.match_time) + ' | Tactics: ' + safe(archived.home_tactics) + ' / ' + safe(archived.away_tactics) + '</p><p class="fineprint">The probability bar remains the archived pre-match baseline, not an in-play or post-match forecast.</p></div>'
+          : "";
+        $("match-board").innerHTML =
+          '<article class="match-card">' +
+            '<div class="match-head">' +
+              '<div><span class="tag">' + safe(match.group) + '</span><h2>' + safe(match.home) + ' vs ' + safe(match.away) + '</h2>' +
+              '<p>' + safe(match.venue) + ' | ' + safe(match.kickoffLabel) + ' | ' + safe(scoreText(match)) + '</p></div>' +
+              '<span class="readiness">' + safe(match.readiness || "Pre-match baseline") + '</span>' +
+            '</div>' +
+            probabilityBar(match) +
+            '<div class="metric-grid">' +
+              '<div class="metric"><b>' + safe(pattern.nonFavoriteShare) + '%</b><span>Draw plus underdog</span></div>' +
+              '<div class="metric"><b>' + safe(pattern.drawPressureIndex) + '</b><span>Draw pressure</span></div>' +
+              '<div class="metric"><b>' + safe(pattern.lateGoalIndex) + '</b><span>Late-goal risk</span></div>' +
+              '<div class="metric"><b>' + safe(match.uncertaintyBand || 0) + '%</b><span>Uncertainty band</span></div>' +
+            '</div>' +
+            '<div class="split">' +
+              '<section class="subpanel"><h3>Source Status</h3><p>' + safe(lineupText(match)) + '</p><p>Referee: ' + safe((official.referees || []).join(", ") || "Pending") + '</p><p>Tactics: ' + safe(official.homeTactics || "Pending") + ' / ' + safe(official.awayTactics || "Pending") + '</p></section>' +
+              '<section class="subpanel"><h3>Pattern Read</h3><p>' + safe(pattern.stance || "") + '</p><ul>' + (pattern.signals || []).slice(0, 3).map((signal) => '<li>' + safe(signal) + '</li>').join("") + '</ul></section>' +
+            '</div>' +
+            resultPanel +
+            '<div class="subpanel" style="margin-top:12px"><h3>Main Drivers</h3><ul>' + (match.drivers || []).map((driver) => '<li>' + safe(driver) + '</li>').join("") + '</ul></div>' +
+            '<div class="subpanel" style="margin-top:12px"><h3>Model Components</h3><table><thead><tr><th>Component</th><th>Weight</th><th>' + safe(match.home) + '</th><th>' + safe(match.away) + '</th></tr></thead><tbody>' +
+              components.map((component) => '<tr><td>' + safe(component.component) + '</td><td>' + safe(component.weight) + '%</td><td>' + safe(component.home_contribution) + '</td><td>' + safe(component.away_contribution) + '</td></tr>').join("") +
+            '</tbody></table></div>' +
+          '</article>';
+      }
 
-    async function load() {
-      let payload = fallback;
-      try {
-        const response = await fetch("/api/matchday", { headers: { accept: "application/json" } });
-        if (response.ok) {
-          payload = await response.json();
+      function renderRecentForm() {
+        const match = currentMatch();
+        const home = formFor(match, "home");
+        const away = formFor(match, "away");
+        $("recent-form").innerHTML = '<div class="form-grid">' + [home, away].filter(Boolean).map((form) => {
+          return '<div class="form-card"><div class="form-title"><h4>' + safe(form.team) + '</h4><span>' + safe(form.record) + '</span></div>' +
+            '<div class="form-strip">' + (form.form_sequence || []).map((result) => '<span class="result-pill ' + safe(result).toLowerCase() + '">' + safe(result) + '</span>').join("") + '</div>' +
+            '<div class="form-stats"><div><b>' + safe(form.ppg) + '</b><span>Points per game</span></div><div><b>' + safe(form.goals_for) + '</b><span>Goals for</span></div><div><b>' + safe(form.goal_difference) + '</b><span>Goal difference</span></div></div>' +
+            '<div class="match-list">' + (form.matches || []).map((row) => '<div class="match-row"><span class="match-date">' + safe(row.date) + '</span><span><b>' + safe(row.opponent) + '</b><small>' + safe(row.competition) + '</small></span><span class="match-score">' + safe(row.score_for) + '-' + safe(row.score_against) + '</span></div>').join("") + '</div></div>';
+        }).join("") + '</div>';
+      }
+
+      function renderFormula() {
+        const match = currentMatch();
+        const method = match && match.modelMethod ? match.modelMethod : {};
+        const h2h = match && match.recentForm ? match.recentForm.head_to_head : null;
+        $("formula-panel").innerHTML =
+          '<div class="model-strip">' +
+            '<div><b>' + safe(method.version || "v0") + '</b><span>Model version</span></div>' +
+            '<div><b>' + safe(method.confidence || "medium-low") + '</b><span>Evidence confidence</span></div>' +
+            '<div><b>' + safe(method.score_diff || "") + '</b><span>Source score gap</span></div>' +
+            '<div><b>' + safe(method.draw_base || "") + '</b><span>Draw base</span></div>' +
+          '</div>' +
+          '<div class="subpanel" style="margin-top:12px"><h3>Formula Lane</h3><p>' + safe(method.form_lane || "Form lane uses reviewed public recent-form rows.") + '</p></div>' +
+          (h2h ? '<div class="subpanel" style="margin-top:12px"><h3>Head To Head</h3><p>' + safe(h2h.summary) + '</p><p>' + safe(h2h.weight_note) + '</p></div>' : "");
+      }
+
+      function playersForTeam(summary) {
+        const seen = new Set();
+        return ((summary.top_goals || []).concat(summary.top_caps || [])).filter((player) => {
+          const key = player.name + "|" + player.position;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+      }
+
+      function rolePoint(player, index, side, phase) {
+        const position = String(player.position || "").toUpperCase();
+        const attackRight = side === "home";
+        let x = 50;
+        let y = 28 + (index % 4) * 14;
+        if (position.indexOf("FW") >= 0) x = phase === "defense" ? 48 : 78;
+        else if (position.indexOf("MF") >= 0) x = phase === "defense" ? 42 : phase === "build" ? 55 : 64;
+        else if (position.indexOf("DF") >= 0) x = phase === "attack" ? 42 : 30;
+        else x = 16;
+        if (!attackRight) x = 100 - x;
+        return { x, y };
+      }
+
+      function renderMovement() {
+        const match = currentMatch();
+        if (!match) return;
+        const teamName = selectedSide === "home" ? match.home : match.away;
+        const summary = teamSummary(teamName);
+        const form = formFor(match, selectedSide) || {};
+        const players = playersForTeam(summary);
+        if (!selectedPlayer && players[0]) selectedPlayer = players[0].name;
+        $("side-home").textContent = match.home;
+        $("side-away").textContent = match.away;
+        document.querySelectorAll("[data-side]").forEach((button) => button.classList.toggle("active", button.getAttribute("data-side") === selectedSide));
+        document.querySelectorAll("[data-phase]").forEach((button) => button.classList.toggle("active", button.getAttribute("data-phase") === selectedPhase));
+        $("player-select").innerHTML = players.map((player) => '<option value="' + safe(player.name) + '"' + (player.name === selectedPlayer ? " selected" : "") + '>' + safe(player.name) + ' | ' + safe(player.position) + '</option>').join("");
+
+        const pitch = $("pitch");
+        pitch.querySelectorAll(".heat-spot,.player-dot").forEach((node) => node.remove());
+        const modelProb = selectedSide === "home" ? pct(match.model.home) : pct(match.model.away);
+        const shotIndex = Math.min(92, Math.round(modelProb * 0.72 + pct(summary.outfield_goals_per_player) * 7 + pct(form.goals_for) * 2.4));
+        const pressureIndex = Math.min(92, Math.round((pct(match.pattern && match.pattern.nonFavoriteShare) + pct(match.pattern && match.pattern.lateGoalIndex)) / 2));
+        const zoneX = selectedSide === "home" ? (selectedPhase === "defense" ? 28 : selectedPhase === "build" ? 52 : 78) : (selectedPhase === "defense" ? 72 : selectedPhase === "build" ? 48 : 22);
+        const zones = [
+          { x: zoneX, y: 50, s: 34 + shotIndex * 0.35 },
+          { x: selectedSide === "home" ? zoneX + 7 : zoneX - 7, y: 34, s: 25 + pressureIndex * 0.22 },
+          { x: selectedSide === "home" ? zoneX + 6 : zoneX - 6, y: 66, s: 24 + pct(summary.avg_goals) * 3 }
+        ];
+        zones.forEach((zone) => {
+          const spot = document.createElement("span");
+          spot.className = "heat-spot";
+          spot.style.left = zone.x + "%";
+          spot.style.top = zone.y + "%";
+          spot.style.width = zone.s + "%";
+          spot.style.height = zone.s + "%";
+          pitch.appendChild(spot);
+        });
+        players.slice(0, 8).forEach((player, index) => {
+          const point = rolePoint(player, index, selectedSide, selectedPhase);
+          const dot = document.createElement("span");
+          dot.className = player.name === selectedPlayer ? "player-dot active" : "player-dot";
+          dot.title = player.name;
+          dot.style.left = point.x + "%";
+          dot.style.top = point.y + "%";
+          pitch.appendChild(dot);
+        });
+        $("pitch-label").textContent = teamName + " | " + selectedPhase + " pressure";
+        $("field-legend").innerHTML =
+          '<div><b>' + shotIndex + '</b><span>Shot danger proxy</span></div>' +
+          '<div><b>' + pressureIndex + '</b><span>Match volatility proxy</span></div>' +
+          '<div><b>' + safe(payload.movementLayer.status) + '</b><span>Tracking source status</span></div>';
+
+        renderPlayerPanel(summary, players, shotIndex);
+      }
+
+      function renderPlayerPanel(summary, players, shotIndex) {
+        const focused = players.find((player) => player.name === selectedPlayer) || players[0] || {};
+        $("player-panel").innerHTML =
+          '<div class="model-strip">' +
+            '<div><b>' + safe(summary.avg_caps || "") + '</b><span>Avg caps</span></div>' +
+            '<div><b>' + safe(summary.avg_goals || "") + '</b><span>Avg goals</span></div>' +
+            '<div><b>' + safe(summary.total_goals || "") + '</b><span>Squad goals</span></div>' +
+            '<div><b>' + safe(shotIndex) + '</b><span>Shot proxy</span></div>' +
+          '</div>' +
+          '<div class="player-grid">' +
+            '<div class="player-card"><h3>Focus Player</h3><p><b>' + safe(focused.name || "Pending") + '</b></p><p>' + safe(focused.position || "") + ' | ' + safe(focused.club || "") + '</p><p>Caps: ' + safe(focused.caps || 0) + ' | Goals: ' + safe(focused.goals || 0) + '</p></div>' +
+            '<div class="player-card"><h3>Top Scorers</h3><ul>' + (summary.top_goals || []).slice(0, 4).map((player) => '<li>' + safe(player.name) + ': ' + safe(player.goals) + ' goals</li>').join("") + '</ul></div>' +
+          '</div>' +
+          '<p class="fineprint">The map estimates public movement pressure from roster roles and team context. It is not GPS or optical coordinate data.</p>';
+      }
+
+      function renderSources() {
+        $("source-list").innerHTML = (payload.sources || []).map((source) =>
+          '<div class="source-item"><h3><a href="' + safe(source.url) + '">' + safe(source.label) + '</a></h3><div><p>' + safe(source.use) + '</p>' + (source.status ? '<p>' + safe(source.status) + '</p>' : '') + '</div></div>'
+        ).join("");
+      }
+
+      function bindControls() {
+        document.querySelectorAll("[data-side]").forEach((button) => {
+          button.addEventListener("click", () => {
+            selectedSide = button.getAttribute("data-side");
+            selectedPlayer = "";
+            render();
+          });
+        });
+        document.querySelectorAll("[data-phase]").forEach((button) => {
+          button.addEventListener("click", () => {
+            selectedPhase = button.getAttribute("data-phase");
+            render();
+          });
+        });
+        $("player-select").addEventListener("change", (event) => {
+          selectedPlayer = event.target.value;
+          renderMovement();
+        });
+      }
+
+      function render() {
+        if (!matchById(selectedMatchId) && payload.matches && payload.matches[0]) selectedMatchId = payload.matches[0].id;
+        renderHero();
+        renderTabs();
+        renderMatchBoard();
+        renderRecentForm();
+        renderFormula();
+        renderMovement();
+        renderSources();
+      }
+
+      async function refresh() {
+        try {
+          const response = await fetch("/api/matchday", { headers: { accept: "application/json" } });
+          if (response.ok) payload = await response.json();
+        } catch (error) {
+          payload = fallback;
+          payload.liveSource = payload.liveSource || {};
+          payload.liveSource.sourceError = error.message;
         }
-      } catch (error) {
-        payload.liveSource.sourceError = error.message;
+        render();
+        const active = payload.liveSource && payload.liveSource.activeWindows && payload.liveSource.activeWindows.length > 0;
+        clearTimeout(refreshTimer);
+        refreshTimer = window.setTimeout(refresh, active ? 15 * 60 * 1000 : 60 * 60 * 1000);
       }
-      renderStatus(payload);
-      renderMatches(payload.matches || fallback.matches);
-      renderSources(payload.sources || fallback.sources);
-      const active = payload.liveSource && payload.liveSource.activeWindows && payload.liveSource.activeWindows.length > 0;
-      window.setTimeout(load, active ? 15 * 60 * 1000 : 60 * 60 * 1000);
-    }
 
-    load();
+      bindControls();
+      refresh();
+    }());
   </script>
 </body>
 </html>
