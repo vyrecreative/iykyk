@@ -689,6 +689,38 @@
       }
     ]
   },
+  "bettingFramework": {
+    "status": "Decision support, not guarantee",
+    "summary": "Official sources can certify facts such as fixture, score, tactics, referee, and final status. They cannot certify a future result. The betting-readiness tier combines model edge, official-data completeness, draw pressure, late-goal risk, and lineup freshness so the site can separate stronger leans from high-volatility traps.",
+    "tiers": [
+      {
+        "label": "No Bet",
+        "use": "No clean model edge, source conflict, or the matchup is already closed."
+      },
+      {
+        "label": "Watch Only",
+        "use": "Fixture is confirmed, but official XI/tactics or key match-state inputs are still missing."
+      },
+      {
+        "label": "Lean",
+        "use": "Model edge is present, source quality is usable, and volatility is not extreme."
+      },
+      {
+        "label": "Strong Lean",
+        "use": "Favorite probability is materially ahead, official source coverage is strong, and draw/late-goal risk is contained."
+      },
+      {
+        "label": "High Volatility",
+        "use": "Draw plus opponent share or late-goal risk is high enough that a late swing can erase the favorite edge."
+      }
+    ],
+    "thresholds": {
+      "strongLean": "favorite >= 62, non-favorite <= 38, late-goal <= 55, source gap >= 0.35, official lineup visible",
+      "lean": "favorite >= 54, source gap >= 0.25, non-favorite <= 46, late-goal <= 65, official data usable",
+      "highVolatility": "non-favorite >= 45 or draw pressure >= 55 or late-goal >= 65",
+      "watchOnly": "official lineup/tactics still pending or fact-certainty below 70"
+    }
+  },
   "matches": [
     {
       "id": "can-bih",
