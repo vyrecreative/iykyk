@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "name": "cupedge-match-signals",
+  "crons": [
+    {
+      "path": "/api/cron/daily-refresh",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/match-window-refresh",
+      "schedule": "*/15 * * * *"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=300, stale-while-revalidate=600"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "cupedge-match-signals",
+  "version": "1.0.0",
+  "private": true,
+  "description": "World Cup matchday probability dashboard with source-backed refresh hooks.",
+  "scripts": {
+    "check": "node --check api/matchday.js && node --check api/cron/daily-refresh.js && node --check api/cron/match-window-refresh.js && node --check lib/matchday.js"
+  }
+}
