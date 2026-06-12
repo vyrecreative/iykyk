@@ -1,0 +1,102 @@
+{
+  "siteName": "CupEdge Match Signals",
+  "timezone": "America/New_York",
+  "generatedAt": "2026-06-12T07:16:14Z",
+  "refreshPolicy": {
+    "dailyRosterCheckUtc": "12:00",
+    "dailyRosterCheckEasternJune": "8:00 AM ET",
+    "matchWindow": "90 minutes before kickoff through 150 minutes after kickoff",
+    "matchWindowCadence": "15 minutes",
+    "notes": [
+      "Daily refresh checks official FIFA calendar and squad source status.",
+      "Match-window refresh checks official status, score, tactics, and lineup exposure more aggressively.",
+      "Google probability widgets are never used as model truth."
+    ]
+  },
+  "matches": [
+    {
+      "id": "can-bih",
+      "fifaMatchId": "400021449",
+      "matchNo": 3,
+      "group": "Group B",
+      "home": "Canada",
+      "away": "Bosnia and Herzegovina",
+      "homeShort": "CAN",
+      "awayShort": "BIH",
+      "kickoffEt": "2026-06-12T15:00:00-04:00",
+      "kickoffLabel": "3:00 PM ET",
+      "venue": "BMO Field / Toronto Stadium, Toronto",
+      "model": {
+        "home": 52,
+        "draw": 26,
+        "away": 22
+      },
+      "pattern": {
+        "label": "Korea-style mixed lane",
+        "nonFavoriteShare": 48,
+        "drawPressureIndex": 59,
+        "lateGoalIndex": 38,
+        "stance": "Canada has the edge, but draw plus Bosnia and Herzegovina is high enough that first-goal and comeback paths matter."
+      },
+      "readiness": "Pre-match baseline. Official lineups pending.",
+      "drivers": [
+        "Canada grades stronger on FIFA rank and host venue context.",
+        "Bosnia and Herzegovina narrows the model through recent form and squad goal depth.",
+        "Lineups are not official until actual starter names or formations are exposed by an official/team source."
+      ]
+    },
+    {
+      "id": "usa-par",
+      "fifaMatchId": "400021458",
+      "matchNo": 4,
+      "group": "Group D",
+      "home": "United States",
+      "away": "Paraguay",
+      "homeShort": "USA",
+      "awayShort": "PAR",
+      "kickoffEt": "2026-06-12T21:00:00-04:00",
+      "kickoffLabel": "9:00 PM ET",
+      "venue": "SoFi Stadium / Los Angeles Stadium, Inglewood",
+      "model": {
+        "home": 55,
+        "draw": 25,
+        "away": 20
+      },
+      "pattern": {
+        "label": "Favorite edge with late-goal risk",
+        "nonFavoriteShare": 45,
+        "drawPressureIndex": 44,
+        "lateGoalIndex": 69,
+        "stance": "The United States is the clearer favorite, but recent scoring and concession data says the match can stay live late."
+      },
+      "readiness": "Pre-match baseline. Official lineups pending.",
+      "drivers": [
+        "The United States grades stronger on FIFA rank, host venue context, average caps, and squad goal depth.",
+        "Paraguay recent form keeps the away outcome alive.",
+        "Lineups are not official until actual starter names or formations are exposed by an official/team source."
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "label": "FIFA calendar API",
+      "url": "https://api.fifa.com/api/v3/calendar/matches?IdCompetition=17&IdSeason=285023&language=en&count=500",
+      "use": "Official match schedule, status, score, venue, referee, tactics when exposed."
+    },
+    {
+      "label": "FIFA match centre Canada vs Bosnia",
+      "url": "https://www.fifa.com/en/match-centre/match/17/285023/289273/400021449",
+      "use": "Official match page for Canada vs Bosnia and Herzegovina."
+    },
+    {
+      "label": "FIFA match centre USA vs Paraguay",
+      "url": "https://www.fifa.com/en/match-centre/match/17/285023/289273/400021458",
+      "use": "Official match page for United States vs Paraguay."
+    },
+    {
+      "label": "Source-backed model seed",
+      "url": "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_squads",
+      "use": "Public squad table seed for caps, goals, and player layer."
+    }
+  ]
+}
