@@ -132,6 +132,16 @@
   .orow .oc i{font-style:normal;color:var(--mut2)}
   .oin{width:36px;background:#05080b;border:1px solid var(--line2);color:var(--cyan);border-radius:4px;padding:3px 3px;font-family:var(--mono);font-size:12px;text-align:right}
   .oin:focus{outline:1px solid var(--cyan)}
+  .stake{margin-top:11px;background:#0a121a;border:1px solid var(--line2);border-radius:8px;padding:10px 12px;font-family:var(--mono)}
+  .srow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .skey{font-size:10px;letter-spacing:.06em;color:var(--mut2)}
+  .oc2{display:flex;align-items:center;gap:2px}
+  .oc2 i{font-style:normal;color:var(--mut2)}
+  .sin{width:74px;background:#05080b;border:1px solid var(--line2);color:var(--cyan);border-radius:4px;padding:4px 5px;font-family:var(--mono);font-size:13px;text-align:right}
+  .sin:focus{outline:1px solid var(--cyan)}
+  .son{font-size:11px;color:var(--mut2)}.son b{color:var(--mut)}
+  .scalc{margin-top:7px;font-size:12px;color:var(--mut);line-height:1.5}.scalc b{color:var(--mut)}
+  .scalc .pos{color:var(--grn)}.scalc .negv{color:var(--red)}
 
   .facts{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
   .fact{font-family:var(--mono);font-size:11px;color:var(--mut);background:#05080b;border:1px solid var(--line2);border-radius:6px;padding:5px 9px}
@@ -300,7 +310,11 @@ let KF=0.25;
 let SYNC='';   // live-data status suffix shown next to the clock
 const EXP=new Set();                       // expanded heatmaps
 const PSIDE={}, PSEL={};                   // pitch side + selected player per fixture
+const STAKE={};                            // optional USD amount you choose to put in, per fixture
 function setOdds(id,leg,v){const fx=FIX.find(f=>f.id==id);const n=parseFloat(v);if(n>1)fx.odds[leg]=n;render();}
+/* you type the dollars you want to put in; we translate the contract price into a real-money outcome.
+   Pure arithmetic on YOUR number - it never sizes the bet for you. */
+function setStake(id,v){const n=parseFloat(String(v).replace(/[^0-9.]/g,''));STAKE[id]=isFinite(n)&&n>0?n:null;render();}
 
 /* ===== risk-appetite sizing helpers (no auto-betting, no sim - your call) ===== */
 const sbank=()=>+document.getElementById('bank').value||1000;
@@ -477,6 +491,20 @@ function card(r){
   const coachFact=fx.coachH?`<span class="fact">coach <b>${esc(fx.coachH)}</b> v <b>${esc(fx.coachA||'?')}</b></span>`:'';
   const facts=`${r.o25!=null?`<span class="fact">O2.5 <b>${(r.o25*100).toFixed(0)}%</b></span>`:''}${r.top?`<span class="fact">top <b>${r.top}</b></span>`:''}${formFact}${coachFact}${xiFact}${motivFact}`;
   const so=fx.conf?`<span class="v">&check; FIFA fixture + XI</span>`:`<span style="color:var(--amb)">XI publishes ~75 min pre-KO</span>`;
+  // USD calculator: translate the contract price you entered into a real-money outcome for YOUR amount.
+  const stk=STAKE[fx.id], perC=(100/e.od)/100, priceC=(100/e.od);
+  let stakeBlock;
+  if(stk>0 && perC>0){
+    const contracts=Math.floor(stk/perC), cost=contracts*perC, payout=contracts*1, profit=payout-cost, roi=cost>0?profit/cost:0;
+    stakeBlock=`<div class="stake"><div class="srow"><span class="skey">YOUR $</span>
+      <span class="oc2"><i>$</i><input class="sin" value="${stk}" inputmode="decimal" onchange="setStake('${fx.id}',this.value)"></span>
+      <span class="son">on <b>${esc(nm(fx,r.bl))}</b> @ ${priceC.toFixed(0)}&cent;</span></div>
+      <div class="scalc">${contracts} contract${contracts==1?'':'s'} &middot; cost <b>$${cost.toFixed(2)}</b> &middot; pays <b class="pos">$${payout.toFixed(2)}</b> if it hits &rarr; <b class="${profit>=0?'pos':'negv'}">${profit>=0?'+':''}$${profit.toFixed(2)} (${roi>=0?'+':''}${(roi*100).toFixed(0)}%)</b> &middot; you risk <b class="negv">-$${cost.toFixed(2)}</b> if it misses</div></div>`;
+  } else {
+    stakeBlock=`<div class="stake"><div class="srow"><span class="skey">YOUR $</span>
+      <span class="oc2"><i>$</i><input class="sin" value="" placeholder="36.57" inputmode="decimal" onchange="setStake('${fx.id}',this.value)"></span>
+      <span class="son">type your amount to size <b>${esc(nm(fx,r.bl))}</b> @ ${priceC.toFixed(0)}&cent; (price &rarr; dollars)</span></div></div>`;
+  }
   const heat=EXP.has(fx.id)?pitchPanel(fx):"";
   return `<div class="card"><div class="pad">
     <div class="crow"><div class="code">[<b>${esc(fx.id)}</b>] ${esc(fx.grp)}${etRef}</div>${badge}</div>
@@ -490,6 +518,7 @@ function card(r){
     <div class="band">${bt}</div>
     ${edgeBlock}
     <div class="otab"><div class="orow head"><span>SEL</span><span>MODEL</span><span>YOUR&nbsp;¢</span><span>RET%</span><span>EDGE%</span></div>${rows}</div>
+    ${stakeBlock}
     <div class="facts">${facts}</div>
     <button class="hbtn" onclick="toggleHeat('${fx.id}')">${EXP.has(fx.id)?'▲ HIDE':'▼ PLAYER SCORING HEATMAP'} · who scores, where</button>
     </div>${heat}
