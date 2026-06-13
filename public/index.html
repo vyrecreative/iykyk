@@ -341,7 +341,7 @@ function saveState(){ try{ localStorage.setItem('cupedge_stake',JSON.stringify(S
 function setOdds(id,leg,v){const fx=FIX.find(f=>f.id==id);const n=parseFloat(v);if(n>1)fx.odds[leg]=n;render();}
 /* you type the dollars you want to put in; we translate the contract price into a real-money outcome.
    Pure arithmetic on YOUR number - it never sizes the bet for you. */
-function setStake(id,v,doRender){const n=parseFloat(String(v).replace(/[^0-9.]/g,''));STAKE[id]=isFinite(n)&&n>0?n:null;saveState();if(doRender!==false)render();}
+function setStake(id,v,doRender){const n=parseFloat(String(v).replace(/[^0-9.]/g,''));STAKE[id]=isFinite(n)&&n>0?n:null;saveState();if(doRender!==false)render(true);}
 /* you type the real PRICE you see (in dollars per contract, e.g. 0.70 = 70 cents). Stored as cents.
    Clearing the box reverts that leg to the model-fair price (edge back to 0).
    oninput saves every keystroke (so a refresh can never wipe what you typed); onchange re-renders on blur. */
@@ -352,7 +352,7 @@ function setPrice(id,leg,v,doRender){
   let cents = (!isFinite(n)||n<=0) ? null : (n<1 ? n*100 : n);
   UPRICE[id]=UPRICE[id]||{};
   if(cents!=null && cents>0 && cents<100){ UPRICE[id][leg]=cents; } else { delete UPRICE[id][leg]; }
-  saveState();if(doRender!==false)render();}
+  saveState();if(doRender!==false)render(true);}
 
 /* ===== risk-appetite sizing helpers (no auto-betting, no sim - your call) ===== */
 const sbank=()=>+document.getElementById('bank').value||1000;
@@ -544,7 +544,7 @@ function card(r){
   const pickPanel=`<div class="pickpanel">
     <div class="picks">${chips}</div>
     <div class="prow"><span class="pkl">price you see for <b>${esc(selTeam)}</b> <span style="color:var(--mut2)">(the number, e.g. 70)</span></span>
-      <span class="oc2"><input class="sin" value="${d.user?showC:''}" placeholder="${fairC.toFixed(0)}" inputmode="decimal" oninput="setPrice('${fx.id}','${sl}',this.value,false)" onchange="setPrice('${fx.id}','${sl}',this.value,true)"><i>&cent;</i>${d.user?`<button class="clrp" onclick="setPrice('${fx.id}','${sl}','',true)">clear</button>`:''}</span></div>
+      <span class="oc2"><input class="sin" value="${d.user?showC:''}" placeholder="${fairC.toFixed(0)}" inputmode="decimal" oninput="setPrice('${fx.id}','${sl}',this.value,false)" onchange="setPrice('${fx.id}','${sl}',this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();setPrice('${fx.id}','${sl}',this.value,true);}"><i>&cent;</i>${d.user?`<button class="clrp" onclick="setPrice('${fx.id}','${sl}','',true)">clear</button>`:''}</span></div>
     <div class="verdict v-${vcls}"><div class="vbig">${vtier}</div><div class="vsub">${vsub}</div></div>
   </div>`;
   const bt=`${esc(fx.home)} range <b>${(r.bd[0]*100).toFixed(0)}-${(r.bd[1]*100).toFixed(0)}%</b> · 10-90% band &plusmn;${(r.bw*100).toFixed(1)}pp`;
@@ -579,8 +579,10 @@ function setCents(id,leg,v){const c=parseFloat(v);if(c>0&&c<100){FIX.find(f=>f.i
 /* don't rebuild the DOM while you're actively typing in a price/amount box (that's what wiped your
    entry every 15s on a live match). The poll just skips this cycle; your typed value is already saved. */
 function isEditingCard(){const a=document.activeElement;return !!(a&&a.classList&&(a.classList.contains('oin')||a.classList.contains('sin')));}
-function render(){
-  if(isEditingCard())return;
+/* force=true means YOU just committed a price (Enter/blur) — repaint even if the box is still focused.
+   force not set means a background poll — skip the repaint while you're mid-typing so it can't wipe you. */
+function render(force){
+  if(!force && isEditingCard())return;
   document.getElementById('cards').innerHTML=FIX.map(fx=>card(evalFx(fx))).join('');
 }
 /* format a UTC time in the VISITOR's local zone (with their tz abbreviation) */
