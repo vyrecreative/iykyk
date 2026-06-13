@@ -250,16 +250,12 @@
     <div class="grow"><b>Tier chip</b> — is there a bet here? <span class="gk t-no">NO BET</span> none · <span class="gk t-watch">WATCH ONLY</span> wait for the lineup · <span class="gk t-lean">LEAN</span> small edge · <span class="gk t-strong">STRONG LEAN</span> best spots · <span class="gk t-vol">HIGH VOLATILITY</span> edge but swingy.</div>
     <div class="grow"><b>Teams + ELO</b> — each side's strength rating (higher = stronger). H+55 = home-field bump.</div>
     <div class="grow"><b>Colored bar</b> — the model's chance of home win / draw / away win. The line under it is the uncertainty range.</div>
-    <div class="grow"><b>Edge box</b> — the headline. It reads "price = model fair" until you type a real price; then it shows your best <b>+EV</b> side.</div>
-    <div class="grow"><b>The table</b>, left to right:<br>
-      &nbsp;&nbsp;<b>SEL</b> = selection (home / draw / away).<br>
-      &nbsp;&nbsp;<b>MODEL%</b> = the model's probability it happens.<br>
-      &nbsp;&nbsp;<b>YOUR ¢</b> = the price you see on Robinhood / Kalshi, in cents (40¢ = the market's 40%). <b>Type it here.</b><br>
-      &nbsp;&nbsp;<b>RET%</b> = your payout if it wins.<br>
-      &nbsp;&nbsp;<b>EDGE%</b> = model minus market. <span style="color:var(--grn)">Green = value</span> (model thinks it's underpriced); grey = no edge.</div>
+    <div class="grow"><b>Team chips</b> — the model already picks <b>who</b> to back: the side with the highest win chance (marked ★). It's selected for you. Tap another chip only if you want to price the draw or the underdog instead.</div>
+    <div class="grow"><b>Price box</b> — type the price you see on Robinhood / Kalshi for that team, <b>just the number</b> — <b>70</b>, <b>34.5</b>, or <b>0.70</b> all work (it's cents; 70 = the market's 70%). That's the only thing you enter.</div>
+    <div class="grow"><b>The verdict</b> — one call, naming the team: <span class="gk t-strong">STRONG LEAN</span> / <span class="gk t-lean">LEAN</span> big-to-small value on the likely winner · <span class="gk t-watch">THIN</span> tiny edge, size down · <span class="gk t-no">NO BET</span> your price is too high. It shows the edge %, the payout if it hits, and your price vs the model's fair price. Green only ever appears on the likely winner — a long shot never lights up green.</div>
     <div class="grow"><b>Facts chips</b> — O2.5 (over 2.5 goals), top (likeliest score), formation, XI status, motivation flag.</div>
     <div class="grow"><b>Player heatmap</b> — tap it to see each player's chance of scoring and where on the pitch (real StatsBomb shots).</div>
-    <div class="grow" style="color:var(--ink)"><b>How to act:</b> wait for the XI to confirm → enter the real price → only back a <b>LEAN</b> or <b>STRONG LEAN</b> with a green edge. If it's NO BET at the real price, pass. Sizing and money are entirely your call.</div>
+    <div class="grow" style="color:var(--ink)"><b>How to act:</b> wait for the XI to confirm → type the price you see → back it only on a green <b>LEAN</b> / <b>STRONG LEAN</b>. NO BET means pass. Your price is saved, so you can lock it pre-match. How much you stake is entirely your call — the app never sizes the bet.</div>
   </div>
 
   <div id="cards"></div>
@@ -349,9 +345,13 @@ function setStake(id,v,doRender){const n=parseFloat(String(v).replace(/[^0-9.]/g
 /* you type the real PRICE you see (in dollars per contract, e.g. 0.70 = 70 cents). Stored as cents.
    Clearing the box reverts that leg to the model-fair price (edge back to 0).
    oninput saves every keystroke (so a refresh can never wipe what you typed); onchange re-renders on blur. */
-function setPrice(id,leg,v,doRender){const d=parseFloat(String(v).replace(/[^0-9.]/g,''));const c=d*100;
+function setPrice(id,leg,v,doRender){
+  let n=parseFloat(String(v).replace(/[^0-9.]/g,''));
+  // accept the number however you see it on Robinhood/Kalshi: 70 or 34.5 (cents) OR 0.70 (dollars).
+  // n<1 is read as dollars (0.70 -> 70), n>=1 is read as cents (70 -> 70, 34.5 -> 34.5). Stored as cents.
+  let cents = (!isFinite(n)||n<=0) ? null : (n<1 ? n*100 : n);
   UPRICE[id]=UPRICE[id]||{};
-  if(isFinite(c)&&c>0&&c<100){ UPRICE[id][leg]=c; } else { delete UPRICE[id][leg]; }
+  if(cents!=null && cents>0 && cents<100){ UPRICE[id][leg]=cents; } else { delete UPRICE[id][leg]; }
   saveState();if(doRender!==false)render();}
 
 /* ===== risk-appetite sizing helpers (no auto-betting, no sim - your call) ===== */
@@ -520,7 +520,9 @@ function card(r){
   const favLeg=r.bl, favTeam=nm(fx,favLeg);
   const sl=(PPICK[fx.id] && r.legs[PPICK[fx.id]])?PPICK[fx.id]:favLeg;   // outcome you're pricing
   const d=r.legs[sl], selTeam=nm(fx,sl), isFav=(sl===favLeg);
-  const yourD=(100/d.od)/100, ev=d.ev, ret=(d.od-1);
+  const yourC=100/d.od, ev=d.ev, ret=(d.od-1);            // your price in cents
+  const fairC=d.p*100;                                     // model-fair price in cents
+  const showC=Math.round(yourC*10)/10;                     // tidy cents for display (1 decimal max)
   // team chips (the pick is starred)
   const chips=["home","draw","away"].map(l=>{const dl=r.legs[l];const on=l===sl;
     return `<button class="pick ${on?'on':''} ${LG[l]}" onclick="setPick('${fx.id}','${l}')">${esc(nm(fx,l))} <i>${(dl.p*100).toFixed(0)}%</i>${l===favLeg?' ★':''}</button>`;}).join('');
@@ -528,7 +530,7 @@ function card(r){
   let vtier, vcls, vsub;
   if(!d.user){
     vtier=`MODEL PICK · ${esc(favTeam)}`; vcls='wait';
-    vsub=`Model backs <b>${esc(favTeam)}</b> at <b>${(r.legs[favLeg].p*100).toFixed(0)}%</b>. Type the price you see for ${esc(selTeam)} on Robinhood / Kalshi (e.g. <b>0.70</b> = 70&cent;) for an instant LEAN / NO&nbsp;BET call.`;
+    vsub=`Model backs <b>${esc(favTeam)}</b> at <b>${(r.legs[favLeg].p*100).toFixed(0)}%</b>. Type the price you see for ${esc(selTeam)} on Robinhood / Kalshi &mdash; just the number, e.g. <b>70</b> or <b>34.5</b> &mdash; for an instant LEAN / NO&nbsp;BET call.`;
   } else {
     let t;
     if(ev<=0){ t='NO BET'; vcls='no'; }
@@ -537,12 +539,12 @@ function card(r){
     else if(ev<0.06){ t='LEAN'; vcls='lean'; }
     else { t='STRONG LEAN'; vcls='lean'; }
     vtier=`${t} · ${esc(selTeam)}`;
-    vsub=`edge <b>${ev>0?'+':''}${(ev*100).toFixed(1)}%</b> &middot; pays <b class="pos">+${(ret*100).toFixed(0)}%</b> if it hits &middot; your <b>$${yourD.toFixed(2)}</b> vs model fair <b>$${d.p.toFixed(2)}</b>${!isFav?` &middot; <span style="color:var(--amb)">${(d.p*100).toFixed(0)}% to win — long shot</span>`:''}${!fx.conf?` &middot; <span style="color:var(--amb)">XI pending</span>`:''}`;
+    vsub=`edge <b>${ev>0?'+':''}${(ev*100).toFixed(1)}%</b> &middot; pays <b class="pos">+${(ret*100).toFixed(0)}%</b> if it hits &middot; your price <b>${showC}&cent;</b> ($${(yourC/100).toFixed(2)}) vs model fair <b>${fairC.toFixed(0)}&cent;</b>${!isFav?` &middot; <span style="color:var(--amb)">${(d.p*100).toFixed(0)}% to win — long shot</span>`:''}${!fx.conf?` &middot; <span style="color:var(--amb)">XI pending</span>`:''}`;
   }
   const pickPanel=`<div class="pickpanel">
     <div class="picks">${chips}</div>
-    <div class="prow"><span class="pkl">price you see for <b>${esc(selTeam)}</b></span>
-      <span class="oc2"><i>$</i><input class="sin" value="${d.user?yourD.toFixed(2):''}" placeholder="${d.p.toFixed(2)}" inputmode="decimal" oninput="setPrice('${fx.id}','${sl}',this.value,false)" onchange="setPrice('${fx.id}','${sl}',this.value,true)">${d.user?`<button class="clrp" onclick="setPrice('${fx.id}','${sl}','',true)">clear</button>`:''}</span></div>
+    <div class="prow"><span class="pkl">price you see for <b>${esc(selTeam)}</b> <span style="color:var(--mut2)">(the number, e.g. 70)</span></span>
+      <span class="oc2"><input class="sin" value="${d.user?showC:''}" placeholder="${fairC.toFixed(0)}" inputmode="decimal" oninput="setPrice('${fx.id}','${sl}',this.value,false)" onchange="setPrice('${fx.id}','${sl}',this.value,true)"><i>&cent;</i>${d.user?`<button class="clrp" onclick="setPrice('${fx.id}','${sl}','',true)">clear</button>`:''}</span></div>
     <div class="verdict v-${vcls}"><div class="vbig">${vtier}</div><div class="vsub">${vsub}</div></div>
   </div>`;
   const bt=`${esc(fx.home)} range <b>${(r.bd[0]*100).toFixed(0)}-${(r.bd[1]*100).toFixed(0)}%</b> · 10-90% band &plusmn;${(r.bw*100).toFixed(1)}pp`;
