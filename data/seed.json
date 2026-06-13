@@ -1,8 +1,8 @@
 {
   "siteName": "CupEdge Match Signals",
   "timezone": "America/New_York",
-  "generatedAt": "2026-06-13T00:33:21Z",
-  "generatedAtEastern": "Jun 12 2026, 8:33 PM EDT",
+  "generatedAt": "2026-06-13T00:43:59Z",
+  "generatedAtEastern": "Jun 12, 2026, 8:43 PM EDT",
   "refreshPolicy": {
     "dailyRosterCheckUtc": "12:00",
     "dailyRosterCheckEasternJune": "8:00 AM ET",
@@ -1134,7 +1134,7 @@
           "Official lineups are still pending, so this pattern layer should be re-run when starters and formations are confirmed."
         ]
       },
-      "readiness": "Pre-match: fixture confirmed; lineups pending",
+      "readiness": "FIFA tactics visible. Verify starter names before calling the lineup official.",
       "drivers": [
         "The United States grades stronger on FIFA rank, host venue context, average caps, and squad goal depth.",
         "Paraguay's last-eight form keeps the away outcome alive, including wins over Mexico, Greece, and Nicaragua.",
@@ -1145,7 +1145,7 @@
         "Official FIFA calendar API lists USA vs Paraguay as Match 4 at 9:00 PM ET in Los Angeles.",
         "The United States receives the host/venue lane and the stronger FIFA ranking, while Paraguay has comparable recent points per game.",
         "Group D source records FIFA June 2026 ranks as United States 17 and Paraguay 41.",
-        "Repeated cache-busted FIFA calendar reads at Jun 12, 2026, 8:33 PM EDT did not expose USA vs Paraguay tactics or starter names; referee and pre-match status remain visible."
+        "Official FIFA calendar fields at Jun 12, 2026, 8:43 PM EDT expose tactics as United States 4-2-3-1 and Paraguay 4-4-2; starter-name fields are still not exposed, so the starting XI is not official-confirmed in this dataset."
       ],
       "recentForm": {
         "home": {
@@ -1457,17 +1457,17 @@
         "away": "Paraguay",
         "homeScore": null,
         "awayScore": null,
-        "homeTactics": null,
-        "awayTactics": null,
+        "homeTactics": "4-2-3-1",
+        "awayTactics": "4-4-2",
         "matchStatus": 1,
         "officialityStatus": 0,
-        "matchTime": null,
+        "matchTime": "0'",
         "venue": "Los Angeles Stadium",
         "city": "Los Angeles",
         "referees": [
           "Danny MAKKELIE"
         ],
-        "officialLineupStatus": "Official starting XI and tactics pending in accessible FIFA calendar fields."
+        "officialLineupStatus": "FIFA tactics visible. Starter-name fields still require official/team confirmation."
       }
     }
   ],
@@ -1476,7 +1476,7 @@
       "label": "FIFA calendar API",
       "url": "https://api.fifa.com/api/v3/calendar/matches?IdCompetition=17&IdSeason=285023&language=en&count=500",
       "use": "Official source used to identify today's Eastern-time fixtures, kickoff timestamps, match IDs, venue names, teams, and referee assignments.",
-      "status": "Refreshed Jun 12, 2026, 8:33 PM EDT; Match 3 Canada vs Bosnia and Herzegovina is logged 1-1 final at 97 minutes with 4-4-2 tactics visible for both sides. Match 4 USA vs Paraguay remains pre-match for 9:00 PM ET with referee Danny Makkelie; repeated latest reads do not expose tactics or starter names."
+      "status": "Refreshed Jun 12, 2026, 8:43 PM EDT; Match 3 Canada vs Bosnia and Herzegovina is logged 1-1 final at 97'; tactics visible as Canada 4-4-2 and Bosnia and Herzegovina 4-4-2. Match 4 United States vs Paraguay shows 0' match time, referee Danny MAKKELIE; tactics visible as United States 4-2-3-1 and Paraguay 4-4-2; starter-name fields are not exposed."
     },
     {
       "label": "June 11 Mexico path check",
@@ -1494,13 +1494,13 @@
       "label": "FIFA match centre",
       "url": "https://www.fifa.com/en/match-centre/match/17/285023/289273/400021449",
       "use": "Official match page for Canada vs Bosnia and Herzegovina; lineup/result status outranks all secondary sources.",
-      "status": "Pre-match source lane; official starting XI not exposed in accessible data yet."
+      "status": "Latest FIFA-backed fields: Match 3 Canada vs Bosnia and Herzegovina is logged 1-1 final at 97'; tactics visible as Canada 4-4-2 and Bosnia and Herzegovina 4-4-2."
     },
     {
       "label": "FIFA match centre",
       "url": "https://www.fifa.com/en/match-centre/match/17/285023/289273/400021458",
       "use": "Official match page for USA vs Paraguay; lineup/result status outranks all secondary sources.",
-      "status": "Latest cache-busted FIFA calendar fields show pre-match status and referee Danny Makkelie; tactics and starter-name fields are not exposed."
+      "status": "Latest FIFA-backed fields: Match 4 United States vs Paraguay shows 0' match time, referee Danny MAKKELIE; tactics visible as United States 4-2-3-1 and Paraguay 4-4-2; starter-name fields are not exposed."
     },
     {
       "label": "Group B fixtures",
