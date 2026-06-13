@@ -16,7 +16,7 @@
   },
   "modelNote": "Public-data v0.4 model. Probabilities are generated from collected source inputs; recent-form scores are derived from source-backed last-eight rows, and Google probability widgets are not copied as model output.",
   "refreshStrategy": {
-    "cadence": "Every 30 minutes",
+    "cadence": "Daily roster/source check, then every 15 minutes during active match windows",
     "lineup_window": "Roughly 75 to 60 minutes before kickoff; use visible official/team lineups first, then labeled secondary live-card or live-coverage lineups if official fields are inaccessible.",
     "matchday_logic": "Identify today's fixtures in Eastern time and update only when source-backed changes are found."
   },
