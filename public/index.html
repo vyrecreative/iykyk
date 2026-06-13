@@ -322,13 +322,14 @@ function saveState(){ try{ localStorage.setItem('cupedge_stake',JSON.stringify(S
 function setOdds(id,leg,v){const fx=FIX.find(f=>f.id==id);const n=parseFloat(v);if(n>1)fx.odds[leg]=n;render();}
 /* you type the dollars you want to put in; we translate the contract price into a real-money outcome.
    Pure arithmetic on YOUR number - it never sizes the bet for you. */
-function setStake(id,v){const n=parseFloat(String(v).replace(/[^0-9.]/g,''));STAKE[id]=isFinite(n)&&n>0?n:null;saveState();render();}
+function setStake(id,v,doRender){const n=parseFloat(String(v).replace(/[^0-9.]/g,''));STAKE[id]=isFinite(n)&&n>0?n:null;saveState();if(doRender!==false)render();}
 /* you type the real PRICE you see (in dollars per contract, e.g. 0.70 = 70 cents). Stored as cents.
-   Clearing the box reverts that leg to the model-fair price (edge back to 0). */
-function setPrice(id,leg,v){const d=parseFloat(String(v).replace(/[^0-9.]/g,''));const c=d*100;
+   Clearing the box reverts that leg to the model-fair price (edge back to 0).
+   oninput saves every keystroke (so a refresh can never wipe what you typed); onchange re-renders on blur. */
+function setPrice(id,leg,v,doRender){const d=parseFloat(String(v).replace(/[^0-9.]/g,''));const c=d*100;
   UPRICE[id]=UPRICE[id]||{};
   if(isFinite(c)&&c>0&&c<100){ UPRICE[id][leg]=c; } else { delete UPRICE[id][leg]; }
-  saveState();render();}
+  saveState();if(doRender!==false)render();}
 
 /* ===== risk-appetite sizing helpers (no auto-betting, no sim - your call) ===== */
 const sbank=()=>+document.getElementById('bank').value||1000;
@@ -354,8 +355,12 @@ function evalFx(fx){
   const up=UPRICE[fx.id]||{};
   const O={}; ["home","draw","away"].forEach(l=>{O[l]=(up[l]!=null)?100/up[l]:fx.odds[l];});
   const userSet={}; ["home","draw","away"].forEach(l=>{userSet[l]=(up[l]!=null);});
-  const fair=devig(O);const legs={};let be=-9,bl="home";
-  ["home","draw","away"].forEach(l=>{const e=ek(P[l],O[l]);legs[l]={p:P[l],fair:fair[l],od:O[l],ev:e.ev,kelly:e.kelly,user:userSet[l]};if(e.ev>be){be=e.ev;bl=l;}});
+  const fair=devig(O);const legs={};
+  ["home","draw","away"].forEach(l=>{const e=ek(P[l],O[l]);legs[l]={p:P[l],fair:fair[l],od:O[l],ev:e.ev,kelly:e.kelly,user:userSet[l]};});
+  // We back the LIKELY WINNER: the side with the highest model win probability, NOT the highest EV.
+  // This stops a low-probability longshot from lighting up green just because a cheap price makes EV positive.
+  let bl="home"; ["draw","away"].forEach(l=>{ if(P[l]>P[bl]) bl=l; });
+  const be=legs[bl].ev;
   const bd=live?[P.home,P.home]:band(he,ae,fx.hadv,fx.total,-.05);const bw=(bd[1]-bd[0])/2;
   const fav=Math.max(P.home,P.draw,P.away);const tr=tierOf(be,fav,P.draw,bw,fx.conf,live);
   const full=fx.serverP?fx.serverP:(live?null:outc(matrix(lh,la)));
@@ -496,16 +501,18 @@ function card(r){
         <div class="esub">model ${(e.p*100).toFixed(1)}% vs your price $${((100/e.od)/100).toFixed(2)} · pays <b style="color:var(--grn)">+${((e.od-1)*100).toFixed(0)}%</b> if it hits${!fx.conf?` · <span style="color:var(--amb)">XI pending</span>`:''}</div></div>
       </div>`;
   let rows="";["home","draw","away"].forEach(l=>{const d=r.legs[l];const yourD=(100/d.od)/100;
+    const isFav=(l===r.bl);   // r.bl is now the highest-probability side (the likely winner)
     let vd; const ev=(d.ev*100);
     if(!d.user) vd=`<span class="vm">— enter price</span>`;
+    else if(!isFav) vd=`<span class="vm">${d.ev>0?'+':''}${ev.toFixed(0)}% · low prob</span>`;   // never green: not the likely winner
     else if(d.ev<=0) vd=`<span class="vno">⛔ NO BET ${ev.toFixed(0)}%</span>`;
     else if(d.ev<0.025) vd=`<span class="vth">◔ THIN +${ev.toFixed(0)}%</span>`;
     else if(d.ev<0.06) vd=`<span class="vbet">✅ BET +${ev.toFixed(0)}%</span>`;
     else vd=`<span class="vbet">✅ STRONG +${ev.toFixed(0)}%</span>`;
-    rows+=`<div class="orow ${l==r.bl?'best':''}">
+    rows+=`<div class="orow ${isFav?'best':''}">
       <span class="onm"><span class="dotc ${LG[l]}"></span>${esc(nm(fx,l))}</span>
       <span>${(d.p*100).toFixed(0)}%</span>
-      <span class="oc"><i>$</i><input class="oin" value="${d.user?yourD.toFixed(2):''}" placeholder="${d.p.toFixed(2)}" inputmode="decimal" onchange="setPrice('${fx.id}','${l}',this.value)"></span>
+      <span class="oc"><i>$</i><input class="oin" value="${d.user?yourD.toFixed(2):''}" placeholder="${d.p.toFixed(2)}" inputmode="decimal" oninput="setPrice('${fx.id}','${l}',this.value,false)" onchange="setPrice('${fx.id}','${l}',this.value,true)"></span>
       <span>+${((d.od-1)*100).toFixed(0)}%</span>
       <span class="vcell">${vd}</span>
     </div>`;});
@@ -522,12 +529,12 @@ function card(r){
   if(stk>0 && perC>0){
     const contracts=Math.floor(stk/perC), cost=contracts*perC, payout=contracts*1, profit=payout-cost, roi=cost>0?profit/cost:0;
     stakeBlock=`<div class="stake"><div class="srow"><span class="skey">YOUR $</span>
-      <span class="oc2"><i>$</i><input class="sin" value="${stk}" inputmode="decimal" onchange="setStake('${fx.id}',this.value)"></span>
+      <span class="oc2"><i>$</i><input class="sin" value="${stk}" inputmode="decimal" oninput="setStake('${fx.id}',this.value,false)" onchange="setStake('${fx.id}',this.value,true)"></span>
       <span class="son">on <b>${esc(nm(fx,r.bl))}</b> @ $${(priceC/100).toFixed(2)}</span></div>
       <div class="scalc">${contracts} contract${contracts==1?'':'s'} &middot; cost <b>$${cost.toFixed(2)}</b> &middot; pays <b class="pos">$${payout.toFixed(2)}</b> if it hits &rarr; <b class="${profit>=0?'pos':'negv'}">${profit>=0?'+':''}$${profit.toFixed(2)} (${roi>=0?'+':''}${(roi*100).toFixed(0)}%)</b> &middot; you risk <b class="negv">-$${cost.toFixed(2)}</b> if it misses</div></div>`;
   } else {
     stakeBlock=`<div class="stake"><div class="srow"><span class="skey">YOUR $</span>
-      <span class="oc2"><i>$</i><input class="sin" value="" placeholder="36.57" inputmode="decimal" onchange="setStake('${fx.id}',this.value)"></span>
+      <span class="oc2"><i>$</i><input class="sin" value="" placeholder="36.57" inputmode="decimal" oninput="setStake('${fx.id}',this.value,false)" onchange="setStake('${fx.id}',this.value,true)"></span>
       <span class="son">type your amount to size <b>${esc(nm(fx,r.bl))}</b> @ $${(priceC/100).toFixed(2)}</span></div></div>`;
   }
   const heat=EXP.has(fx.id)?pitchPanel(fx):"";
@@ -554,7 +561,11 @@ function card(r){
 function setCents(id,leg,v){const c=parseFloat(v);if(c>0&&c<100){FIX.find(f=>f.id==id).odds[leg]=100/c;render();}}
 
 /* =================== render =================== */
+/* don't rebuild the DOM while you're actively typing in a price/amount box (that's what wiped your
+   entry every 15s on a live match). The poll just skips this cycle; your typed value is already saved. */
+function isEditingCard(){const a=document.activeElement;return !!(a&&a.classList&&(a.classList.contains('oin')||a.classList.contains('sin')));}
 function render(){
+  if(isEditingCard())return;
   document.getElementById('cards').innerHTML=FIX.map(fx=>card(evalFx(fx))).join('');
 }
 /* format a UTC time in the VISITOR's local zone (with their tz abbreviation) */
