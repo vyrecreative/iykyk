@@ -2,8 +2,8 @@
   "name": "cupedge-match-signals",
   "version": "1.0.0",
   "private": true,
-  "description": "World Cup matchday probability dashboard with source-backed refresh hooks.",
+  "description": "World Cup 2026 match-edge model on real FIFA data + Elo + xG, with lineup and motivation edges.",
   "scripts": {
-    "check": "node --check api/matchday.js && node --check api/cron/daily-refresh.js && node --check api/cron/match-window-refresh.js && node --check lib/matchday.js"
+    "check": "node --check api/matchday.js && node --check lib/matchday.js && node --check lib/model.js"
   }
 }
