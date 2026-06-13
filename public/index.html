@@ -123,7 +123,9 @@
   .best td{background:rgba(25,224,138,.07)}
   /* odds grid: every column locked to the same right edge */
   .otab{margin-top:11px;font-family:var(--mono);font-size:12px}
-  .orow{display:grid;grid-template-columns:1.7fr .9fr 1.15fr 1.05fr .9fr;gap:8px;align-items:center;padding:6px 2px;border-top:1px solid var(--line)}
+  .orow{display:grid;grid-template-columns:1.35fr .68fr 1.12fr .72fr 1.75fr;gap:8px;align-items:center;padding:6px 2px;border-top:1px solid var(--line)}
+  .vcell{text-align:right;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .vbet{color:var(--grn);font-weight:700}.vth{color:var(--amb);font-weight:700}.vno{color:var(--red);font-weight:700}.vm{color:var(--mut2)}
   .orow.head{border-top:0;color:var(--mut2);font-size:10px;letter-spacing:.05em;padding-bottom:3px}
   .orow>span{text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .orow>span.onm{text-align:left;color:var(--mut);display:flex;align-items:center;min-width:0}
@@ -310,11 +312,23 @@ let KF=0.25;
 let SYNC='';   // live-data status suffix shown next to the clock
 const EXP=new Set();                       // expanded heatmaps
 const PSIDE={}, PSEL={};                   // pitch side + selected player per fixture
-const STAKE={};                            // optional USD amount you choose to put in, per fixture
+/* These two persist in the browser so a price/amount you lock PRE-MATCH survives auto-refresh,
+   kickoff, and even a page reload - so you can bet early and watch the edge move against YOUR entry. */
+let STAKE={};      // USD amount you choose to put in, per fixture id
+let UPRICE={};     // the real contract price YOU see, in cents, per fixture id + leg (overrides model-fair)
+try{ STAKE=JSON.parse(localStorage.getItem('cupedge_stake')||'{}')||{}; }catch(e){ STAKE={}; }
+try{ UPRICE=JSON.parse(localStorage.getItem('cupedge_uprice')||'{}')||{}; }catch(e){ UPRICE={}; }
+function saveState(){ try{ localStorage.setItem('cupedge_stake',JSON.stringify(STAKE)); localStorage.setItem('cupedge_uprice',JSON.stringify(UPRICE)); }catch(e){} }
 function setOdds(id,leg,v){const fx=FIX.find(f=>f.id==id);const n=parseFloat(v);if(n>1)fx.odds[leg]=n;render();}
 /* you type the dollars you want to put in; we translate the contract price into a real-money outcome.
    Pure arithmetic on YOUR number - it never sizes the bet for you. */
-function setStake(id,v){const n=parseFloat(String(v).replace(/[^0-9.]/g,''));STAKE[id]=isFinite(n)&&n>0?n:null;render();}
+function setStake(id,v){const n=parseFloat(String(v).replace(/[^0-9.]/g,''));STAKE[id]=isFinite(n)&&n>0?n:null;saveState();render();}
+/* you type the real PRICE you see (in dollars per contract, e.g. 0.70 = 70 cents). Stored as cents.
+   Clearing the box reverts that leg to the model-fair price (edge back to 0). */
+function setPrice(id,leg,v){const d=parseFloat(String(v).replace(/[^0-9.]/g,''));const c=d*100;
+  UPRICE[id]=UPRICE[id]||{};
+  if(isFinite(c)&&c>0&&c<100){ UPRICE[id][leg]=c; } else { delete UPRICE[id][leg]; }
+  saveState();render();}
 
 /* ===== risk-appetite sizing helpers (no auto-betting, no sim - your call) ===== */
 const sbank=()=>+document.getElementById('bank').value||1000;
@@ -336,8 +350,12 @@ function evalFx(fx){
   const live=fx.state=="live";
   // serverP = probabilities computed server-side from REAL FIFA data + lineup/motivation edges
   const P=fx.serverP?fx.serverP:(live?inPlay(lh,la,fx.mn,fx.hs,fx.as):outc(matrix(lh,la)));
-  const fair=devig(fx.odds);const legs={};let be=-9,bl="home";
-  ["home","draw","away"].forEach(l=>{const e=ek(P[l],fx.odds[l]);legs[l]={p:P[l],fair:fair[l],od:fx.odds[l],ev:e.ev,kelly:e.kelly};if(e.ev>be){be=e.ev;bl=l;}});
+  // effective price per leg: YOUR locked entry (UPRICE, in cents) if you typed one, else the model-fair prefill.
+  const up=UPRICE[fx.id]||{};
+  const O={}; ["home","draw","away"].forEach(l=>{O[l]=(up[l]!=null)?100/up[l]:fx.odds[l];});
+  const userSet={}; ["home","draw","away"].forEach(l=>{userSet[l]=(up[l]!=null);});
+  const fair=devig(O);const legs={};let be=-9,bl="home";
+  ["home","draw","away"].forEach(l=>{const e=ek(P[l],O[l]);legs[l]={p:P[l],fair:fair[l],od:O[l],ev:e.ev,kelly:e.kelly,user:userSet[l]};if(e.ev>be){be=e.ev;bl=l;}});
   const bd=live?[P.home,P.home]:band(he,ae,fx.hadv,fx.total,-.05);const bw=(bd[1]-bd[0])/2;
   const fav=Math.max(P.home,P.draw,P.away);const tr=tierOf(be,fav,P.draw,bw,fx.conf,live);
   const full=fx.serverP?fx.serverP:(live?null:outc(matrix(lh,la)));
@@ -466,23 +484,30 @@ function card(r){
     :fin?`<span class="badge b-ft">FT ${fx.hs}-${fx.as}</span>`
     :`<span class="badge b-pre">${fx.koUtc?esc(fmtLocal(fx.koUtc)):(esc((fx.grp.split('·').pop()||'').trim())||'SCHEDULED')}</span>`;
   const mid=(fx.state=='live'||fin)?`<div class="score">${fx.hs}-${fx.as}<small>${fin?'full':fx.mn+"'"}</small></div>`:`<div class="score" style="font-size:13px;color:var(--mut2)">vs</div>`;
-  const fair0=Math.abs(e.ev)<0.01;   // price you entered equals the model fair value
+  const anyPrice=["home","draw","away"].some(l=>r.legs[l].user);
+  const fair0=!anyPrice || Math.abs(e.ev)<0.01;   // you haven't entered a price, or it equals model fair
   const edgeBlock = fair0
-   ? `<div class="edge flat"><div><div class="ekey">NO TRADEABLE EDGE</div>
-       <div class="ebig neg" style="font-size:16px">price = model fair</div>
-       <div class="esub">Type the cents you see on Robinhood / Kalshi. An edge shows up only when your price differs from the model.</div></div></div>`
+   ? `<div class="edge flat"><div><div class="ekey">ENTER A PRICE TO GET A VERDICT</div>
+       <div class="ebig neg" style="font-size:16px">no bet yet</div>
+       <div class="esub">In the table below, type the price you see on Robinhood / Kalshi for any team — in dollars, e.g. <b>0.70</b> for 70&cent;. A <b style="color:var(--grn)">BET</b> / <b style="color:var(--red)">NO BET</b> call appears the moment your price differs from the model. Your entry is saved, so you can lock it pre-match.</div></div></div>`
    : `<div class="edge ${e.ev<=0||!fx.conf?'flat':''}">
       <div><div class="ekey">BEST EDGE · ${esc(nm(fx,r.bl))} ${r.bl=='draw'?'':'ML'}</div>
-        <div class="ebig ${e.ev<=0?'neg':'flash'}">${e.ev>0?'+':''}${(e.ev*100).toFixed(1)}%<span class="esub" style="display:inline"> vs market</span></div>
-        <div class="esub">model ${(e.p*100).toFixed(1)}% vs market ${(100/e.od).toFixed(0)}¢ · pays <b style="color:var(--grn)">+${((e.od-1)*100).toFixed(0)}%</b> if it hits${!fx.conf?` · <span style="color:var(--amb)">XI pending</span>`:''}</div></div>
+        <div class="ebig ${e.ev<=0?'neg':'flash'}">${e.ev>0?'+':''}${(e.ev*100).toFixed(1)}%<span class="esub" style="display:inline"> vs your price</span></div>
+        <div class="esub">model ${(e.p*100).toFixed(1)}% vs your price $${((100/e.od)/100).toFixed(2)} · pays <b style="color:var(--grn)">+${((e.od-1)*100).toFixed(0)}%</b> if it hits${!fx.conf?` · <span style="color:var(--amb)">XI pending</span>`:''}</div></div>
       </div>`;
-  let rows="";["home","draw","away"].forEach(l=>{const d=r.legs[l];const cents=(100/d.od);
+  let rows="";["home","draw","away"].forEach(l=>{const d=r.legs[l];const yourD=(100/d.od)/100;
+    let vd; const ev=(d.ev*100);
+    if(!d.user) vd=`<span class="vm">— enter price</span>`;
+    else if(d.ev<=0) vd=`<span class="vno">⛔ NO BET ${ev.toFixed(0)}%</span>`;
+    else if(d.ev<0.025) vd=`<span class="vth">◔ THIN +${ev.toFixed(0)}%</span>`;
+    else if(d.ev<0.06) vd=`<span class="vbet">✅ BET +${ev.toFixed(0)}%</span>`;
+    else vd=`<span class="vbet">✅ STRONG +${ev.toFixed(0)}%</span>`;
     rows+=`<div class="orow ${l==r.bl?'best':''}">
       <span class="onm"><span class="dotc ${LG[l]}"></span>${esc(nm(fx,l))}</span>
       <span>${(d.p*100).toFixed(0)}%</span>
-      <span class="oc"><input class="oin" value="${cents.toFixed(0)}" onchange="setCents('${fx.id}','${l}',this.value)"><i>¢</i></span>
+      <span class="oc"><i>$</i><input class="oin" value="${d.user?yourD.toFixed(2):''}" placeholder="${d.p.toFixed(2)}" inputmode="decimal" onchange="setPrice('${fx.id}','${l}',this.value)"></span>
       <span>+${((d.od-1)*100).toFixed(0)}%</span>
-      <span class="${d.ev>0?'pos':'negv'}">${d.ev>0?'+':''}${(d.ev*100).toFixed(1)}%</span>
+      <span class="vcell">${vd}</span>
     </div>`;});
   const bt=`${esc(fx.home)} range <b>${(r.bd[0]*100).toFixed(0)}-${(r.bd[1]*100).toFixed(0)}%</b> · 10-90% band &plusmn;${(r.bw*100).toFixed(1)}pp`;
   const formFact=(fx.formationH||fx.formationA)?`<span class="fact">form <b>${esc(fx.formationH||'?')}</b> v <b>${esc(fx.formationA||'?')}</b></span>`:'';
@@ -498,12 +523,12 @@ function card(r){
     const contracts=Math.floor(stk/perC), cost=contracts*perC, payout=contracts*1, profit=payout-cost, roi=cost>0?profit/cost:0;
     stakeBlock=`<div class="stake"><div class="srow"><span class="skey">YOUR $</span>
       <span class="oc2"><i>$</i><input class="sin" value="${stk}" inputmode="decimal" onchange="setStake('${fx.id}',this.value)"></span>
-      <span class="son">on <b>${esc(nm(fx,r.bl))}</b> @ ${priceC.toFixed(0)}&cent;</span></div>
+      <span class="son">on <b>${esc(nm(fx,r.bl))}</b> @ $${(priceC/100).toFixed(2)}</span></div>
       <div class="scalc">${contracts} contract${contracts==1?'':'s'} &middot; cost <b>$${cost.toFixed(2)}</b> &middot; pays <b class="pos">$${payout.toFixed(2)}</b> if it hits &rarr; <b class="${profit>=0?'pos':'negv'}">${profit>=0?'+':''}$${profit.toFixed(2)} (${roi>=0?'+':''}${(roi*100).toFixed(0)}%)</b> &middot; you risk <b class="negv">-$${cost.toFixed(2)}</b> if it misses</div></div>`;
   } else {
     stakeBlock=`<div class="stake"><div class="srow"><span class="skey">YOUR $</span>
       <span class="oc2"><i>$</i><input class="sin" value="" placeholder="36.57" inputmode="decimal" onchange="setStake('${fx.id}',this.value)"></span>
-      <span class="son">type your amount to size <b>${esc(nm(fx,r.bl))}</b> @ ${priceC.toFixed(0)}&cent; (price &rarr; dollars)</span></div></div>`;
+      <span class="son">type your amount to size <b>${esc(nm(fx,r.bl))}</b> @ $${(priceC/100).toFixed(2)}</span></div></div>`;
   }
   const heat=EXP.has(fx.id)?pitchPanel(fx):"";
   return `<div class="card"><div class="pad">
@@ -517,7 +542,7 @@ function card(r){
     <div class="plab"><span>${esc(fx.home)}</span><span>X</span><span>${esc(fx.away)}</span></div>
     <div class="band">${bt}</div>
     ${edgeBlock}
-    <div class="otab"><div class="orow head"><span>SEL</span><span>MODEL</span><span>YOUR&nbsp;¢</span><span>RET%</span><span>EDGE%</span></div>${rows}</div>
+    <div class="otab"><div class="orow head"><span>SEL</span><span>MODEL</span><span>YOUR&nbsp;$</span><span>PAYS</span><span>VERDICT</span></div>${rows}</div>
     ${stakeBlock}
     <div class="facts">${facts}</div>
     <button class="hbtn" onclick="toggleHeat('${fx.id}')">${EXP.has(fx.id)?'▲ HIDE':'▼ PLAYER SCORING HEATMAP'} · who scores, where</button>
