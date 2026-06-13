@@ -169,6 +169,20 @@
   .v-th{border-color:rgba(255,176,0,.4);background:rgba(255,176,0,.07)}.v-th .vbig{color:var(--amb)}
   .v-lean{border-color:rgba(25,224,138,.45);background:rgba(25,224,138,.09)}.v-lean .vbig{color:var(--grn);text-shadow:0 0 16px rgba(25,224,138,.35)}
 
+  /* late-surge sector (80'+) */
+  .latebox{margin-top:11px;background:#0a121a;border:1px solid var(--line2);border-radius:8px;padding:10px 12px}
+  .ltrow{display:grid;grid-template-columns:1.25fr .8fr 2.2fr;gap:10px;align-items:center;padding:5px 0;font-family:var(--mono);font-size:11px}
+  .ltnm{display:flex;align-items:center;gap:6px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ltstar{color:var(--grn);font-size:10px}
+  .ltlean .ltnm{color:var(--grn)}
+  .ltbar{height:7px;background:#05080b;border:1px solid var(--line2);border-radius:4px;overflow:hidden}
+  .ltbar>span{display:block;height:100%}
+  .ltrow:nth-child(2) .ltbar>span{background:linear-gradient(90deg,#1c5a8f,var(--home))}
+  .ltrow:nth-child(3) .ltbar>span{background:linear-gradient(90deg,#7a4a20,var(--away))}
+  .ltval{color:var(--mut);text-align:right}.ltval b{color:var(--ink)}
+  .ltno{grid-column:2/4;color:var(--mut2);font-family:var(--mono);font-size:11px;text-align:right}
+  .latecap{font-family:var(--mono);font-size:10.5px;color:var(--mut2);line-height:1.5;margin-top:7px;border-top:1px solid var(--line);padding-top:7px}.latecap b{color:var(--mut)}
+
   .facts{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
   .fact{font-family:var(--mono);font-size:11px;color:var(--mut);background:#05080b;border:1px solid var(--line2);border-radius:6px;padding:5px 9px}
   .fact b{color:var(--ink)}
@@ -302,6 +316,9 @@ const ELO={Brazil:1991,Morocco:1827,Switzerland:1891,Scotland:1782,Qatar:1421,Ha
    Teams not covered by StatsBomb open data (e.g. Haiti) are absent -> field shows "no data".
    x = advancement 0..100, y = lateral 0..100, sh90 = shots/match, xgs = xG per shot. */
 const SQUADS={"Brazil":[{"n":"Neymar","p":"AM","x":90.2,"y":38.4,"sh90":2.4,"xgs":0.177,"eloImpact":17},{"n":"Richarlison","p":"ST","x":91.6,"y":49.1,"sh90":1.6,"xgs":0.202,"eloImpact":15},{"n":"Rodrygo","p":"AM","x":86.4,"y":46.0,"sh90":1.4,"xgs":0.178,"eloImpact":13},{"n":"Pedro","p":"ST","x":90.2,"y":53.2,"sh90":1.0,"xgs":0.243,"eloImpact":13},{"n":"Casemiro","p":"CM","x":80.9,"y":45.3,"sh90":2.0,"xgs":0.114,"eloImpact":13},{"n":"Raphinha","p":"W","x":85.0,"y":56.4,"sh90":1.6,"xgs":0.115,"eloImpact":12}],"Morocco":[{"n":"Hakim Ziyech","p":"W","x":79.7,"y":60.9,"sh90":1.57,"xgs":0.1,"eloImpact":16},{"n":"Youssef En-Nesyri","p":"ST","x":93.4,"y":53.2,"sh90":1.57,"xgs":0.095,"eloImpact":15},{"n":"Achraf Hakimi","p":"DF","x":82.4,"y":52.2,"sh90":0.71,"xgs":0.184,"eloImpact":14},{"n":"Abdelhamid Sabiri","p":"CM","x":75.5,"y":47.6,"sh90":0.57,"xgs":0.227,"eloImpact":14},{"n":"Zakaria Aboukhlal","p":"ST","x":88.5,"y":55.7,"sh90":0.43,"xgs":0.199,"eloImpact":12},{"n":"Abderrazak Hamdallah","p":"ST","x":96.9,"y":41.4,"sh90":0.29,"xgs":0.271,"eloImpact":12}],"Switzerland":[{"n":"Breel Embolo","p":"ST","x":91.9,"y":46.4,"sh90":1.5,"xgs":0.399,"eloImpact":28},{"n":"Manuel Akanji","p":"DF","x":90.9,"y":53.3,"sh90":1.0,"xgs":0.221,"eloImpact":17},{"n":"Remo Freuler","p":"CM","x":91.9,"y":50.5,"sh90":0.75,"xgs":0.182,"eloImpact":13},{"n":"Xherdan Shaqiri","p":"W","x":84.2,"y":65.6,"sh90":1.0,"xgs":0.124,"eloImpact":13},{"n":"Ruben Vargas","p":"W","x":86.9,"y":48.0,"sh90":0.75,"xgs":0.099,"eloImpact":11},{"n":"Granit Xhaka","p":"CM","x":82.6,"y":44.7,"sh90":1.5,"xgs":0.049,"eloImpact":11}],"Qatar":[{"n":"Almoez Ali","p":"ST","x":86.9,"y":50.0,"sh90":1.0,"xgs":0.161,"eloImpact":28},{"n":"Ismaeel Mohammad","p":"W","x":86.3,"y":49.9,"sh90":0.67,"xgs":0.179,"eloImpact":23},{"n":"Abdelkarim Hassan","p":"DF","x":81.6,"y":42.2,"sh90":2.0,"xgs":0.046,"eloImpact":20},{"n":"Mohammed Muntari","p":"ST","x":89.1,"y":55.6,"sh90":1.0,"xgs":0.062,"eloImpact":16},{"n":"Pedro Miguel Correia","p":"DF","x":81.4,"y":62.9,"sh90":0.67,"xgs":0.019,"eloImpact":10},{"n":"Akram Afif","p":"ST","x":76.9,"y":40.4,"sh90":0.67,"xgs":0.015,"eloImpact":9}],"Scotland":[{"n":"Scott McTominay","p":"AM","x":89.2,"y":51.2,"sh90":1.33,"xgs":0.061,"eloImpact":23},{"n":"Callum McGregor","p":"CM","x":84.8,"y":43.4,"sh90":1.0,"xgs":0.047,"eloImpact":16},{"n":"Che Adams","p":"ST","x":88.7,"y":45.7,"sh90":0.67,"xgs":0.062,"eloImpact":15},{"n":"Billy Gilmour","p":"CM","x":84.0,"y":49.2,"sh90":0.67,"xgs":0.044,"eloImpact":13},{"n":"Scott McKenna","p":"DF","x":89.7,"y":55.1,"sh90":0.67,"xgs":0.043,"eloImpact":13}]};
+/* REAL StatsBomb late-game scoring profile (shots struck at minute>=80, regulation). Descriptive only, NOT in the price.
+   lx=share of the team's shot xG struck after 80' · g80=late goals · g=total goals · m=matches · lsh=late shots/match. */
+const LATE={"Brazil":{lx:0.225,g80:1,g:7,m:5,lsh:4.6,src:"WC2022"},"Morocco":{lx:0.311,g80:1,g:6,m:7,lsh:1.86,src:"WC2022"},"Switzerland":{lx:0.128,g80:0,g:5,m:4,lsh:1.5,src:"WC2022"},"Qatar":{lx:0.142,g80:0,g:1,m:3,lsh:1.67,src:"WC2022"},"Scotland":{lx:0.444,g80:0,g:1,m:3,lsh:3.0,src:"Euro2024"}};
 function scoreProb(pl){return 1-Math.exp(-(pl.sh90*pl.xgs));}
 function zoneLabel(x,y){const depth=x>=82?"in the box":x>=72?"box edge":"top of D";
   const lane=y<=33?"left channel":y>=67?"right channel":"central";return lane+", "+depth;}
@@ -507,6 +524,31 @@ function pitchPanel(fx){
   </div>`;
 }
 
+/* =================== late-surge sector (80'+) =================== */
+/* who scores late, from REAL StatsBomb shots struck at minute>=80. Descriptive, not in the price. */
+function lateRow(team, side, lean){
+  const d=LATE[team];
+  if(!d) return `<div class="ltrow"><span class="ltnm"><span class="dotc ${side}"></span>${esc(team)}</span><span class="ltno">no StatsBomb data</span></div>`;
+  const pct=(d.lx*100).toFixed(0);
+  return `<div class="ltrow ${lean?'ltlean':''}">
+    <span class="ltnm"><span class="dotc ${side}"></span>${esc(team)}${lean?' <b class="ltstar">★ latest</b>':''}</span>
+    <span class="ltbar"><span style="width:${Math.min(100,d.lx*200).toFixed(0)}%"></span></span>
+    <span class="ltval"><b>${pct}%</b> of threat after 80' &middot; ${d.g80} late goal${d.g80==1?'':'s'} in ${d.m} &middot; ${d.lsh} late shots/match</span></div>`;
+}
+function latePanel(fx){
+  const H=LATE[fx.home], A=LATE[fx.away];
+  if(!H && !A) return '';
+  let leanH=false, leanA=false;
+  if(H && A){ if(H.lx>=A.lx) leanH=true; else leanA=true; }
+  const cap = (H&&A)
+    ? `<b>${esc(leanH?fx.home:fx.away)}</b> creates more of its attacking threat in the final 10 min. Small samples (${H.m}/${A.m} matches) — read it as a tilt for late goals / live in-running, not a lock.`
+    : `Only one side is in StatsBomb open data; the other shows no late-scoring data (never invented).`;
+  return `<div class="latebox">
+    <div class="xilab">LATE SURGE · who scores after 80'<span>real StatsBomb shots struck at minute 80+ (regulation). Descriptive only — not in the price.</span></div>
+    ${lateRow(fx.home,'d-h',leanH)}${lateRow(fx.away,'d-a',leanA)}
+    <div class="latecap">${cap}</div></div>`;
+}
+
 /* =================== card =================== */
 /* you enter the price you see (in cents, prediction-market style); edge = model - market */
 function card(r){
@@ -586,6 +628,7 @@ function card(r){
     <div class="band">${bt}</div>
     ${pickPanel}
     <div class="facts">${facts}</div>
+    ${latePanel(fx)}
     <button class="hbtn" onclick="toggleHeat('${fx.id}')">${EXP.has(fx.id)?'▲ HIDE':'▼ PLAYER SCORING HEATMAP'} · who scores, where</button>
     </div>${heat}
     <div class="pad" style="padding-top:0"><div class="src">${so} · <span class="v">measured:</span> real Elo (eloratings.net) · shots: StatsBomb open data · market: <b style="color:var(--cyan)">Robinhood / Kalshi ${esc(fx.kalshi||'')}</b></div></div>
