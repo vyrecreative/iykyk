@@ -291,7 +291,13 @@ function dcTau(i,j,lh,la,r){if(i==0&&j==0)return 1-lh*la*r;if(i==0&&j==1)return 
 function eloToGoals(he,ae,h,t,s=0.40){const sup=((he+h)-ae)/100*s;return[Math.max(.15,(t+sup)/2),Math.max(.15,(t-sup)/2)];}
 function matrix(lh,la,r=-0.05){let m=[],S=0;for(let i=0;i<=MAXG;i++){m[i]=[];for(let j=0;j<=MAXG;j++){const v=pois(i,lh)*pois(j,la)*dcTau(i,j,lh,la,r);m[i][j]=v;S+=v;}}for(let i=0;i<=MAXG;i++)for(let j=0;j<=MAXG;j++)m[i][j]/=S;return m;}
 function outc(m){let h=0,d=0,a=0,o=0,b=0,bp=0,bi=0,bj=0;for(let i=0;i<=MAXG;i++)for(let j=0;j<=MAXG;j++){const p=m[i][j];if(i>j)h+=p;else if(i<j)a+=p;else d+=p;if(i+j>=3)o+=p;if(i&&j)b+=p;if(p>bp){bp=p;bi=i;bj=j;}}return{home:h,draw:d,away:a,over25:o,btts:b,top:bi+"-"+bj};}
-function inPlay(lh,la,mn,hs,as_,r=-0.05){const rem=Math.max(0,(94-mn))/90;const m=matrix(lh*rem,la*rem,r);let h=0,d=0,a=0;for(let i=0;i<=MAXG;i++)for(let j=0;j<=MAXG;j++){const p=m[i][j];const fh=hs+i,fa=as_+j;if(fh>fa)h+=p;else if(fh<fa)a+=p;else d+=p;}return{home:h,draw:d,away:a};}
+/* mirrors lib/model.js inPlay: late-surge comeback bump (real StatsBomb late-xG share), live + closing phase only, capped. */
+function inPlay(lh,la,mn,hs,as_,r=-0.05,lateH,lateA){const rem=Math.max(0,(94-mn))/90;
+  const base=0.22,K=1.0,CAP=1.18;let bh=1,ba=1;
+  if(mn>=70){const ph=Math.min(1,Math.max(0,(mn-70)/25));
+    const fh=Math.min(CAP,1+Math.max(0,(lateH||0)-base)*K*ph),fa=Math.min(CAP,1+Math.max(0,(lateA||0)-base)*K*ph);
+    if(hs<=as_)bh=fh; if(as_<=hs)ba=fa;}
+  const m=matrix(lh*rem*bh,la*rem*ba,r);let h=0,d=0,a=0;for(let i=0;i<=MAXG;i++)for(let j=0;j<=MAXG;j++){const p=m[i][j];const fh=hs+i,fa=as_+j;if(fh>fa)h+=p;else if(fh<fa)a+=p;else d+=p;}return{home:h,draw:d,away:a};}
 function devig(o){const r={home:1/o.home,draw:1/o.draw,away:1/o.away};const s=r.home+r.draw+r.away;return{home:r.home/s,draw:r.draw/s,away:r.away/s,vig:s-1};}
 function ek(p,od){const b=od-1,q=1-p;return{ev:p*od-1,kelly:b>0?Math.max(0,(b*p-q)/b):0};}
 let gs=7;function gauss(){gs=(gs*9301+49297)%233280;let u=gs/233280;gs=(gs*9301+49297)%233280;let v=gs/233280;return Math.sqrt(-2*Math.log(u+1e-9))*Math.cos(6.283*v);}
@@ -395,7 +401,7 @@ function evalFx(fx){
   const he=ELO[fx.home]??fx.homeElo??1700,ae=ELO[fx.away]??fx.awayElo??1700;const[lh,la]=eloToGoals(he,ae,fx.hadv,fx.total);
   const live=fx.state=="live";
   // serverP = probabilities computed server-side from REAL FIFA data + lineup/motivation edges
-  const P=fx.serverP?fx.serverP:(live?inPlay(lh,la,fx.mn,fx.hs,fx.as):outc(matrix(lh,la)));
+  const P=fx.serverP?fx.serverP:(live?inPlay(lh,la,fx.mn,fx.hs,fx.as,-0.05,(LATE[fx.home]||{}).lx,(LATE[fx.away]||{}).lx):outc(matrix(lh,la)));
   // effective price per leg: YOUR locked entry (UPRICE, in cents) if you typed one, else the model-fair prefill.
   const up=UPRICE[fx.id]||{};
   const O={}; ["home","draw","away"].forEach(l=>{O[l]=(up[l]!=null)?100/up[l]:fx.odds[l];});
