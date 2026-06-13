@@ -425,7 +425,8 @@ function card(r){
   const formFact=(fx.formationH||fx.formationA)?`<span class="fact">form <b>${esc(fx.formationH||'?')}</b> v <b>${esc(fx.formationA||'?')}</b></span>`:'';
   const xiFact=fx.lineupStatus?`<span class="fact">XI: <b>${esc(fx.lineupStatus)}</b></span>`:'';
   const motivFact=fx.motiv?`<span class="fact" style="color:var(--amb)">motivation: <b>${esc(fx.motiv)}</b></span>`:'';
-  const facts=`${r.o25!=null?`<span class="fact">O2.5 <b>${(r.o25*100).toFixed(0)}%</b></span>`:''}${r.top?`<span class="fact">top <b>${r.top}</b></span>`:''}${formFact}${xiFact}${motivFact}`;
+  const coachFact=fx.coachH?`<span class="fact">coach <b>${esc(fx.coachH)}</b> v <b>${esc(fx.coachA||'?')}</b></span>`:'';
+  const facts=`${r.o25!=null?`<span class="fact">O2.5 <b>${(r.o25*100).toFixed(0)}%</b></span>`:''}${r.top?`<span class="fact">top <b>${r.top}</b></span>`:''}${formFact}${coachFact}${xiFact}${motivFact}`;
   const so=fx.conf?`<span class="v">&check; FIFA fixture + XI</span>`:`<span style="color:var(--amb)">XI publishes ~75 min pre-KO</span>`;
   const heat=EXP.has(fx.id)?pitchPanel(fx):"";
   return `<div class="card"><div class="pad">
@@ -475,7 +476,7 @@ function mapServer(m){
     grp:`${m.group||''} · ${m.venue||''}`.replace(/·\s+·/g,'·'), koEt:m.kickoffEt, koUtc:m.kickoffUtc,
     home:m.home, away:m.away, homeElo:m.homeElo, awayElo:m.awayElo, hadv:55, total:2.55, kalshi:'',
     conf:!!m.lineupConfirmed, state:m.state, mn:m.minute||0, hs:m.homeScore||0, as:m.awayScore||0,
-    formationH:m.homeFormation, formationA:m.awayFormation,
+    formationH:m.homeFormation, formationA:m.awayFormation, coachH:m.homeCoach, coachA:m.awayCoach,
     lineupStatus:e.edges&&e.edges.lineup&&e.edges.lineup.home.status,
     motiv:(e.edges&&e.edges.motivation&&(e.edges.motivation.home||e.edges.motivation.away))||null,
     serverP:{home:e.home,draw:e.draw,away:e.away,over25:e.over25,btts:e.btts,top:e.top},
