@@ -249,6 +249,7 @@ let FIX=[
 
 /* =================== state =================== */
 let KF=0.25;
+let SYNC='';   // live-data status suffix shown next to the clock
 const EXP=new Set();                       // expanded heatmaps
 const PSIDE={}, PSEL={};                   // pitch side + selected player per fixture
 function setOdds(id,leg,v){const fx=FIX.find(f=>f.id==id);const n=parseFloat(v);if(n>1)fx.odds[leg]=n;render();}
@@ -405,7 +406,7 @@ function render(){
   document.getElementById('cards').innerHTML=FIX.map(fx=>card(evalFx(fx))).join('');
 }
 function tick(){
-  document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'})+" ET";
+  document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'})+" ET"+SYNC;
 }
 
 /* ===== live sync: pull REAL FIFA data + model edges from /api/matchday, auto re-poll ===== */
@@ -434,7 +435,7 @@ async function loadLive(){
         FIX=d.matches.map(mapServer);
         next=(d.refreshSeconds||60)*1000;
         const day=d.matchdayDate?(' · '+d.matchdayDate):'';
-        document.getElementById('clock').textContent=(d.generatedAtEt||'')+' · LIVE'+day+(d.rolledForward?' (next matchday)':'');
+        SYNC=' · LIVE'+day+(d.rolledForward?' (next matchday)':'');
         render();
       }
     }
