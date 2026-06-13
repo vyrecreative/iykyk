@@ -1,906 +1,448 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CupEdge Match Signals</title>
-  <style>
-    :root {
-      --bg: #f5f7f2;
-      --ink: #18211f;
-      --muted: #61716d;
-      --line: #d7ded8;
-      --panel: #ffffff;
-      --green: #0f6b43;
-      --green-dark: #143f32;
-      --blue: #276b8f;
-      --gold: #d59c16;
-      --red: #b23a48;
-      --soft: #edf4ef;
-      --shadow: 0 18px 55px rgba(20, 36, 32, 0.12);
-      --radius: 8px;
-      --mono: "SFMono-Regular", "Roboto Mono", Consolas, monospace;
-      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--ink);
-      font-family: var(--sans);
-      letter-spacing: 0;
-      background:
-        linear-gradient(90deg, rgba(15, 107, 67, 0.055) 1px, transparent 1px),
-        linear-gradient(0deg, rgba(15, 107, 67, 0.045) 1px, transparent 1px),
-        var(--bg);
-      background-size: 34px 34px, 34px 34px, auto;
-    }
-    a { color: inherit; }
-    h1, h2, h3, h4, p { margin: 0; }
-    button, select { font: inherit; }
-    .shell { width: min(1220px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 46px; }
-    .hero {
-      position: relative;
-      overflow: hidden;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 390px;
-      gap: 28px;
-      min-height: 400px;
-      padding: clamp(22px, 4vw, 44px);
-      color: #f7fff8;
-      background: linear-gradient(120deg, rgba(20, 63, 50, 0.98), rgba(12, 32, 29, 0.96));
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
-    .hero:after {
-      content: "";
-      position: absolute;
-      right: -180px;
-      bottom: -190px;
-      width: 620px;
-      height: 420px;
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      border-radius: 50%;
-      transform: rotate(-12deg);
-    }
-    .hero > * { position: relative; z-index: 1; }
-    .eyebrow {
-      display: inline-flex;
-      gap: 8px;
-      align-items: center;
-      width: fit-content;
-      padding: 7px 10px;
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: #68d391; box-shadow: 0 0 0 5px rgba(104, 211, 145, 0.14); }
-    h1 { max-width: 820px; margin-top: 18px; font-size: clamp(40px, 7vw, 78px); line-height: 0.98; letter-spacing: 0; }
-    .subtitle { max-width: 780px; margin-top: 18px; color: #d6e6dd; font-size: clamp(16px, 2vw, 20px); line-height: 1.5; }
-    .hero-actions, .chip-row, .control-row, .tab-row { display: flex; flex-wrap: wrap; gap: 10px; }
-    .hero-actions, .chip-row { margin-top: 22px; }
-    .button, .chip, .tab-button, .toggle-button {
-      min-height: 38px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 9px 12px;
-      border-radius: var(--radius);
-      font-size: 13px;
-      font-weight: 900;
-      text-decoration: none;
-      line-height: 1;
-      cursor: pointer;
-    }
-    .button { color: #10231b; background: #fff; border: 1px solid rgba(255, 255, 255, 0.75); }
-    .chip { color: #dcefe6; background: rgba(255, 255, 255, 0.09); border: 1px solid rgba(255, 255, 255, 0.18); }
-    .refresh-card {
-      position: relative;
-      z-index: 1;
-      align-self: stretch;
-      color: var(--ink);
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: var(--radius);
-      padding: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.7);
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .status-pill { width: fit-content; color: #0f3b2b; background: #dff4e8; border: 1px solid #bfe5ce; border-radius: 999px; padding: 7px 10px; font-size: 12px; font-weight: 900; }
-    .status-pill.warn { color: #785606; background: #fbefd0; border-color: #efd48d; }
-    .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .time-box { min-height: 82px; display: grid; place-items: center; text-align: center; padding: 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--soft); }
-    .time-box strong { display: block; font-size: 22px; line-height: 1; }
-    .time-box span { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; font-weight: 900; text-transform: uppercase; }
-    .small { color: var(--muted); margin-top: 5px; font-size: 13px; line-height: 1.45; }
-    .section { margin-top: 18px; }
-    .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px; }
-    .span-4 { grid-column: span 4; }
-    .span-5 { grid-column: span 5; }
-    .span-6 { grid-column: span 6; }
-    .span-7 { grid-column: span 7; }
-    .span-8 { grid-column: span 8; }
-    .span-12 { grid-column: span 12; }
-    .panel, .match-card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: 0 12px 32px rgba(20, 36, 32, 0.06);
-      padding: 18px;
-      min-width: 0;
-    }
-    .panel-header, .match-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
-    .tag { display: inline-flex; width: fit-content; min-height: 28px; align-items: center; padding: 6px 9px; border-radius: 999px; color: var(--green-dark); background: #e3f3e9; border: 1px solid #cae8d5; font-size: 11px; font-weight: 900; line-height: 1.2; text-align: center; text-transform: uppercase; overflow-wrap: anywhere; }
-    .tag.warn { color: #785606; background: #fbefd0; border-color: #efd48d; }
-    .readiness { max-width: 260px; color: #785606; background: #fbefd0; border: 1px solid #efd48d; border-radius: var(--radius); padding: 10px; font-size: 12px; font-weight: 900; line-height: 1.35; }
-    .signal-panel { margin-top: 12px; padding: 14px; border: 1px solid #cadbd3; border-radius: var(--radius); background: #f7faf7; min-width: 0; }
-    .signal-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-    .signal-tier { display: inline-flex; align-items: center; min-height: 34px; padding: 8px 11px; border-radius: 999px; font-size: 13px; font-weight: 950; text-transform: uppercase; line-height: 1; white-space: nowrap; }
-    .signal-panel.risk { border-color: #efd48d; background: #fff9eb; }
-    .signal-panel.watch { border-color: #c9d7ef; background: #f5f8ff; }
-    .signal-panel.lean { border-color: #bfe5ce; background: #f2fbf5; }
-    .signal-panel.strong { border-color: #a8dcc1; background: #eefaf3; }
-    .signal-panel.no, .signal-panel.closed { border-color: #d7ded8; background: #f8fbf7; }
-    .signal-panel.risk .signal-tier { color: #76510a; background: #fbefd0; border: 1px solid #efd48d; }
-    .signal-panel.watch .signal-tier { color: #265372; background: #e9f2fa; border: 1px solid #c9d7ef; }
-    .signal-panel.lean .signal-tier, .signal-panel.strong .signal-tier { color: #0f3b2b; background: #dff4e8; border: 1px solid #bfe5ce; }
-    .signal-panel.no .signal-tier, .signal-panel.closed .signal-tier { color: #3f4c49; background: #eef2ef; border: 1px solid #d7ded8; }
-    .signal-panel p { color: var(--muted); font-size: 13px; line-height: 1.5; margin-top: 9px; }
-    .signal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
-    .signal-grid div { min-height: 72px; padding: 10px; border: 1px solid rgba(24, 33, 31, 0.1); border-radius: var(--radius); background: rgba(255, 255, 255, 0.72); }
-    .signal-grid b { display: block; font-size: 20px; line-height: 1.05; overflow-wrap: anywhere; }
-    .signal-grid span { display: block; margin-top: 6px; color: var(--muted); font-size: 11px; line-height: 1.3; text-transform: uppercase; font-weight: 900; overflow-wrap: anywhere; }
-    .signal-panel ul { margin-top: 8px; }
-    .tab-button, .toggle-button { color: var(--green-dark); background: #f5faf6; border: 1px solid var(--line); }
-    .tab-button.active, .toggle-button.active { color: #fff; background: var(--green-dark); border-color: var(--green-dark); }
-    .tab-row { margin-top: 12px; }
-    .prob-bar { display: flex; overflow: hidden; min-height: 62px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--soft); }
-    .prob-segment { display: grid; place-items: center; min-width: 58px; color: #fff; text-align: center; padding: 8px 4px; }
-    .prob-segment.home { background: var(--green); }
-    .prob-segment.draw { background: var(--blue); }
-    .prob-segment.away { background: var(--gold); }
-    .prob-segment strong { display: block; font-size: 20px; line-height: 1; }
-    .prob-segment span { display: block; margin-top: 4px; font-size: 10px; font-weight: 900; text-transform: uppercase; }
-    .model-strip, .metric-grid, .pattern-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
-    .model-strip div, .metric, .pattern-grid div { min-height: 74px; padding: 11px; border: 1px solid var(--line); border-radius: var(--radius); background: #f8fbf7; min-width: 0; }
-    .model-strip b, .metric b, .pattern-grid b { display: block; font-size: 20px; line-height: 1.05; overflow-wrap: anywhere; }
-    .model-strip span, .metric span, .pattern-grid span { display: block; margin-top: 6px; color: var(--muted); font-size: 11px; line-height: 1.3; text-transform: uppercase; font-weight: 900; overflow-wrap: anywhere; }
-    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-    .subpanel { border: 1px solid var(--line); border-radius: var(--radius); background: #fbfcfa; padding: 13px; min-width: 0; }
-    .subpanel p, li { color: var(--muted); font-size: 13px; line-height: 1.45; margin-top: 7px; overflow-wrap: anywhere; }
-    .result-panel { margin-top: 12px; border-color: #cfe5d9; background: #f3fbf6; }
-    .result-score { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 12px; align-items: center; margin: 10px 0; }
-    .result-score b { overflow-wrap: anywhere; }
-    .result-score b:last-child { text-align: right; }
-    .result-score strong { display: inline-flex; min-width: 86px; min-height: 44px; align-items: center; justify-content: center; border-radius: var(--radius); background: var(--ink); color: #fff; font-size: 22px; }
-    ul { margin: 6px 0 0; padding-left: 18px; }
-    .form-grid, .player-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
-    .form-card, .player-card { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; padding: 12px; }
-    .form-title { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-    .form-title h4 { margin: 0; font-size: 16px; line-height: 1.2; }
-    .form-title span { color: var(--muted); font-size: 12px; font-weight: 900; line-height: 1.3; text-align: right; }
-    .form-strip { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-    .result-pill { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 999px; color: #fff; font-size: 12px; font-weight: 900; }
-    .result-pill.w { background: var(--green); }
-    .result-pill.d { background: var(--blue); }
-    .result-pill.l { background: var(--red); }
-    .form-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
-    .form-stats div { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); background: #f8fbf7; padding: 9px; }
-    .form-stats b { display: block; font-size: 16px; }
-    .form-stats span { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; font-weight: 900; line-height: 1.25; text-transform: uppercase; }
-    .match-list { display: grid; gap: 6px; margin-top: 10px; }
-    .match-row { display: grid; grid-template-columns: 86px minmax(0, 1fr) 50px; gap: 8px; align-items: center; min-height: 42px; padding: 7px 8px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbfcfa; }
-    .match-row span { min-width: 0; overflow-wrap: anywhere; }
-    .match-row b { font-size: 13px; }
-    .match-row small { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; line-height: 1.25; }
-    .match-date, .match-score { color: var(--muted); font-size: 11px; font-weight: 900; text-transform: uppercase; }
-    .match-score { color: var(--ink); text-align: right; }
-    .source-list { display: grid; gap: 10px; }
-    .source-item { display: grid; grid-template-columns: minmax(112px, 170px) minmax(0, 1fr); align-items: start; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbfcfa; }
-    .source-item h3, .source-item a { overflow-wrap: anywhere; }
-    .source-item p { color: var(--muted); font-size: 13px; line-height: 1.55; margin-top: 4px; overflow-wrap: anywhere; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { text-align: left; border-bottom: 1px solid var(--line); padding: 10px 8px; vertical-align: top; }
-    th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0; }
-    .fineprint { color: var(--muted); font-size: 12px; line-height: 1.5; margin-top: 14px; }
-    .pitch-wrap { display: grid; gap: 10px; margin-top: 12px; }
-    .pitch {
-      position: relative;
-      overflow: hidden;
-      aspect-ratio: 105 / 68;
-      min-height: 320px;
-      border: 2px solid rgba(255, 255, 255, 0.86);
-      border-radius: var(--radius);
-      background:
-        linear-gradient(90deg, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.06) 50%),
-        linear-gradient(0deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-        #17613f;
-      background-size: 50% 100%, 100% 16.66%, auto;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
-    }
-    .pitch:before {
-      content: "";
-      position: absolute;
-      inset: 9%;
-      border: 2px solid rgba(255, 255, 255, 0.76);
-      border-radius: 4px;
-      pointer-events: none;
-    }
-    .pitch:after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 9%;
-      width: 2px;
-      height: 82%;
-      background: rgba(255, 255, 255, 0.72);
-      transform: translateX(-1px);
-      pointer-events: none;
-    }
-    .center-circle {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 18%;
-      aspect-ratio: 1;
-      border: 2px solid rgba(255, 255, 255, 0.7);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-    .box-left, .box-right {
-      position: absolute;
-      top: 30%;
-      width: 14%;
-      height: 40%;
-      border: 2px solid rgba(255, 255, 255, 0.7);
-      pointer-events: none;
-    }
-    .box-left { left: 9%; border-left: 0; }
-    .box-right { right: 9%; border-right: 0; }
-    .heat-spot {
-      position: absolute;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      mix-blend-mode: screen;
-      background: radial-gradient(circle, rgba(255, 229, 112, 0.9) 0%, rgba(213, 156, 22, 0.42) 38%, rgba(178, 58, 72, 0.08) 70%, transparent 72%);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-    }
-    .player-dot {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      background: #fff;
-      border: 2px solid var(--gold);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
-    }
-    .player-dot.active { width: 17px; height: 17px; border-color: var(--red); }
-    .pitch-label {
-      position: absolute;
-      left: 12px;
-      bottom: 10px;
-      color: rgba(255, 255, 255, 0.86);
-      font-size: 12px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0;
-    }
-    .field-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .field-legend div { min-height: 68px; padding: 10px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
-    .field-legend b { display: block; font-size: 18px; }
-    .field-legend span { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.3; font-weight: 900; text-transform: uppercase; }
-    select { min-height: 38px; max-width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius); color: var(--ink); background: #fff; font-weight: 800; }
-    @media (max-width: 960px) {
-      .hero, .grid, .split, .form-grid, .player-grid { grid-template-columns: 1fr; }
-      .span-4, .span-5, .span-6, .span-7, .span-8, .span-12 { grid-column: auto; }
-      .model-strip, .metric-grid, .pattern-grid, .signal-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 620px) {
-      .shell { width: min(100% - 20px, 1220px); padding-top: 10px; }
-      .hero, .panel, .match-card, .refresh-card { padding: 16px; }
-      .time-grid, .model-strip, .metric-grid, .pattern-grid, .signal-grid, .form-stats, .field-legend { grid-template-columns: 1fr; }
-      .source-item, .match-head, .panel-header { grid-template-columns: 1fr; display: grid; }
-      .form-title { display: grid; }
-      .form-title span { text-align: left; }
-      .prob-bar { display: grid; overflow: visible; min-height: 0; }
-      .prob-segment { width: 100% !important; min-height: 54px; grid-template-columns: 58px minmax(0, 1fr); place-items: center start; justify-items: start; padding: 10px 12px; text-align: left; }
-      .prob-segment strong { font-size: 18px; }
-      .prob-segment span { margin-top: 0; font-size: 11px; line-height: 1.2; overflow-wrap: anywhere; }
-      .match-row { grid-template-columns: 72px minmax(0, 1fr) 44px; }
-      .readiness { max-width: none; }
-      table { table-layout: fixed; white-space: normal; }
-      th, td { overflow-wrap: anywhere; }
-      .pitch { width: 100%; min-height: 0; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CUPEDGE // MATCH SIGNALS</title>
+<style>
+  :root{
+    --bg:#06080b;--bg2:#0a0e13;--panel:#0d141b;--panel2:#101922;--line:#1c2a36;--line2:#283a49;
+    --ink:#dfe9f0;--mut:#7c93a3;--mut2:#4f6473;
+    --grn:#19e08a;--grn2:#0e8f59;--amb:#ffb000;--red:#ff4d4d;--cyan:#37d4ff;--home:#37a6ff;--away:#ff7a44;--draw:#8aa0ad;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:14px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,sans-serif;-webkit-font-smoothing:antialiased;}
+  body:before{content:"";position:fixed;inset:0;background:radial-gradient(900px 500px at 78% -8%,rgba(25,224,138,.07),transparent 60%);pointer-events:none}
+  .wrap{max-width:680px;margin:0 auto;padding:18px 14px 80px;position:relative}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+  /* ---- ticker (label fixed, marquee scrolls inside its own clipped window) ---- */
+  .ticker{position:sticky;top:0;z-index:40;width:100%;background:#04070a;border-bottom:1px solid var(--line2);
+    height:32px;display:flex;align-items:stretch;font-family:var(--mono);font-size:12px;overflow:hidden}
+  .ticker .lab{flex:0 0 auto;background:var(--grn);color:#04070a;font-weight:800;padding:0 13px;display:flex;align-items:center;letter-spacing:.06em}
+  .tkwin{flex:1 1 auto;min-width:0;position:relative;overflow:hidden}
+  .tk{position:absolute;top:0;left:0;height:100%;white-space:nowrap;display:flex;align-items:center;padding-left:100%;animation:tk 34s linear infinite}
+  .tk span{margin:0 20px;color:var(--mut)}
+  .tk b.up{color:var(--grn)} .tk b.dn{color:var(--red)} .tk b.live{color:var(--amb)}
+  @keyframes tk{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+
+  /* ---- masthead ---- */
+  .mast{display:flex;align-items:baseline;justify-content:space-between;margin:18px 0 4px}
+  .logo{font-family:var(--mono);font-weight:800;letter-spacing:.06em;font-size:20px}
+  .logo .c{color:var(--grn)} .logo .s{color:var(--mut2)}
+  .cur{display:inline-block;width:9px;height:16px;background:var(--grn);margin-left:3px;vertical-align:-2px;animation:bl 1.1s steps(1) infinite}
+  @keyframes bl{50%{opacity:0}}
+  .clock{font-family:var(--mono);font-size:12px;color:var(--mut)}
+  .sub{font-size:12px;color:var(--mut);margin-bottom:14px}
+  .sub b{color:var(--ink)}
+
+  /* ---- control deck ---- */
+  .deck{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line2);border-radius:10px;
+    padding:12px 14px;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px 18px}
+  .deck h4{margin:0 0 8px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut2);font-weight:700}
+  .field{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut)}
+  .field input{width:78px;background:#05080b;border:1px solid var(--line2);color:var(--grn);border-radius:6px;
+    padding:6px 8px;font-family:var(--mono);font-size:14px}
+  .splitbar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;display:flex;margin-top:8px;border:1px solid var(--line)}
+  .splitbar .cash{background:linear-gradient(90deg,#123,#1c3a4d)} .splitbar .risk{background:linear-gradient(90deg,var(--grn2),var(--grn))}
+  .splitlab{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--mut);margin-top:5px}
+  .kseg{display:flex;border:1px solid var(--line2);border-radius:6px;overflow:hidden;margin-top:6px}
+  .kseg button{flex:1;background:#05080b;color:var(--mut);border:0;border-right:1px solid var(--line2);padding:6px 4px;font-family:var(--mono);font-size:11px;cursor:pointer}
+  .kseg button:last-child{border-right:0}
+  .kseg button.on{background:var(--grn);color:#04070a;font-weight:800}
+  .livetog{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mut)}
+  .sw{width:36px;height:19px;border-radius:999px;background:#16222c;position:relative;cursor:pointer;border:1px solid var(--line2)}
+  .sw.on{background:rgba(25,224,138,.35)} .sw i{position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#bfe;transition:.18s}.sw.on i{left:18px}
+
+  /* ---- card ---- */
+  .card{background:linear-gradient(180deg,var(--panel),#080d12);border:1px solid var(--line2);border-radius:11px;
+    margin-bottom:15px;position:relative;overflow:hidden}
+  .card:before{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,var(--home),var(--grn),var(--away))}
+  .pad{padding:14px 15px}
+  .crow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .code{font-family:var(--mono);font-size:11px;color:var(--mut2);letter-spacing:.05em}
+  .code b{color:var(--cyan)}
+  .badge{font-family:var(--mono);font-size:11px;font-weight:700;padding:4px 9px;border-radius:5px;white-space:nowrap}
+  .b-live{background:rgba(255,77,77,.14);color:#ff7a7a;border:1px solid rgba(255,77,77,.4)}
+  .b-live .d{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-right:5px;animation:bl 1s steps(1) infinite}
+  .b-pre{background:rgba(55,166,255,.12);color:var(--home);border:1px solid rgba(55,166,255,.32)}
+  .b-ft{background:rgba(140,160,173,.1);color:var(--mut);border:1px solid var(--line2)}
+
+  .tiers{margin:11px 0 3px}
+  .tier{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.03em;padding:4px 10px;border-radius:5px}
+  .t-strong{background:rgba(25,224,138,.16);color:var(--grn);border:1px solid rgba(25,224,138,.4)}
+  .t-lean{background:rgba(55,166,255,.14);color:var(--home);border:1px solid rgba(55,166,255,.34)}
+  .t-watch{background:rgba(255,176,0,.14);color:var(--amb);border:1px solid rgba(255,176,0,.34)}
+  .t-vol{background:rgba(255,122,68,.14);color:var(--away);border:1px solid rgba(255,122,68,.34)}
+  .t-no{background:rgba(140,160,173,.1);color:var(--mut);border:1px solid var(--line2)}
+
+  .teams{display:flex;align-items:center;justify-content:space-between;margin:8px 0 2px}
+  .team{flex:1}.team.r{text-align:right}
+  .tn{font-size:19px;font-weight:800;letter-spacing:-.01em}
+  .telo{font-family:var(--mono);font-size:11px;color:var(--mut2)}
+  .score{font-family:var(--mono);font-size:26px;font-weight:800;padding:0 14px}
+  .score small{display:block;font-size:10px;color:var(--mut2);text-align:center;font-weight:600}
+
+  .pbar{display:flex;height:30px;border-radius:6px;overflow:hidden;margin:10px 0 4px;font-family:var(--mono);font-size:12px;font-weight:700;border:1px solid var(--line)}
+  .pbar span{display:flex;align-items:center;justify-content:center;color:#04070a;transition:width .6s}
+  .ph{background:var(--home)}.pd{background:var(--draw)}.pa{background:var(--away)}
+  .plab{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);font-family:var(--mono)}
+  .band{font-size:11px;color:var(--mut2);margin-top:7px;font-family:var(--mono)}.band b{color:var(--home)}
+
+  .edge{margin-top:12px;background:#0a121a;border:1px solid var(--line2);border-radius:8px;padding:11px 13px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .edge.flat{opacity:.55}
+  .ekey{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut2)}
+  .ebig{font-family:var(--mono);font-size:23px;font-weight:800;color:var(--grn)}.ebig.neg{color:var(--mut)}
+  .ebig.flash{animation:fl 1.4s ease-out}
+  @keyframes fl{0%{text-shadow:0 0 12px var(--grn)}100%{text-shadow:none}}
+  .esub{font-family:var(--mono);font-size:11px;color:var(--mut);margin-top:2px}
+  .stakebox{text-align:right;min-width:130px}
+  .stakeamt{font-family:var(--mono);font-size:20px;font-weight:800;color:var(--ink)}
+  .stakek{font-family:var(--mono);font-size:10px;color:var(--mut2);margin-top:2px}
+  .hold{font-family:var(--mono);font-size:11px;color:var(--amb)}
+
+  table{width:100%;border-collapse:collapse;margin-top:11px;font-family:var(--mono);font-size:12px}
+  th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut2);text-align:right;font-weight:700;padding:3px 5px}
+  th:first-child{text-align:left}
+  td{padding:6px 5px;text-align:right;border-top:1px solid var(--line)}
+  td:first-child{text-align:left;color:var(--mut)}
+  .pos{color:var(--grn);font-weight:700}.negv{color:var(--mut2)}
+  .dotc{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:7px;vertical-align:middle}
+  .d-h{background:var(--home)}.d-d{background:var(--draw)}.d-a{background:var(--away)}
+  .best td{background:rgba(25,224,138,.07)}
+  /* odds grid: every column locked to the same right edge */
+  .otab{margin-top:11px;font-family:var(--mono);font-size:12px}
+  .orow{display:grid;grid-template-columns:1.7fr .9fr 1.15fr 1.05fr .9fr;gap:8px;align-items:center;padding:6px 2px;border-top:1px solid var(--line)}
+  .orow.head{border-top:0;color:var(--mut2);font-size:10px;letter-spacing:.05em;padding-bottom:3px}
+  .orow>span{text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .orow>span.onm{text-align:left;color:var(--mut);display:flex;align-items:center;min-width:0}
+  .orow.best{background:rgba(25,224,138,.07);border-radius:5px}
+  .orow .oc{display:flex;align-items:center;justify-content:flex-end;gap:1px}
+  .orow .oc i{font-style:normal;color:var(--mut2)}
+  .oin{width:36px;background:#05080b;border:1px solid var(--line2);color:var(--cyan);border-radius:4px;padding:3px 3px;font-family:var(--mono);font-size:12px;text-align:right}
+  .oin:focus{outline:1px solid var(--cyan)}
+
+  .facts{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+  .fact{font-family:var(--mono);font-size:11px;color:var(--mut);background:#05080b;border:1px solid var(--line2);border-radius:6px;padding:5px 9px}
+  .fact b{color:var(--ink)}
+
+  /* ---- heatmap pitch ---- */
+  .hbtn{margin-top:12px;width:100%;background:#05080b;border:1px dashed var(--line2);color:var(--cyan);
+    font-family:var(--mono);font-size:12px;padding:9px;border-radius:7px;cursor:pointer;letter-spacing:.04em}
+  .hbtn:hover{border-color:var(--cyan)}
+  .pitchwrap{border-top:1px solid var(--line2);background:#04070a;padding:13px 14px}
+  .ptabs{display:flex;gap:6px;margin-bottom:10px}
+  .ptab{font-family:var(--mono);font-size:11px;padding:5px 11px;border-radius:5px;border:1px solid var(--line2);background:#05080b;color:var(--mut);cursor:pointer}
+  .ptab.on{color:#04070a;font-weight:800}
+  .ptab.on.h{background:var(--home);border-color:var(--home)} .ptab.on.a{background:var(--away);border-color:var(--away)} .ptab.on.b{background:var(--grn);border-color:var(--grn)}
+  .pitch{width:100%;border-radius:8px;display:block;background:#071d12}
+  .pdetail{margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--mut);min-height:30px}
+  .pdetail .hot{color:var(--ink)}
+  .threats{margin-top:10px}
+  .threats .tr{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:11px;padding:4px 0;border-top:1px solid var(--line)}
+  .threats .nm{color:var(--ink)} .threats .zn{color:var(--mut2)}
+  .threats .pp{color:var(--grn);font-weight:700}
+  .heatcap{font-size:10px;color:var(--mut2);margin-top:8px;font-family:var(--mono)}
+  .nodata{font-family:var(--mono);text-align:center;color:var(--mut);padding:26px 14px;font-size:13px;letter-spacing:.06em}
+  .nodata span{display:block;margin-top:8px;font-size:11px;color:var(--mut2);letter-spacing:0;line-height:1.6}
+
+  .src{font-family:var(--mono);font-size:10px;color:var(--mut2);margin-top:11px}
+  .src .v{color:var(--grn)}
+  /* ---- P&L book ---- */
+  .book{background:linear-gradient(180deg,#0a1016,#070b0f);border:1px solid var(--line2);border-radius:10px;margin-bottom:16px;overflow:hidden}
+  .bkhead{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line)}
+  .bkhead .ttl{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--mut2)}
+  .bkhead .ttl b{color:var(--cyan)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
+  .kpi{background:#080d12;padding:10px 12px}
+  .kpi .k{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut2)}
+  .kpi .v{font-family:var(--mono);font-size:18px;font-weight:800;margin-top:2px}
+  .kpi .v.g{color:var(--grn)} .kpi .v.r{color:var(--red)} .kpi .v.n{color:var(--ink)}
+  .poss{padding:8px 14px 12px}
+  .pos{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:11px;padding:6px 0;border-top:1px solid var(--line)}
+  .pos:first-child{border-top:0}
+  .pos .lf{color:var(--mut)}.pos .lf b{color:var(--ink)}
+  .stat{font-size:9px;padding:2px 6px;border-radius:4px;margin-left:8px}
+  .st-open{background:rgba(55,166,255,.14);color:var(--home)} .st-won{background:rgba(25,224,138,.16);color:var(--grn)} .st-lost{background:rgba(255,77,77,.14);color:var(--red)}
+  .empty{font-family:var(--mono);font-size:11px;color:var(--mut2);padding:6px 0}
+  h2.sec{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--mut2);margin:24px 4px 10px}
+  .foot{font-size:11px;color:var(--mut2);text-align:center;line-height:1.7;border-top:1px solid var(--line2);padding-top:16px;margin-top:14px;font-family:var(--mono)}
+</style>
 </head>
 <body>
-  <main class="shell">
-    <section class="hero">
-      <div>
-        <div class="eyebrow"><span class="dot"></span> CupEdge Match Signals</div>
-        <h1>World Cup probabilities with a live movement lens.</h1>
-        <p class="subtitle">A source-backed matchday hub for win, draw, loss probability, recent form, player averages, official readiness, betting-readiness tiers, and a field map that separates public evidence from private tracking data.</p>
-        <div class="hero-actions">
-          <a class="button" href="#matches">Match boards</a>
-          <a class="button" href="#decision-framework">Decision tiers</a>
-          <a class="button" href="#movement">Movement map</a>
-          <a class="button" href="#players">Player layer</a>
-          <a class="button" href="#sources">Sources</a>
-        </div>
-        <div class="chip-row">
-          <span class="chip">Timezone: Eastern</span>
-          <span class="chip">Official first, secondary labeled</span>
-          <span class="chip">Private GPS never invented</span>
-          <span class="chip">Edge signal, not guarantee</span>
-        </div>
-      </div>
-      <aside class="refresh-card">
-        <span class="status-pill" id="source-mode">Loading</span>
-        <h2>Today&apos;s Windows</h2>
-        <p class="small" id="hero-note">Checking official matchday source state...</p>
-        <div class="time-grid" id="window-grid"></div>
-        <p class="fineprint" id="generated-at">Seed loading</p>
-      </aside>
-    </section>
+<div class="wrap">
 
-    <section class="section grid">
-      <article class="panel span-7">
-        <div class="panel-header">
-          <div>
-            <h2>How The Data Helps</h2>
-            <p class="small">The default view shows probability quality, source readiness, and which inputs are still missing before kickoff.</p>
-          </div>
-          <span class="tag">decision logic</span>
-        </div>
-        <div class="model-strip" id="quality-strip"></div>
-      </article>
-      <article class="panel span-5">
-        <div class="panel-header">
-          <div>
-            <h2>Tracking Reality</h2>
-            <p class="small">The player vest and optical tracking concept is real, but the live raw stream is not publicly exposed for this model.</p>
-          </div>
-          <span class="tag warn">source caveat</span>
-        </div>
-        <p class="small" id="tracking-summary"></p>
-      </article>
-    </section>
+  <div class="mast">
+    <div class="logo"><span class="c">CUP</span>EDGE<span class="s"> // MATCH SIGNALS</span><span class="cur"></span></div>
+    <div class="clock" id="clock">connecting...</div>
+  </div>
+  <div class="sub">World Cup 2026 · Eastern Time · model fair value vs the price you see.<br>
+    Measured inputs: <b>real Elo</b> (eloratings.net, today) · <b>StatsBomb</b> shot data · <b>Robinhood / Kalshi</b> contract price · FIFA status. Edge only; sizing and money are entirely your call.</div>
 
-    <section class="section panel" id="decision-framework">
-      <div class="panel-header">
-        <div>
-          <h2>Betting-Readiness Framework</h2>
-          <p class="small">This separates official data certainty from prediction confidence so a high probability is never treated as a guaranteed result.</p>
-        </div>
-        <span class="tag warn">not a guarantee</span>
-      </div>
-      <div class="model-strip" id="decision-framework-list"></div>
-      <p class="fineprint" id="decision-framework-note"></p>
-    </section>
+  <div id="cards"></div>
 
-    <section class="section panel" id="matches">
-      <div class="panel-header">
-        <div>
-          <h2>Today&apos;s Match Boards</h2>
-          <p class="small">Select a fixture to inspect probability, recent form, player averages, and movement pressure.</p>
-        </div>
-        <span class="tag" id="match-count">0 matches</span>
-      </div>
-      <div class="tab-row" id="match-tabs"></div>
-      <div id="match-board" class="section"></div>
-    </section>
+  <div class="foot">
+    SYSTEMATIC MODEL OUTPUT. Probabilities computed from measured inputs (real Elo, StatsBomb shot data, lineup and motivation edges) and benchmarked vs the Robinhood / Kalshi contract price. EDGE = model minus market. RETURN = contract payout if it hits. A positive edge is a long-run price signal, not a single-game guarantee.<br>
+    Player heat is a model projection; live 2026 shot maps and full in-match shifts need a paid event feed. Not affiliated with FIFA, Robinhood, Kalshi, or any sportsbook.
+  </div>
+</div>
 
-    <section class="section grid" id="movement">
-      <article class="panel span-8">
-        <div class="panel-header">
-          <div>
-            <h2>Movement Intelligence Map</h2>
-            <p class="small">A field view of public movement proxies: role, scoring threat, recent goal environment, and model pressure.</p>
-          </div>
-          <span class="tag" id="movement-status">public proxy</span>
-        </div>
-        <div class="control-row">
-          <button class="toggle-button active" data-side="home" type="button" id="side-home">Home</button>
-          <button class="toggle-button" data-side="away" type="button" id="side-away">Away</button>
-          <button class="toggle-button active" data-phase="attack" type="button">Attack</button>
-          <button class="toggle-button" data-phase="build" type="button">Build</button>
-          <button class="toggle-button" data-phase="defense" type="button">Defense</button>
-          <select id="player-select" aria-label="Player focus"></select>
-        </div>
-        <div class="pitch-wrap">
-          <div class="pitch" id="pitch">
-            <span class="center-circle"></span>
-            <span class="box-left"></span>
-            <span class="box-right"></span>
-            <span class="pitch-label" id="pitch-label">Public movement proxy</span>
-          </div>
-          <div class="field-legend" id="field-legend"></div>
-        </div>
-      </article>
-      <article class="panel span-4" id="players">
-        <div class="panel-header">
-          <div>
-            <h2>Player Stat Layer</h2>
-            <p class="small">Squad averages, top scorers, and top caps from the source-backed seed.</p>
-          </div>
-          <span class="tag">roster lens</span>
-        </div>
-        <div id="player-panel"></div>
-      </article>
-    </section>
+<script>
+/* =================== edge engine (verified vs python) =================== */
+const MAXG=8,fact=[1,1,2,6,24,120,720,5040,40320];
+const pois=(k,l)=>Math.exp(-l)*Math.pow(l,k)/fact[k];
+function dcTau(i,j,lh,la,r){if(i==0&&j==0)return 1-lh*la*r;if(i==0&&j==1)return 1+lh*r;if(i==1&&j==0)return 1+la*r;if(i==1&&j==1)return 1-r;return 1;}
+function eloToGoals(he,ae,h,t,s=0.40){const sup=((he+h)-ae)/100*s;return[Math.max(.15,(t+sup)/2),Math.max(.15,(t-sup)/2)];}
+function matrix(lh,la,r=-0.05){let m=[],S=0;for(let i=0;i<=MAXG;i++){m[i]=[];for(let j=0;j<=MAXG;j++){const v=pois(i,lh)*pois(j,la)*dcTau(i,j,lh,la,r);m[i][j]=v;S+=v;}}for(let i=0;i<=MAXG;i++)for(let j=0;j<=MAXG;j++)m[i][j]/=S;return m;}
+function outc(m){let h=0,d=0,a=0,o=0,b=0,bp=0,bi=0,bj=0;for(let i=0;i<=MAXG;i++)for(let j=0;j<=MAXG;j++){const p=m[i][j];if(i>j)h+=p;else if(i<j)a+=p;else d+=p;if(i+j>=3)o+=p;if(i&&j)b+=p;if(p>bp){bp=p;bi=i;bj=j;}}return{home:h,draw:d,away:a,over25:o,btts:b,top:bi+"-"+bj};}
+function inPlay(lh,la,mn,hs,as_,r=-0.05){const rem=Math.max(0,(94-mn))/90;const m=matrix(lh*rem,la*rem,r);let h=0,d=0,a=0;for(let i=0;i<=MAXG;i++)for(let j=0;j<=MAXG;j++){const p=m[i][j];const fh=hs+i,fa=as_+j;if(fh>fa)h+=p;else if(fh<fa)a+=p;else d+=p;}return{home:h,draw:d,away:a};}
+function devig(o){const r={home:1/o.home,draw:1/o.draw,away:1/o.away};const s=r.home+r.draw+r.away;return{home:r.home/s,draw:r.draw/s,away:r.away/s,vig:s-1};}
+function ek(p,od){const b=od-1,q=1-p;return{ev:p*od-1,kelly:b>0?Math.max(0,(b*p-q)/b):0};}
+let gs=7;function gauss(){gs=(gs*9301+49297)%233280;let u=gs/233280;gs=(gs*9301+49297)%233280;let v=gs/233280;return Math.sqrt(-2*Math.log(u+1e-9))*Math.cos(6.283*v);}
+function band(he,ae,h,t,r,n=200){let a=[];for(let k=0;k<n;k++){const[lh,la]=eloToGoals(he+gauss()*40,ae+gauss()*40,h,Math.min(3.6,Math.max(1.6,t+gauss()*.3)));a.push(outc(matrix(lh,la,r)).home);}a.sort((x,y)=>x-y);return[a[n/10|0],a[n*9/10|0]];}
+function tierOf(e,fav,dr,bw,conf,live){if(live)return"LIVE";if(!conf)return"Watch Only";if(e<0)return"No Bet";const hv=dr>=.30||bw>=.12;if(e>=.06&&fav>=.55&&!hv)return"Strong Lean";if(e>=.025)return hv?"High Volatility":"Lean";return"No Bet";}
 
-    <section class="section grid">
-      <article class="panel span-7">
-        <div class="panel-header">
-          <div>
-            <h2>Recent Form</h2>
-            <p class="small">Last-eight match rows used in the model&apos;s form lane.</p>
-          </div>
-          <span class="tag">last matches</span>
-        </div>
-        <div id="recent-form"></div>
-      </article>
-      <article class="panel span-5">
-        <div class="panel-header">
-          <div>
-            <h2>Model Formula</h2>
-            <p class="small">Component weights and contributions from the public-data v0 model.</p>
-          </div>
-          <span class="tag">formula</span>
-        </div>
-        <div id="formula-panel"></div>
-      </article>
-    </section>
+/* =================== ratings =================== */
+/* REAL national-team Elo - eloratings.net (World.tsv), pulled 2026-06-13. Not placeholders. */
+const ELO={Brazil:1991,Morocco:1827,Switzerland:1891,Scotland:1782,Qatar:1421,Haiti:1548,
+ Spain:2157,Argentina:2115,France:2063,England:2024,Portugal:1989,Netherlands:1948,Germany:1932,Italy:1869,
+ Croatia:1912,Belgium:1894,"United States":1726,Mexico:1881,Canada:1767,Paraguay:1834,Uruguay:1892,Colombia:1982,
+ Senegal:1860,Japan:1906,"Korea Republic":1786,Australia:1777,Ecuador:1938,Norway:1914,Austria:1830,Serbia:1734,
+ Turkiye:1911,Ukraine:1780,Poland:1710,Egypt:1696,Nigeria:1767,"Ivory Coast":1695,Ghana:1510,Algeria:1772,
+ Iran:1772,"Saudi Arabia":1576,"South Africa":1511,Panama:1730,Jamaica:1527,"Costa Rica":1608,"New Zealand":1562,
+ Uzbekistan:1714,Jordan:1680,"Cape Verde":1578,"Bosnia & Herzegovina":1616};
 
-    <section class="section panel" id="sources">
-      <div class="panel-header">
-        <div>
-          <h2>Source Ledger</h2>
-          <p class="small">Official FIFA sources control match status. Tracking research is included only to explain what is possible and what is not public.</p>
-        </div>
-        <span class="tag">source-backed</span>
-      </div>
-      <div class="source-list" id="source-list"></div>
-      <p class="fineprint">Analysis only. This dashboard is not betting advice and does not guarantee outcomes.</p>
-    </section>
-  </main>
+/* =================== player threat data (REAL, StatsBomb Open Data) ====================
+   Aggregated from recorded shot EVENTS: avg shot location, xG/shot, shots per match.
+   Source: FIFA World Cup 2022 (Brazil, Morocco, Switzerland, Qatar) + UEFA Euro 2024 (Scotland).
+   Teams not covered by StatsBomb open data (e.g. Haiti) are absent -> field shows "no data".
+   x = advancement 0..100, y = lateral 0..100, sh90 = shots/match, xgs = xG per shot. */
+const SQUADS={"Brazil":[{"n":"Neymar","p":"AM","x":90.2,"y":38.4,"sh90":2.4,"xgs":0.177,"eloImpact":17},{"n":"Richarlison","p":"ST","x":91.6,"y":49.1,"sh90":1.6,"xgs":0.202,"eloImpact":15},{"n":"Rodrygo","p":"AM","x":86.4,"y":46.0,"sh90":1.4,"xgs":0.178,"eloImpact":13},{"n":"Pedro","p":"ST","x":90.2,"y":53.2,"sh90":1.0,"xgs":0.243,"eloImpact":13},{"n":"Casemiro","p":"CM","x":80.9,"y":45.3,"sh90":2.0,"xgs":0.114,"eloImpact":13},{"n":"Raphinha","p":"W","x":85.0,"y":56.4,"sh90":1.6,"xgs":0.115,"eloImpact":12}],"Morocco":[{"n":"Hakim Ziyech","p":"W","x":79.7,"y":60.9,"sh90":1.57,"xgs":0.1,"eloImpact":16},{"n":"Youssef En-Nesyri","p":"ST","x":93.4,"y":53.2,"sh90":1.57,"xgs":0.095,"eloImpact":15},{"n":"Achraf Hakimi","p":"DF","x":82.4,"y":52.2,"sh90":0.71,"xgs":0.184,"eloImpact":14},{"n":"Abdelhamid Sabiri","p":"CM","x":75.5,"y":47.6,"sh90":0.57,"xgs":0.227,"eloImpact":14},{"n":"Zakaria Aboukhlal","p":"ST","x":88.5,"y":55.7,"sh90":0.43,"xgs":0.199,"eloImpact":12},{"n":"Abderrazak Hamdallah","p":"ST","x":96.9,"y":41.4,"sh90":0.29,"xgs":0.271,"eloImpact":12}],"Switzerland":[{"n":"Breel Embolo","p":"ST","x":91.9,"y":46.4,"sh90":1.5,"xgs":0.399,"eloImpact":28},{"n":"Manuel Akanji","p":"DF","x":90.9,"y":53.3,"sh90":1.0,"xgs":0.221,"eloImpact":17},{"n":"Remo Freuler","p":"CM","x":91.9,"y":50.5,"sh90":0.75,"xgs":0.182,"eloImpact":13},{"n":"Xherdan Shaqiri","p":"W","x":84.2,"y":65.6,"sh90":1.0,"xgs":0.124,"eloImpact":13},{"n":"Ruben Vargas","p":"W","x":86.9,"y":48.0,"sh90":0.75,"xgs":0.099,"eloImpact":11},{"n":"Granit Xhaka","p":"CM","x":82.6,"y":44.7,"sh90":1.5,"xgs":0.049,"eloImpact":11}],"Qatar":[{"n":"Almoez Ali","p":"ST","x":86.9,"y":50.0,"sh90":1.0,"xgs":0.161,"eloImpact":28},{"n":"Ismaeel Mohammad","p":"W","x":86.3,"y":49.9,"sh90":0.67,"xgs":0.179,"eloImpact":23},{"n":"Abdelkarim Hassan","p":"DF","x":81.6,"y":42.2,"sh90":2.0,"xgs":0.046,"eloImpact":20},{"n":"Mohammed Muntari","p":"ST","x":89.1,"y":55.6,"sh90":1.0,"xgs":0.062,"eloImpact":16},{"n":"Pedro Miguel Correia","p":"DF","x":81.4,"y":62.9,"sh90":0.67,"xgs":0.019,"eloImpact":10},{"n":"Akram Afif","p":"ST","x":76.9,"y":40.4,"sh90":0.67,"xgs":0.015,"eloImpact":9}],"Scotland":[{"n":"Scott McTominay","p":"AM","x":89.2,"y":51.2,"sh90":1.33,"xgs":0.061,"eloImpact":23},{"n":"Callum McGregor","p":"CM","x":84.8,"y":43.4,"sh90":1.0,"xgs":0.047,"eloImpact":16},{"n":"Che Adams","p":"ST","x":88.7,"y":45.7,"sh90":0.67,"xgs":0.062,"eloImpact":15},{"n":"Billy Gilmour","p":"CM","x":84.0,"y":49.2,"sh90":0.67,"xgs":0.044,"eloImpact":13},{"n":"Scott McKenna","p":"DF","x":89.7,"y":55.1,"sh90":0.67,"xgs":0.043,"eloImpact":13}]};
+function scoreProb(pl){return 1-Math.exp(-(pl.sh90*pl.xgs));}
+function zoneLabel(x,y){const depth=x>=82?"in the box":x>=72?"box edge":"top of D";
+  const lane=y<=33?"left channel":y>=67?"right channel":"central";return lane+", "+depth;}
+/* live-shifting threat: chasing team gains threat + pushes up; leading team drops; late-game amplifies */
+function liveAdj(pl,fx,side){let sp=scoreProb(pl),x=pl.x;
+  if(fx.state=="live"){const gd=side=="home"?(fx.hs-fx.as):(fx.as-fx.hs);
+    if(gd<0){sp*=1+Math.min(.55,.22*(-gd));x=Math.min(94,x+6*(-gd));if(fx.mn>=75)sp*=1.12;}
+    else if(gd>0){sp*=Math.max(.55,1-.15*gd);x=Math.max(40,x-4*gd);}
+    sp=Math.min(.88,sp);}
+  return{sp,x};}
+function liveCaption(fx){if(fx.state!="live")return"";const gd=fx.hs-fx.as;
+  if(gd==0)return`<span style="color:var(--amb)">● LIVE ${fx.mn}' · level, threat balanced</span>`;
+  const lead=gd>0?fx.home:fx.away, chase=gd>0?fx.away:fx.home;
+  return`<span style="color:var(--amb)">● LIVE ${fx.mn}' · ${chase} chasing (threat up, pushing higher), ${lead} sitting (threat down)</span>`;}
 
-  <script id="seed-data" type="application/json">{"siteName":"CupEdge Match Signals","timezone":"America/New_York","generatedAt":"2026-06-13T00:43:59Z","generatedAtEastern":"Jun 12, 2026, 8:43 PM EDT","refreshPolicy":{"dailyRosterCheckUtc":"12:00","dailyRosterCheckEasternJune":"8:00 AM ET","matchWindow":"90 minutes before kickoff through 150 minutes after kickoff","matchWindowCadence":"15 minutes in-page during active match windows","notes":["Daily refresh checks official FIFA calendar and squad source status.","Match-window refresh checks official status, score, tactics, and lineup exposure more aggressively.","Google probability widgets are comparison only, not model truth."]},"modelNote":"Public-data v0.4 model. Probabilities are generated from collected source inputs; recent-form scores are derived from source-backed last-eight rows, and Google probability widgets are not copied as model output.","refreshStrategy":{"cadence":"Daily roster/source check, then every 15 minutes during active match windows","lineup_window":"Roughly 75 to 60 minutes before kickoff; use visible official/team lineups first, then labeled secondary live-card or live-coverage lineups if official fields are inaccessible.","matchday_logic":"Identify today's fixtures in Eastern time and update only when source-backed changes are found."},"team_summaries":[{"team":"Canada","rank":30,"squad_size":26,"total_caps":953,"avg_caps":36.7,"total_goals":133,"avg_goals":5.1,"outfield_goals_per_player":5.8,"top_goals":[{"name":"Jonathan David","position":"FW","goals":39,"caps":77,"club":"Juventus"},{"name":"Cyle Larin","position":"FW","goals":30,"caps":90,"club":"Southampton"},{"name":"Alphonso Davies (captain)","position":"DF","goals":15,"caps":58,"club":"Bayern Munich"},{"name":"Jonathan Osorio","position":"MF","goals":10,"caps":90,"club":"Toronto FC"}],"top_caps":[{"name":"Cyle Larin","position":"FW","caps":90,"goals":30,"club":"Southampton"},{"name":"Jonathan Osorio","position":"MF","caps":90,"goals":10,"club":"Toronto FC"},{"name":"Jonathan David","position":"FW","caps":77,"goals":39,"club":"Juventus"}]},{"team":"Bosnia and Herzegovina","rank":64,"squad_size":26,"total_caps":591,"avg_caps":22.7,"total_goals":93,"avg_goals":3.6,"outfield_goals_per_player":4,"top_goals":[{"name":"Edin Džeko (captain)","position":"FW","goals":73,"caps":148,"club":"Schalke 04"},{"name":"Ermedin Demirović","position":"FW","goals":4,"caps":40,"club":"VfB Stuttgart"},{"name":"Haris Tabaković","position":"FW","goals":4,"caps":10,"club":"Borussia Mönchengladbach"},{"name":"Benjamin Tahirović","position":"MF","goals":2,"caps":28,"club":"Brøndby"}],"top_caps":[{"name":"Edin Džeko (captain)","position":"FW","caps":148,"goals":73,"club":"Schalke 04"},{"name":"Sead Kolašinac","position":"DF","caps":65,"goals":0,"club":"Atalanta"},{"name":"Ermedin Demirović","position":"FW","caps":40,"goals":4,"club":"VfB Stuttgart"}]},{"team":"United States","rank":17,"squad_size":26,"total_caps":962,"avg_caps":37,"total_goals":125,"avg_goals":4.8,"outfield_goals_per_player":5.4,"top_goals":[{"name":"Christian Pulisic","position":"FW","goals":33,"caps":86,"club":"Milan"},{"name":"Ricardo Pepi","position":"FW","goals":13,"caps":37,"club":"PSV Eindhoven"},{"name":"Weston McKennie","position":"MF","goals":12,"caps":66,"club":"Juventus"},{"name":"Brenden Aaronson","position":"FW","goals":9,"caps":58,"club":"Leeds United"}],"top_caps":[{"name":"Christian Pulisic","position":"FW","caps":86,"goals":33,"club":"Milan"},{"name":"Tim Ream (captain)","position":"DF","caps":82,"goals":1,"club":"Charlotte FC"},{"name":"Weston McKennie","position":"MF","caps":66,"goals":12,"club":"Juventus"}]},{"team":"Paraguay","rank":41,"squad_size":26,"total_caps":690,"avg_caps":26.5,"total_goals":53,"avg_goals":2,"outfield_goals_per_player":2.3,"top_goals":[{"name":"Miguel Almirón","position":"MF","goals":10,"caps":76,"club":"Atlanta United FC"},{"name":"Antonio Sanabria","position":"FW","goals":7,"caps":48,"club":"Cremonese"},{"name":"Kaku","position":"FW","goals":6,"caps":33,"club":"Al Ain"},{"name":"Gustavo Gómez (captain)","position":"DF","goals":4,"caps":89,"club":"Palmeiras"}],"top_caps":[{"name":"Gustavo Gómez (captain)","position":"DF","caps":89,"goals":4,"club":"Palmeiras"},{"name":"Miguel Almirón","position":"MF","caps":76,"goals":10,"club":"Atlanta United FC"},{"name":"Júnior Alonso","position":"DF","caps":71,"goals":3,"club":"Atlético Mineiro"}]}],"recent_form":{"Canada":{"team":"Canada","source_label":"Canada men's national soccer team results","source_url":"https://en.wikipedia.org/wiki/Canada_men%27s_national_soccer_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the Bosnia and Herzegovina opener.","matches":[{"date":"2025 Oct 10","opponent":"vs Australia","score_for":0,"score_against":1,"result":"L","competition":"Friendly"},{"date":"2025 Oct 14","opponent":"at Colombia","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2025 Nov 13","opponent":"vs Ecuador","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2025 Nov 18","opponent":"at Venezuela","score_for":2,"score_against":0,"result":"W","competition":"Friendly"},{"date":"2026 Mar 28","opponent":"vs Iceland","score_for":2,"score_against":2,"result":"D","competition":"Friendly"},{"date":"2026 Mar 31","opponent":"vs Tunisia","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2026 Jun 01","opponent":"vs Uzbekistan","score_for":2,"score_against":0,"result":"W","competition":"Friendly"},{"date":"2026 Jun 05","opponent":"vs Republic of Ireland","score_for":1,"score_against":1,"result":"D","competition":"Friendly"}],"wins":2,"draws":5,"losses":1,"record":"2W 5D 1L","goals_for":7,"goals_against":4,"goal_difference":3,"goal_difference_per_match":0.375,"ppg":1.375,"form_sequence":["L","D","D","W","D","D","W","D"]},"Bosnia and Herzegovina":{"team":"Bosnia and Herzegovina","source_label":"Bosnia and Herzegovina national football team results","source_url":"https://en.wikipedia.org/wiki/Bosnia_and_Herzegovina_national_football_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the Canada opener; penalty wins are counted as draws for regulation-time form.","matches":[{"date":"2025 Oct 09","opponent":"at Cyprus","score_for":2,"score_against":2,"result":"D","competition":"WCQ"},{"date":"2025 Oct 12","opponent":"at Malta","score_for":4,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2025 Nov 15","opponent":"vs Romania","score_for":3,"score_against":1,"result":"W","competition":"WCQ"},{"date":"2025 Nov 18","opponent":"at Austria","score_for":1,"score_against":1,"result":"D","competition":"WCQ"},{"date":"2026 Mar 26","opponent":"at Wales","score_for":1,"score_against":1,"result":"D","competition":"WC playoff","note":"won 4-2 pens"},{"date":"2026 Mar 31","opponent":"vs Italy","score_for":1,"score_against":1,"result":"D","competition":"WC playoff","note":"won 4-1 pens"},{"date":"2026 May 29","opponent":"vs North Macedonia","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2026 Jun 06","opponent":"vs Panama","score_for":1,"score_against":1,"result":"D","competition":"Friendly"}],"wins":2,"draws":6,"losses":0,"record":"2W 6D 0L","goals_for":13,"goals_against":8,"goal_difference":5,"goal_difference_per_match":0.625,"ppg":1.5,"form_sequence":["D","W","W","D","D","D","D","D"]},"United States":{"team":"United States","source_label":"United States men's national soccer team results","source_url":"https://en.wikipedia.org/wiki/United_States_men%27s_national_soccer_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the Paraguay opener.","matches":[{"date":"2025 Oct 10","opponent":"vs Ecuador","score_for":1,"score_against":1,"result":"D","competition":"Friendly"},{"date":"2025 Oct 14","opponent":"vs Australia","score_for":2,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2025 Nov 15","opponent":"vs Paraguay","score_for":2,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2025 Nov 18","opponent":"vs Uruguay","score_for":5,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2026 Mar 28","opponent":"vs Belgium","score_for":2,"score_against":5,"result":"L","competition":"Friendly"},{"date":"2026 Mar 31","opponent":"vs Portugal","score_for":0,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2026 May 31","opponent":"vs Senegal","score_for":3,"score_against":2,"result":"W","competition":"Friendly"},{"date":"2026 Jun 06","opponent":"vs Germany","score_for":1,"score_against":2,"result":"L","competition":"Friendly"}],"wins":4,"draws":1,"losses":3,"record":"4W 1D 3L","goals_for":16,"goals_against":15,"goal_difference":1,"goal_difference_per_match":0.125,"ppg":1.625,"form_sequence":["D","W","W","W","L","L","W","L"]},"Paraguay":{"team":"Paraguay","source_label":"Paraguay national football team results","source_url":"https://en.wikipedia.org/wiki/Paraguay_national_football_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the United States opener.","matches":[{"date":"2025 Sep 09","opponent":"vs Peru","score_for":1,"score_against":0,"result":"W","competition":"WCQ"},{"date":"2025 Oct 10","opponent":"at Japan","score_for":2,"score_against":2,"result":"D","competition":"Friendly"},{"date":"2025 Oct 14","opponent":"at South Korea","score_for":0,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2025 Nov 15","opponent":"at United States","score_for":1,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2025 Nov 18","opponent":"vs Mexico","score_for":2,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2026 Mar 27","opponent":"at Greece","score_for":1,"score_against":0,"result":"W","competition":"Friendly"},{"date":"2026 Mar 31","opponent":"at Morocco","score_for":1,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2026 Jun 05","opponent":"vs Nicaragua","score_for":4,"score_against":0,"result":"W","competition":"Friendly"}],"wins":4,"draws":1,"losses":3,"record":"4W 1D 3L","goals_for":12,"goals_against":9,"goal_difference":3,"goal_difference_per_match":0.375,"ppg":1.625,"form_sequence":["W","D","L","L","W","W","L","W"]}},"head_to_head":{"can-bih":{"source_label":"Group B historical note","source_url":"https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_B","summary":"Group B source says Canada and Bosnia and Herzegovina have never met before.","weight_note":"No direct history, so this is a context note rather than a model driver."},"usa-par":{"source_label":"Group D historical note","source_url":"https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_D","summary":"Group D source says the teams have met nine times, including a 1930 World Cup match won 3-0 by the United States and a 2025 friendly won 2-1 by the United States.","weight_note":"Small and partly old sample; this is context, not a high-weight model input."}},"movementLayer":{"status":"Public proxy, not private GPS tracking","summary":"The field heat map uses roster position, top scorer threat, recent team scoring, model pressure, official tactics when exposed, and match status. It will upgrade when official event, lineup, or public tracking fields are available.","unavailable":["Team GPS vest telemetry","Optical x-y player coordinates","Sprint load and high-intensity effort streams","Private coaching platform tracking exports"],"publicInputs":["FIFA calendar status, score, venue, referee, and tactics when exposed","Official match centre and federation lineup releases","Roster position, caps, goals, and source-backed recent form","Future public event feeds if a reliable source exposes shots, touches, and average positions"],"sources":[{"label":"FIFA player tracking and AI avatars reporting","url":"https://www.theguardian.com/football/2026/jan/07/world-cup-players-to-have-lifelike-ai-avatars-for-use-in-var-offside-decisions","use":"Public reporting says FIFA tracking and AI avatar systems support VAR and broadcast explainers. This is not an open public live player GPS feed."},{"label":"Broadcast computer vision tracking validation","url":"https://arxiv.org/abs/2508.19477","use":"Research benchmark for deriving player position, speed, and distance from broadcast footage. Useful for roadmap context, not a live source for this site."},{"label":"World Cup camera, sensor, and smart ball coverage","url":"https://www.wired.com/story/world-cup-tech-helping-eliminate-bad-calls-var-sensors-3d-body-scans/","use":"Public reporting on camera, sensor, and smart ball systems. The available article does not expose a public API for live betting models."}]},"bettingFramework":{"status":"Decision support, not guarantee","summary":"Official sources can certify facts such as fixture, score, tactics, referee, and final status. They cannot certify a future result. The betting-readiness tier combines model edge, official-data completeness, draw pressure, late-goal risk, and lineup freshness so the site can separate stronger leans from high-volatility traps.","tiers":[{"label":"No Bet","use":"No clean model edge, source conflict, or the matchup is already closed."},{"label":"Watch Only","use":"Fixture is confirmed, but official XI/tactics or key match-state inputs are still missing."},{"label":"Lean","use":"Model edge is present, source quality is usable, and volatility is not extreme."},{"label":"Strong Lean","use":"Favorite probability is materially ahead, official source coverage is strong, and draw/late-goal risk is contained."},{"label":"High Volatility","use":"Draw plus opponent share or late-goal risk is high enough that a late swing can erase the favorite edge."}],"thresholds":{"strongLean":"favorite >= 62, non-favorite \u003c= 38, late-goal \u003c= 55, source gap >= 0.35, official lineup visible","lean":"favorite >= 54, source gap >= 0.25, non-favorite \u003c= 46, late-goal \u003c= 65, official data usable","highVolatility":"non-favorite >= 45 or draw pressure >= 55 or late-goal >= 65","watchOnly":"official lineup/tactics still pending or fact-certainty below 70"}},"matches":[{"id":"can-bih","fifaMatchId":"400021449","matchNo":3,"group":"Group B","home":"Canada","away":"Bosnia and Herzegovina","homeShort":"CAN","awayShort":"BIH","kickoffEt":"2026-06-12T15:00:00-04:00","kickoffLabel":"3:00 PM ET","venue":"BMO Field / Toronto Stadium, Toronto","model":{"home":52,"draw":26,"away":22},"pattern":{"label":"Korea-style mixed lane","nonFavoriteShare":48,"drawPressureIndex":59,"lateGoalIndex":38,"stance":"The favorite can still win, but draw/underdog share is high enough that first-goal and comeback paths matter.","signals":["Canada is the model favorite at 52%, but draw plus Bosnia and Herzegovina still totals 48%.","Source-score gap is 0.27; under roughly 0.32, treat the match as materially more mixed than a high-favorite game.","Recent combined goal environment is 2.0 total goals per match.","Canada conceded 0.5 per match recently; Bosnia and Herzegovina scored 1.62 per match recently.","Official lineups are still pending, so this pattern layer should be re-run when starters and formations are confirmed."]},"readiness":"Final: FIFA logged a 1-1 result; pre-match probability archived.","drivers":["Canada graded stronger on FIFA rank and host venue context.","Bosnia and Herzegovina narrowed the model through recent form and squad goal depth.","The draw-pressure warning was the key read: draw plus Bosnia and Herzegovina totaled 48% before kickoff."],"lineupWindow":"roughly 1:45-2:00 PM ET","contextNotes":["Official FIFA calendar API lists Canada vs Bosnia and Herzegovina as Match 3 at 3:00 PM ET in Toronto.","Official FIFA calendar API later logged the match as a 1-1 final at 97 minutes, with 4-4-2 tactics visible for both sides.","Canada received the host/venue lane, but Bosnia brought an unbeaten last-eight form record into this opener.","Group B source records FIFA June 2026 ranks as Canada 30 and Bosnia and Herzegovina 64.","The pre-match model kept Canada as favorite, but the 48% non-favorite share correctly marked the draw path as material."],"recentForm":{"home":{"team":"Canada","source_label":"Canada men's national soccer team results","source_url":"https://en.wikipedia.org/wiki/Canada_men%27s_national_soccer_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the Bosnia and Herzegovina opener.","matches":[{"date":"2025 Oct 10","opponent":"vs Australia","score_for":0,"score_against":1,"result":"L","competition":"Friendly"},{"date":"2025 Oct 14","opponent":"at Colombia","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2025 Nov 13","opponent":"vs Ecuador","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2025 Nov 18","opponent":"at Venezuela","score_for":2,"score_against":0,"result":"W","competition":"Friendly"},{"date":"2026 Mar 28","opponent":"vs Iceland","score_for":2,"score_against":2,"result":"D","competition":"Friendly"},{"date":"2026 Mar 31","opponent":"vs Tunisia","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2026 Jun 01","opponent":"vs Uzbekistan","score_for":2,"score_against":0,"result":"W","competition":"Friendly"},{"date":"2026 Jun 05","opponent":"vs Republic of Ireland","score_for":1,"score_against":1,"result":"D","competition":"Friendly"}],"wins":2,"draws":5,"losses":1,"record":"2W 5D 1L","goals_for":7,"goals_against":4,"goal_difference":3,"goal_difference_per_match":0.375,"ppg":1.375,"form_sequence":["L","D","D","W","D","D","W","D"]},"away":{"team":"Bosnia and Herzegovina","source_label":"Bosnia and Herzegovina national football team results","source_url":"https://en.wikipedia.org/wiki/Bosnia_and_Herzegovina_national_football_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the Canada opener; penalty wins are counted as draws for regulation-time form.","matches":[{"date":"2025 Oct 09","opponent":"at Cyprus","score_for":2,"score_against":2,"result":"D","competition":"WCQ"},{"date":"2025 Oct 12","opponent":"at Malta","score_for":4,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2025 Nov 15","opponent":"vs Romania","score_for":3,"score_against":1,"result":"W","competition":"WCQ"},{"date":"2025 Nov 18","opponent":"at Austria","score_for":1,"score_against":1,"result":"D","competition":"WCQ"},{"date":"2026 Mar 26","opponent":"at Wales","score_for":1,"score_against":1,"result":"D","competition":"WC playoff","note":"won 4-2 pens"},{"date":"2026 Mar 31","opponent":"vs Italy","score_for":1,"score_against":1,"result":"D","competition":"WC playoff","note":"won 4-1 pens"},{"date":"2026 May 29","opponent":"vs North Macedonia","score_for":0,"score_against":0,"result":"D","competition":"Friendly"},{"date":"2026 Jun 06","opponent":"vs Panama","score_for":1,"score_against":1,"result":"D","competition":"Friendly"}],"wins":2,"draws":6,"losses":0,"record":"2W 6D 0L","goals_for":13,"goals_against":8,"goal_difference":5,"goal_difference_per_match":0.625,"ppg":1.5,"form_sequence":["D","W","W","D","D","D","D","D"]},"head_to_head":{"source_label":"Group B historical note","source_url":"https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_B","summary":"Group B source says Canada and Bosnia and Herzegovina have never met before.","weight_note":"No direct history, so this is a context note rather than a model driver."}},"modelMethod":{"version":"public-data v0.4","weights":{"rank":0.36,"experience":0.17,"goals":0.15,"top_scorer":0.07,"venue":0.1,"form":0.15},"home_score":0.703,"away_score":0.433,"score_diff":0.27,"draw_base":0.263,"form_lane":"Derived from the source-backed last-eight match rows using points-per-game and goal-difference-per-match.","components":[{"component":"FIFA rank prior","weight":36,"home_score":0.707,"away_score":0.364,"home_contribution":0.255,"away_contribution":0.131},{"component":"Squad avg caps","weight":17,"home_score":0.612,"away_score":0.378,"home_contribution":0.104,"away_contribution":0.064},{"component":"Squad goal depth","weight":15,"home_score":0.829,"away_score":0.571,"home_contribution":0.124,"away_contribution":0.086},{"component":"Top-scorer threat","weight":7,"home_score":0.65,"away_score":1,"home_contribution":0.046,"away_contribution":0.07},{"component":"Venue/host factor","weight":10,"home_score":1,"away_score":0,"home_contribution":0.1,"away_contribution":0},{"component":"Recent-form context","weight":15,"home_score":0.499,"away_score":0.547,"home_contribution":0.075,"away_contribution":0.082}],"confidence":"medium-low","pattern_test":{"label":"Korea-style mixed lane","favorite":"Canada","underdog":"Bosnia and Herzegovina","favorite_probability":52,"draw_probability":26,"underdog_probability":22,"non_favorite_share":48,"source_score_gap":0.27,"draw_pressure_index":59,"late_goal_index":38,"recent_total_goals_per_match":2,"favorite_conceded_per_match":0.5,"underdog_scored_per_match":1.62,"favorite_top_scorer_goals":39,"underdog_top_scorer_goals":73,"stance":"The favorite can still win, but draw/underdog share is high enough that first-goal and comeback paths matter.","signals":["Canada is the model favorite at 52%, but draw plus Bosnia and Herzegovina still totals 48%.","Source-score gap is 0.27; under roughly 0.32, treat the match as materially more mixed than a high-favorite game.","Recent combined goal environment is 2.0 total goals per match.","Canada conceded 0.5 per match recently; Bosnia and Herzegovina scored 1.62 per match recently.","Official lineups are still pending, so this pattern layer should be re-run when starters and formations are confirmed."]},"not_included_yet":["official starting XI","official live match-centre status","club-level xG/xA and minutes load","verified late injury or weather changes"],"live_status":{"source":"FIFA calendar API","observed_at_et":"Jun 12, 2026, 5:50 PM EDT","status":"Official FIFA calendar fields show a 1-1 final, match time 97 minutes, and 4-4-2 tactics visible for both sides.","home_score":1,"away_score":1,"match_time":"97'","home_tactics":"4-4-2","away_tactics":"4-4-2"},"probability_state":"Pre-match/lineup probability baseline. Do not use as a calibrated live in-play probability after kickoff."},"uncertaintyBand":9,"inputScores":{"home":{"venue":1,"form":0.499},"away":{"venue":0,"form":0.547},"draw_adjustment":0.01},"official":{"fifaMatchId":"400021449","matchNo":3,"group":"Group B","kickoffUtc":"2026-06-12T19:00:00Z","kickoffEastern":"Jun 12, 2026, 3:00 PM EDT","home":"Canada","away":"Bosnia and Herzegovina","homeScore":1,"awayScore":1,"homeTactics":"4-4-2","awayTactics":"4-4-2","matchStatus":0,"officialityStatus":1,"matchTime":"97'","venue":"Toronto Stadium","city":"Toronto","referees":["Facundo TELLO"],"officialLineupStatus":"FIFA final score logged: 1-1."}},{"id":"usa-par","fifaMatchId":"400021458","matchNo":4,"group":"Group D","home":"United States","away":"Paraguay","homeShort":"USA","awayShort":"PAR","kickoffEt":"2026-06-12T21:00:00-04:00","kickoffLabel":"9:00 PM ET","venue":"SoFi Stadium / Los Angeles Stadium, Inglewood","model":{"home":55,"draw":25,"away":20},"pattern":{"label":"Favorite edge with late-goal risk","nonFavoriteShare":45,"drawPressureIndex":44,"lateGoalIndex":69,"stance":"The favorite is clearer than Korea was, but recent scoring/concession data says the match can stay live late.","signals":["United States is the model favorite at 55%, but draw plus Paraguay still totals 45%.","Source-score gap is 0.308; under roughly 0.32, treat the match as materially more mixed than a high-favorite game.","Recent combined goal environment is 3.25 total goals per match.","United States conceded 1.88 per match recently; Paraguay scored 1.5 per match recently.","Official lineups are still pending, so this pattern layer should be re-run when starters and formations are confirmed."]},"readiness":"FIFA tactics visible. Verify starter names before calling the lineup official.","drivers":["The United States grades stronger on FIFA rank, host venue context, average caps, and squad goal depth.","Paraguay's last-eight form keeps the away outcome alive, including wins over Mexico, Greece, and Nicaragua.","The probability is still a pre-lineup baseline and should be re-run when official starters are released."],"lineupWindow":"roughly 7:45-8:00 PM ET","contextNotes":["Official FIFA calendar API lists USA vs Paraguay as Match 4 at 9:00 PM ET in Los Angeles.","The United States receives the host/venue lane and the stronger FIFA ranking, while Paraguay has comparable recent points per game.","Group D source records FIFA June 2026 ranks as United States 17 and Paraguay 41.","Official FIFA calendar fields at Jun 12, 2026, 8:43 PM EDT expose tactics as United States 4-2-3-1 and Paraguay 4-4-2; starter-name fields are still not exposed, so the starting XI is not official-confirmed in this dataset."],"recentForm":{"home":{"team":"United States","source_label":"United States men's national soccer team results","source_url":"https://en.wikipedia.org/wiki/United_States_men%27s_national_soccer_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the Paraguay opener.","matches":[{"date":"2025 Oct 10","opponent":"vs Ecuador","score_for":1,"score_against":1,"result":"D","competition":"Friendly"},{"date":"2025 Oct 14","opponent":"vs Australia","score_for":2,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2025 Nov 15","opponent":"vs Paraguay","score_for":2,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2025 Nov 18","opponent":"vs Uruguay","score_for":5,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2026 Mar 28","opponent":"vs Belgium","score_for":2,"score_against":5,"result":"L","competition":"Friendly"},{"date":"2026 Mar 31","opponent":"vs Portugal","score_for":0,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2026 May 31","opponent":"vs Senegal","score_for":3,"score_against":2,"result":"W","competition":"Friendly"},{"date":"2026 Jun 06","opponent":"vs Germany","score_for":1,"score_against":2,"result":"L","competition":"Friendly"}],"wins":4,"draws":1,"losses":3,"record":"4W 1D 3L","goals_for":16,"goals_against":15,"goal_difference":1,"goal_difference_per_match":0.125,"ppg":1.625,"form_sequence":["D","W","W","W","L","L","W","L"]},"away":{"team":"Paraguay","source_label":"Paraguay national football team results","source_url":"https://en.wikipedia.org/wiki/Paraguay_national_football_team_results_%282020%E2%80%93present%29","source_status":"Public results page checked for the last eight matches before the United States opener.","matches":[{"date":"2025 Sep 09","opponent":"vs Peru","score_for":1,"score_against":0,"result":"W","competition":"WCQ"},{"date":"2025 Oct 10","opponent":"at Japan","score_for":2,"score_against":2,"result":"D","competition":"Friendly"},{"date":"2025 Oct 14","opponent":"at South Korea","score_for":0,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2025 Nov 15","opponent":"at United States","score_for":1,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2025 Nov 18","opponent":"vs Mexico","score_for":2,"score_against":1,"result":"W","competition":"Friendly"},{"date":"2026 Mar 27","opponent":"at Greece","score_for":1,"score_against":0,"result":"W","competition":"Friendly"},{"date":"2026 Mar 31","opponent":"at Morocco","score_for":1,"score_against":2,"result":"L","competition":"Friendly"},{"date":"2026 Jun 05","opponent":"vs Nicaragua","score_for":4,"score_against":0,"result":"W","competition":"Friendly"}],"wins":4,"draws":1,"losses":3,"record":"4W 1D 3L","goals_for":12,"goals_against":9,"goal_difference":3,"goal_difference_per_match":0.375,"ppg":1.625,"form_sequence":["W","D","L","L","W","W","L","W"]},"head_to_head":{"source_label":"Group D historical note","source_url":"https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_D","summary":"Group D source says the teams have met nine times, including a 1930 World Cup match won 3-0 by the United States and a 2025 friendly won 2-1 by the United States.","weight_note":"Small and partly old sample; this is context, not a high-weight model input."}},"modelMethod":{"version":"public-data v0.4","weights":{"rank":0.36,"experience":0.17,"goals":0.15,"top_scorer":0.07,"venue":0.1,"form":0.15},"home_score":0.742,"away_score":0.434,"score_diff":0.308,"draw_base":0.247,"form_lane":"Derived from the source-backed last-eight match rows using points-per-game and goal-difference-per-match.","components":[{"component":"FIFA rank prior","weight":36,"home_score":0.838,"away_score":0.596,"home_contribution":0.302,"away_contribution":0.215},{"component":"Squad avg caps","weight":17,"home_score":0.617,"away_score":0.442,"home_contribution":0.105,"away_contribution":0.075},{"component":"Squad goal depth","weight":15,"home_score":0.771,"away_score":0.329,"home_contribution":0.116,"away_contribution":0.049},{"component":"Top-scorer threat","weight":7,"home_score":0.55,"away_score":0.167,"home_contribution":0.039,"away_contribution":0.012},{"component":"Venue/host factor","weight":10,"home_score":1,"away_score":0,"home_contribution":0.1,"away_contribution":0},{"component":"Recent-form context","weight":15,"home_score":0.539,"away_score":0.557,"home_contribution":0.081,"away_contribution":0.084}],"confidence":"medium-low","pattern_test":{"label":"Favorite edge with late-goal risk","favorite":"United States","underdog":"Paraguay","favorite_probability":55,"draw_probability":25,"underdog_probability":20,"non_favorite_share":45,"source_score_gap":0.308,"draw_pressure_index":44,"late_goal_index":69,"recent_total_goals_per_match":3.25,"favorite_conceded_per_match":1.88,"underdog_scored_per_match":1.5,"favorite_top_scorer_goals":33,"underdog_top_scorer_goals":10,"stance":"The favorite is clearer than Korea was, but recent scoring/concession data says the match can stay live late.","signals":["United States is the model favorite at 55%, but draw plus Paraguay still totals 45%.","Source-score gap is 0.308; under roughly 0.32, treat the match as materially more mixed than a high-favorite game.","Recent combined goal environment is 3.25 total goals per match.","United States conceded 1.88 per match recently; Paraguay scored 1.5 per match recently.","Official lineups are still pending, so this pattern layer should be re-run when starters and formations are confirmed."]},"not_included_yet":["official live match-centre status","official starting XI","club-level xG/xA and minutes load","verified late injury or weather changes"]},"uncertaintyBand":9,"inputScores":{"home":{"venue":1,"form":0.539},"away":{"venue":0,"form":0.557},"draw_adjustment":0.005},"official":{"fifaMatchId":"400021458","matchNo":4,"group":"Group D","kickoffUtc":"2026-06-13T01:00:00Z","kickoffEastern":"Jun 12, 2026, 9:00 PM EDT","home":"United States","away":"Paraguay","homeScore":null,"awayScore":null,"homeTactics":"4-2-3-1","awayTactics":"4-4-2","matchStatus":1,"officialityStatus":0,"matchTime":"0'","venue":"Los Angeles Stadium","city":"Los Angeles","referees":["Danny MAKKELIE"],"officialLineupStatus":"FIFA tactics visible. Starter-name fields still require official/team confirmation."}}],"sources":[{"label":"FIFA calendar API","url":"https://api.fifa.com/api/v3/calendar/matches?IdCompetition=17&IdSeason=285023&language=en&count=500","use":"Official source used to identify today's Eastern-time fixtures, kickoff timestamps, match IDs, venue names, teams, and referee assignments.","status":"Refreshed Jun 12, 2026, 8:43 PM EDT; Match 3 Canada vs Bosnia and Herzegovina is logged 1-1 final at 97'; tactics visible as Canada 4-4-2 and Bosnia and Herzegovina 4-4-2. Match 4 United States vs Paraguay shows 0' match time, referee Danny MAKKELIE; tactics visible as United States 4-2-3-1 and Paraguay 4-4-2; starter-name fields are not exposed."},{"label":"June 11 Mexico path check","url":"https://www.theguardian.com/football/live/2026/jun/11/mexico-v-south-africa-world-cup-2026-opening-match-live","use":"Secondary live report used to interpret the controlled-favorite path: early Mexico goal, second goal, and South Africa discipline collapse.","status":"Pattern-calibration source only; official score remains FIFA calendar API."},{"label":"June 11 Korea path check","url":"https://www.theguardian.com/football/live/2026/jun/12/fifa-world-cup-2026-live-south-korea-v-czechia-updates-kor-vs-cze-group-a-match-score-latest","use":"Secondary live report used to interpret the mixed-profile path: Czechia first goal, Korea equalizer, and late Korea winner.","status":"Pattern-calibration source only; official score remains FIFA calendar API."},{"label":"FIFA match centre","url":"https://www.fifa.com/en/match-centre/match/17/285023/289273/400021449","use":"Official match page for Canada vs Bosnia and Herzegovina; lineup/result status outranks all secondary sources.","status":"Latest FIFA-backed fields: Match 3 Canada vs Bosnia and Herzegovina is logged 1-1 final at 97'; tactics visible as Canada 4-4-2 and Bosnia and Herzegovina 4-4-2."},{"label":"FIFA match centre","url":"https://www.fifa.com/en/match-centre/match/17/285023/289273/400021458","use":"Official match page for USA vs Paraguay; lineup/result status outranks all secondary sources.","status":"Latest FIFA-backed fields: Match 4 United States vs Paraguay shows 0' match time, referee Danny MAKKELIE; tactics visible as United States 4-2-3-1 and Paraguay 4-4-2; starter-name fields are not exposed."},{"label":"Group B fixtures","url":"https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_B","use":"Group composition, FIFA ranking snapshot, Canada vs Bosnia kickoff, venue, referee, and no-prior-meeting note.","status":"Secondary, source-linked schedule and context check."},{"label":"Group D fixtures","url":"https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_D","use":"Group composition, FIFA ranking snapshot, USA vs Paraguay kickoff, venue, referee, and head-to-head note.","status":"Secondary, source-linked schedule and context check."},{"label":"Canada recent results","url":"https://en.wikipedia.org/wiki/Canada_men%27s_national_soccer_team_results_%282020%E2%80%93present%29","use":"Source-backed last-eight form rows for Canada; feeds the model form lane and final HTML history section.","status":"Public results page checked for the last eight matches before the Bosnia and Herzegovina opener."},{"label":"Bosnia and Herzegovina recent results","url":"https://en.wikipedia.org/wiki/Bosnia_and_Herzegovina_national_football_team_results_%282020%E2%80%93present%29","use":"Source-backed last-eight form rows for Bosnia and Herzegovina; feeds the model form lane and final HTML history section.","status":"Public results page checked for the last eight matches before the Canada opener; penalty wins are counted as draws for regulation-time form."},{"label":"United States recent results","url":"https://en.wikipedia.org/wiki/United_States_men%27s_national_soccer_team_results_%282020%E2%80%93present%29","use":"Source-backed last-eight form rows for the United States; feeds the model form lane and final HTML history section.","status":"Public results page checked for the last eight matches before the Paraguay opener."},{"label":"Paraguay recent results","url":"https://en.wikipedia.org/wiki/Paraguay_national_football_team_results_%282020%E2%80%93present%29","use":"Source-backed last-eight form rows for Paraguay; feeds the model form lane and final HTML history section.","status":"Public results page checked for the last eight matches before the United States opener."},{"label":"Final squads","url":"https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_squads","use":"Downloaded and parsed for player caps, goals, clubs, squad sizes, and top-scorer layers.","status":"Secondary, source-linked squad layer."},{"label":"World Football Elo","url":"https://www.eloratings.net/","use":"Next strength prior to refresh; not pulled into this local v0 probability file yet.","status":"Public rating system; listed as a future calibration lane."},{"label":"FIFA player tracking and AI avatars reporting","url":"https://www.theguardian.com/football/2026/jan/07/world-cup-players-to-have-lifelike-ai-avatars-for-use-in-var-offside-decisions","use":"Public reporting says FIFA tracking and AI avatar systems support VAR and broadcast explainers. This is not an open public live player GPS feed."},{"label":"Broadcast computer vision tracking validation","url":"https://arxiv.org/abs/2508.19477","use":"Research benchmark for deriving player position, speed, and distance from broadcast footage. Useful for roadmap context, not a live source for this site."},{"label":"World Cup camera, sensor, and smart ball coverage","url":"https://www.wired.com/story/world-cup-tech-helping-eliminate-bad-calls-var-sensors-3d-body-scans/","use":"Public reporting on camera, sensor, and smart ball systems. The available article does not expose a public API for live betting models."}]}</script>
-  <script>
-    (function () {
-      const fallback = JSON.parse(document.getElementById("seed-data").textContent);
-      let payload = fallback;
-      let selectedMatchId = fallback.matches[0] ? fallback.matches[0].id : null;
-      let selectedSide = "home";
-      let selectedPhase = "attack";
-      let selectedPlayer = "";
-      let refreshTimer = null;
+/* =================== today's fixtures (ET) =================== */
+/* odds = the price YOU see (Kalshi/Robinhood). Prefilled with the model's REAL-Elo fair
+   value so edge starts at 0 - type the real price and the edge + your return update. */
+let FIX=[
+ {id:"QAT-SUI",grp:"GRP B · M17 · Seattle · 3:00 PM ET",home:"Qatar",away:"Switzerland",hadv:0,total:2.5,
+   kalshi:"KXWCGAME-26JUN13QATSUI",odds:{home:26.5,draw:6.5,away:1.24},conf:true},
+ {id:"BRA-MAR",grp:"GRP C · M18 · Los Angeles · 6:00 PM ET",home:"Brazil",away:"Morocco",hadv:25,total:2.65,
+   kalshi:"KXWCGAME-26JUN13BRAMAR",odds:{home:1.83,draw:3.98,away:4.93},conf:true},
+ {id:"HAI-SCO",grp:"GRP C · M19 · Atlanta · 9:00 PM ET",home:"Haiti",away:"Scotland",hadv:0,total:2.4,
+   kalshi:"KXWCGAME-26JUN13HTISCO",odds:{home:6.41,draw:3.98,away:1.69},conf:false},
+];
 
-      const $ = (id) => document.getElementById(id);
-      const safe = (value) => String(value === undefined || value === null ? "" : value).replace(/[&<>"']/g, (char) => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;"
-      }[char]));
-      const pct = (value) => Number.isFinite(Number(value)) ? Number(value) : 0;
-      const teamSummary = (name) => (payload.team_summaries || []).find((team) => team.team === name) || {};
-      const matchById = (id) => (payload.matches || []).find((match) => match.id === id) || (payload.matches || [])[0];
-      const currentMatch = () => matchById(selectedMatchId);
-      const formFor = (match, side) => match && match.recentForm ? match.recentForm[side] : null;
-      const liveStatus = (match) => match && match.modelMethod && match.modelMethod.live_status ? match.modelMethod.live_status : null;
-      const scoreText = (match) => {
-        const archived = liveStatus(match);
-        if (archived) return String(archived.home_score) + "-" + String(archived.away_score) + " final";
-        const official = match && match.official ? match.official : {};
-        if (official.homeScore === null || official.homeScore === undefined) return "Pre-match";
-        return String(official.homeScore) + "-" + String(official.awayScore);
-      };
-      const lineupText = (match) => {
-        const archived = liveStatus(match);
-        if (archived) return archived.status || "Official result logged.";
-        if (!match || !match.official) return "Official lineup fields pending.";
-        return match.official.officialLineupStatus || "Official lineup fields pending.";
-      };
-      const prettyCheck = () => {
-        const source = payload.liveSource || {};
-        return source.checkedAtEastern || payload.generatedAtEastern || "Seed fallback";
-      };
+/* =================== state =================== */
+let KF=0.25;
+const EXP=new Set();                       // expanded heatmaps
+const PSIDE={}, PSEL={};                   // pitch side + selected player per fixture
+function setOdds(id,leg,v){const fx=FIX.find(f=>f.id==id);const n=parseFloat(v);if(n>1)fx.odds[leg]=n;render();}
 
-      function isFinalMatch(match) {
-        const archived = liveStatus(match);
-        const official = match && match.official ? match.official : {};
-        const hasOfficialScore = official.homeScore !== null && official.homeScore !== undefined && official.awayScore !== null && official.awayScore !== undefined;
-        return !!archived || (hasOfficialScore && official.matchStatus === 0);
-      }
+/* ===== risk-appetite sizing helpers (no auto-betting, no sim - your call) ===== */
+const sbank=()=>+document.getElementById('bank').value||1000;
+const spct=()=>Math.min(100,Math.max(0,+document.getElementById('stakepct').value||10))/100;
+function setK(k){KF=k;document.querySelectorAll('#kseg button').forEach(b=>b.classList.toggle('on',+b.dataset.k===k));render();}
+function toggleHeat(id){EXP.has(id)?EXP.delete(id):EXP.add(id);render();}
+function setSide(id,s){PSIDE[id]=s;PSEL[id]=null;render();}
+function pick(id,team,idx){PSEL[id]={team,idx};render();}
 
-      function strongestOutcome(match) {
-        const model = match && match.model ? match.model : {};
-        const entries = [
-          { key: "home", label: match ? match.home : "Home", probability: pct(model.home) },
-          { key: "draw", label: "Draw", probability: pct(model.draw) },
-          { key: "away", label: match ? match.away : "Away", probability: pct(model.away) }
-        ];
-        entries.sort((a, b) => b.probability - a.probability);
-        return entries[0];
-      }
+/* =================== eval =================== */
+const TC={"Strong Lean":"t-strong",Lean:"t-lean","Watch Only":"t-watch","High Volatility":"t-vol","No Bet":"t-no",LIVE:"t-vol"};
+const LG={home:"d-h",draw:"d-d",away:"d-a"};
+const nm=(fx,l)=>l=="home"?fx.home:l=="away"?fx.away:"Draw";
+function evalFx(fx){
+  const he=ELO[fx.home]??fx.homeElo??1700,ae=ELO[fx.away]??fx.awayElo??1700;const[lh,la]=eloToGoals(he,ae,fx.hadv,fx.total);
+  const live=fx.state=="live";
+  // serverP = probabilities computed server-side from REAL FIFA data + lineup/motivation edges
+  const P=fx.serverP?fx.serverP:(live?inPlay(lh,la,fx.mn,fx.hs,fx.as):outc(matrix(lh,la)));
+  const fair=devig(fx.odds);const legs={};let be=-9,bl="home";
+  ["home","draw","away"].forEach(l=>{const e=ek(P[l],fx.odds[l]);legs[l]={p:P[l],fair:fair[l],od:fx.odds[l],ev:e.ev,kelly:e.kelly};if(e.ev>be){be=e.ev;bl=l;}});
+  const bd=live?[P.home,P.home]:band(he,ae,fx.hadv,fx.total,-.05);const bw=(bd[1]-bd[0])/2;
+  const fav=Math.max(P.home,P.draw,P.away);const tr=tierOf(be,fav,P.draw,bw,fx.conf,live);
+  const full=fx.serverP?fx.serverP:(live?null:outc(matrix(lh,la)));
+  return{fx,he,ae,P,fair,legs,be,bl,bd,bw,tr,live,o25:full?full.over25:null,top:full?full.top:null,vig:fair.vig};
+}
 
-      function officialFactCertainty(match) {
-        const official = match && match.official ? match.official : {};
-        const archived = liveStatus(match);
-        const finalMatch = isFinalMatch(match);
-        const starterNamesPending = official.officialLineupStatus && official.officialLineupStatus.toLowerCase().indexOf("starter-name") >= 0;
-        const facts = [];
-        const missing = [];
-        let score = 0;
-        if (match && match.fifaMatchId) { score += 14; facts.push("FIFA match ID"); }
-        if (match && match.kickoffEt) { score += 12; facts.push("kickoff"); }
-        if (match && match.venue) { score += 10; facts.push("venue"); }
-        if (official.referees && official.referees.length) { score += 8; facts.push("referee"); }
-        if (match && match.recentForm) { score += 12; facts.push("recent form"); }
-        if (match && match.modelMethod && match.modelMethod.components) { score += 12; facts.push("model components"); }
-        if (official.homeTactics || official.awayTactics || (archived && (archived.home_tactics || archived.away_tactics))) { score += 14; facts.push("tactics"); }
-        if (finalMatch) { score = Math.max(score, 94); facts.push("final score"); }
-        if (!(official.homeTactics || official.awayTactics) && !(archived && (archived.home_tactics || archived.away_tactics)) && !finalMatch) missing.push("official XI/tactics");
-        if (starterNamesPending && !finalMatch) missing.push("official starter names");
-        if (!finalMatch && !(official.referees && official.referees.length)) missing.push("referee");
-        if (!finalMatch && match && match.modelMethod && match.modelMethod.not_included_yet && match.modelMethod.not_included_yet.length) missing.push(match.modelMethod.not_included_yet[0]);
-        return { score: Math.min(100, score), facts, missing };
-      }
+/* HTML-escape any string that originates from the FIFA feed before it touches innerHTML (XSS guard). */
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 
-      function bettingReadiness(match) {
-        const finalMatch = isFinalMatch(match);
-        const official = match && match.official ? match.official : {};
-        const archived = liveStatus(match);
-        const pattern = match && match.pattern ? match.pattern : {};
-        const strongest = strongestOutcome(match);
-        const nonFavorite = pct(pattern.nonFavoriteShare);
-        const drawPressure = pct(pattern.drawPressureIndex);
-        const lateGoal = pct(pattern.lateGoalIndex);
-        const scoreGap = match && match.modelMethod && match.modelMethod.score_diff !== undefined ? Number(match.modelMethod.score_diff) : 0;
-        const fact = officialFactCertainty(match);
-        const lineupKnown = !!(official.homeTactics || official.awayTactics || (archived && (archived.home_tactics || archived.away_tactics)));
-        const starterNamesPending = official.officialLineupStatus && official.officialLineupStatus.toLowerCase().indexOf("starter-name") >= 0;
-        let tier = "Watch Only";
-        let tone = "watch";
-        let action = "Wait for official XI or live match state.";
-        const reasons = [];
+/* =================== heatmap pitch =================== */
+function heatBlob(x,y,r,col,op){return `<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" opacity="${op}" filter="url(#blur)"/>`;}
+function pitchSVG(fx){
+  const id=fx.id,side=PSIDE[id]||"both";
+  const W=300,H=190;
+  const sx=v=>10+(v/100)*(W-20), sy=v=>12+(v/100)*(H-24);
+  // teams change ends at half-time: in the 2nd half home attacks LEFT, away attacks RIGHT
+  const flip = fx.state=="live" && fx.mn>45 && fx.mn<=90;
+  const hx = v => flip ? sx(100-v) : sx(v);       // home attacking direction
+  const ax = v => flip ? sx(v) : sx(100-v);       // away attacking direction
+  const homeP=(SQUADS[fx.home]||[]).map((pl,i)=>{const a=liveAdj(pl,fx,"home");return{...pl,team:"home",i,SX:hx(a.x*.92),SY:sy(pl.y),sp:a.sp};});
+  const awayP=(SQUADS[fx.away]||[]).map((pl,i)=>{const a=liveAdj(pl,fx,"away");return{...pl,team:"away",i,SX:ax(a.x*.92),SY:sy(100-pl.y),sp:a.sp};});
+  let show=side=="home"?homeP:side=="away"?awayP:homeP.concat(awayP);
+  // heat layer
+  let heat="";show.forEach(p=>{const col=p.team=="home"?"#37a6ff":"#ff7a44";heat+=heatBlob(p.SX,p.SY,8+p.sp*64,col,.10+p.sp*.5);});
+  // dots
+  const sel=PSEL[id];
+  let dots="";show.forEach(p=>{const col=p.team=="home"?"#37a6ff":"#ff7a44";
+    const on=sel&&sel.team==p.team&&sel.idx==p.i;const r=4+p.sp*7;
+    dots+=`<g style="cursor:pointer" onclick="pick('${id}','${p.team}',${p.i})">
+      <circle cx="${p.SX}" cy="${p.SY}" r="${r+ (on?3:0)}" fill="${col}" stroke="${on?'#fff':'#04070a'}" stroke-width="${on?2:1}"/>
+      <text x="${p.SX}" y="${p.SY-r-3}" fill="#cfe3ef" font-size="7" font-family="monospace" text-anchor="middle">${esc(p.n)}</text></g>`;});
+  return `<svg class="pitch" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+    <defs><filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7"/></filter></defs>
+    <rect x="2" y="2" width="${W-4}" height="${H-4}" rx="6" fill="#0a2a18" stroke="#16432a"/>
+    ${[...Array(6)].map((_,i)=>`<rect x="${2+i*(W-4)/6}" y="2" width="${(W-4)/6}" height="${H-4}" fill="${i%2?'#0b2e1a':'#0a2a18'}"/>`).join('')}
+    <line x1="${W/2}" y1="4" x2="${W/2}" y2="${H-4}" stroke="#1d5236"/><circle cx="${W/2}" cy="${H/2}" r="20" fill="none" stroke="#1d5236"/>
+    <rect x="2" y="${H/2-32}" width="34" height="64" fill="none" stroke="#1d5236"/><rect x="${W-36}" y="${H/2-32}" width="34" height="64" fill="none" stroke="#1d5236"/>
+    ${heat}${dots}
+    <text x="14" y="${H-7}" fill="#3f6b52" font-size="7" font-family="monospace">${esc(fx.away)} ◄ attack</text>
+    <text x="${W-14}" y="${H-7}" fill="#3f6b52" font-size="7" font-family="monospace" text-anchor="end">attack ► ${esc(fx.home)}</text>
+  </svg>`;
+}
+function threatList(fx){
+  const side=PSIDE[fx.id]||"both";
+  let pool=[];
+  if(side!=="away")(SQUADS[fx.home]||[]).forEach((p,i)=>{const a=liveAdj(p,fx,"home");pool.push({...p,team:fx.home,col:"var(--home)",i,t:"home",sp:a.sp,zx:a.x});});
+  if(side!=="home")(SQUADS[fx.away]||[]).forEach((p,i)=>{const a=liveAdj(p,fx,"away");pool.push({...p,team:fx.away,col:"var(--away)",i,t:"away",sp:a.sp,zx:a.x});});
+  pool.sort((a,b)=>b.sp-a.sp);
+  return pool.slice(0,5).map(p=>`<div class="tr"><span class="nm" style="border-left:3px solid ${p.col};padding-left:7px">${esc(p.n)} <span class="zn">${esc(p.team)} · ${esc(p.p)}</span></span>
+    <span><span class="zn">${zoneLabel(p.zx,p.y)}</span> &nbsp; <span class="pp">${(p.sp*100).toFixed(0)}%</span></span></div>`).join('');
+}
+function pitchPanel(fx){
+  const id=fx.id,side=PSIDE[id]||"both";const sel=PSEL[id];
+  const hasH=(SQUADS[fx.home]||[]).length, hasA=(SQUADS[fx.away]||[]).length;
+  if(!hasH && !hasA){
+    return `<div class="pitchwrap"><div class="nodata">NO SHOT DATA<br><span>${esc(fx.home)} and ${esc(fx.away)} are not in StatsBomb open data. No numbers are invented; the field stays empty until a covered/feed source exists.</span></div></div>`;
+  }
+  let det=liveCaption(fx)||`<span class="zn">Tap a player. Dot size and heat = scoring probability this match.${(!hasH||!hasA)?` Only ${hasH?fx.home:fx.away} has StatsBomb data; the other side shows no data.`:''}</span>`;
+  if(sel){const arr=SQUADS[sel.team==="home"?fx.home:fx.away];const p=arr[sel.idx];const a=liveAdj(p,fx,sel.team);
+    det=`<span class="hot">${esc(p.n)}</span> (${esc(p.p)}) · xG/shot ${p.xgs.toFixed(2)} · ${p.sh90} sh/90 · hot zone <span class="hot">${zoneLabel(a.x,p.y)}</span> · <span style="color:var(--grn)">scores ${fx.state=='live'?'from here':'this match'} ${(a.sp*100).toFixed(0)}%</span>`;}
+  return `<div class="pitchwrap">
+    <div class="ptabs">
+      <div class="ptab b ${side=='both'?'on':''}" onclick="setSide('${id}','both')">BOTH</div>
+      <div class="ptab h ${side=='home'?'on':''}" onclick="setSide('${id}','home')">${esc(fx.home)}</div>
+      <div class="ptab a ${side=='away'?'on':''}" onclick="setSide('${id}','away')">${esc(fx.away)}</div>
+    </div>
+    ${pitchSVG(fx)}
+    <div class="pdetail">${det}</div>
+    <div class="threats">${threatList(fx)}</div>
+    <div class="heatcap">// REAL shot data: StatsBomb Open Data (World Cup 2022 / Euro 2024) recorded shots. threat = 1 minus e^(minus xG). The left/right shift with score is model logic on the live clock, not a data feed. True in-match shot updates need a paid feed (Opta / StatsBomb live / Sportradar).</div>
+  </div>`;
+}
 
-        if (finalMatch) {
-          tier = "Closed";
-          tone = "closed";
-          action = "Archive and use for backtest only.";
-          reasons.push("Official result is already logged, so this is no longer a pre-match betting decision.");
-          reasons.push("Pre-match probability remains useful for checking whether the model correctly warned about draw or late-swing risk.");
-        } else {
-          if (!lineupKnown) reasons.push("Official starting XI/tactics are still pending.");
-          if (starterNamesPending) reasons.push("FIFA tactics are visible, but official starter-name fields are still pending.");
-          if (nonFavorite >= 45) reasons.push("Draw plus opponent share is " + nonFavorite + "%, which makes the favorite lane less clean.");
-          if (drawPressure >= 55) reasons.push("Draw pressure is " + drawPressure + ", so a stalemate path is live.");
-          if (lateGoal >= 65) reasons.push("Late-goal risk is " + lateGoal + ", so end-game swings matter.");
-          if (strongest.probability >= 62 && nonFavorite <= 38 && lateGoal <= 55 && scoreGap >= 0.35 && lineupKnown && fact.score >= 75) {
-            tier = "Strong Lean";
-            tone = "strong";
-            action = "Eligible for strongest pre-match lean if price is reasonable.";
-            reasons.push("Favorite probability, source gap, and official coverage all clear the strong-lean threshold.");
-          } else if (nonFavorite >= 45 || drawPressure >= 55 || lateGoal >= 65) {
-            tier = "High Volatility";
-            tone = "risk";
-            action = "Watch only or reduce exposure until lineup/live state confirms the edge.";
-          } else if (!lineupKnown || fact.score < 70) {
-            tier = "Watch Only";
-            tone = "watch";
-          } else if (strongest.probability >= 54 && scoreGap >= 0.25 && nonFavorite <= 46 && lateGoal <= 65) {
-            tier = "Lean";
-            tone = "lean";
-            action = "Usable lean, but still price-check against draw risk.";
-            reasons.push("Model edge is present without an extreme volatility warning.");
-          } else {
-            tier = "No Bet";
-            tone = "no";
-            action = "No clean edge from the current source set.";
-            reasons.push("Current inputs do not create a strong enough separation from draw/opponent paths.");
-          }
-        }
+/* =================== card =================== */
+/* you enter the price you see (in cents, prediction-market style); edge = model - market */
+function card(r){
+  const fx=r.fx,P=r.P,e=r.legs[r.bl];
+  const fin=fx.state=='final'||fx.state=='ft';
+  const badge=fx.state=='live'?`<span class="badge b-live"><span class="d"></span>LIVE ${fx.mn}'</span>`
+    :fin?`<span class="badge b-ft">FT ${fx.hs}-${fx.as}</span>`
+    :`<span class="badge b-pre">${esc((fx.grp.split('·').pop()||'').trim())||'SCHEDULED'}</span>`;
+  const mid=(fx.state=='live'||fin)?`<div class="score">${fx.hs}-${fx.as}<small>${fin?'full':fx.mn+"'"}</small></div>`:`<div class="score" style="font-size:13px;color:var(--mut2)">vs</div>`;
+  const fair0=Math.abs(e.ev)<0.01;   // price you entered equals the model fair value
+  const edgeBlock = fair0
+   ? `<div class="edge flat"><div><div class="ekey">NO TRADEABLE EDGE</div>
+       <div class="ebig neg" style="font-size:16px">price = model fair</div>
+       <div class="esub">Type the cents you see on Robinhood / Kalshi. An edge shows up only when your price differs from the model.</div></div></div>`
+   : `<div class="edge ${e.ev<=0||!fx.conf?'flat':''}">
+      <div><div class="ekey">BEST EDGE · ${esc(nm(fx,r.bl))} ${r.bl=='draw'?'':'ML'}</div>
+        <div class="ebig ${e.ev<=0?'neg':'flash'}">${e.ev>0?'+':''}${(e.ev*100).toFixed(1)}%<span class="esub" style="display:inline"> vs market</span></div>
+        <div class="esub">model ${(e.p*100).toFixed(1)}% vs market ${(100/e.od).toFixed(0)}¢ · pays <b style="color:var(--grn)">+${((e.od-1)*100).toFixed(0)}%</b> if it hits${!fx.conf?` · <span style="color:var(--amb)">XI pending</span>`:''}</div></div>
+      </div>`;
+  let rows="";["home","draw","away"].forEach(l=>{const d=r.legs[l];const cents=(100/d.od);
+    rows+=`<div class="orow ${l==r.bl?'best':''}">
+      <span class="onm"><span class="dotc ${LG[l]}"></span>${esc(nm(fx,l))}</span>
+      <span>${(d.p*100).toFixed(0)}%</span>
+      <span class="oc"><input class="oin" value="${cents.toFixed(0)}" onchange="setCents('${fx.id}','${l}',this.value)"><i>¢</i></span>
+      <span>+${((d.od-1)*100).toFixed(0)}%</span>
+      <span class="${d.ev>0?'pos':'negv'}">${d.ev>0?'+':''}${(d.ev*100).toFixed(1)}%</span>
+    </div>`;});
+  const bt=`${esc(fx.home)} range <b>${(r.bd[0]*100).toFixed(0)}-${(r.bd[1]*100).toFixed(0)}%</b> · 10-90% band &plusmn;${(r.bw*100).toFixed(1)}pp`;
+  const formFact=(fx.formationH||fx.formationA)?`<span class="fact">form <b>${esc(fx.formationH||'?')}</b> v <b>${esc(fx.formationA||'?')}</b></span>`:'';
+  const xiFact=fx.lineupStatus?`<span class="fact">XI: <b>${esc(fx.lineupStatus)}</b></span>`:'';
+  const motivFact=fx.motiv?`<span class="fact" style="color:var(--amb)">motivation: <b>${esc(fx.motiv)}</b></span>`:'';
+  const facts=`${r.o25!=null?`<span class="fact">O2.5 <b>${(r.o25*100).toFixed(0)}%</b></span>`:''}${r.top?`<span class="fact">top <b>${r.top}</b></span>`:''}${formFact}${xiFact}${motivFact}`;
+  const so=fx.conf?`<span class="v">&check; FIFA fixture + XI</span>`:`<span style="color:var(--amb)">XI publishes ~75 min pre-KO</span>`;
+  const heat=EXP.has(fx.id)?pitchPanel(fx):"";
+  return `<div class="card"><div class="pad">
+    <div class="crow"><div class="code">[<b>${esc(fx.id)}</b>] ${esc(fx.grp)}</div>${badge}</div>
+    <div class="tiers"><span class="tier ${TC[r.tr]}">${r.tr.toUpperCase()}</span></div>
+    <div class="teams"><div class="team"><div class="tn">${esc(fx.home)}</div><div class="telo">ELO ${r.he}${fx.hadv?` H+${fx.hadv}`:''}</div></div>
+      ${mid}<div class="team r"><div class="tn">${esc(fx.away)}</div><div class="telo">ELO ${r.ae}</div></div></div>
+    <div class="pbar"><span class="ph" style="width:${P.home*100}%">${(P.home*100).toFixed(0)}</span>
+      <span class="pd" style="width:${P.draw*100}%">${(P.draw*100).toFixed(0)}</span>
+      <span class="pa" style="width:${P.away*100}%">${(P.away*100).toFixed(0)}</span></div>
+    <div class="plab"><span>${esc(fx.home)}</span><span>X</span><span>${esc(fx.away)}</span></div>
+    <div class="band">${bt}</div>
+    ${edgeBlock}
+    <div class="otab"><div class="orow head"><span>SEL</span><span>MODEL</span><span>YOUR&nbsp;¢</span><span>RET%</span><span>EDGE%</span></div>${rows}</div>
+    <div class="facts">${facts}</div>
+    <button class="hbtn" onclick="toggleHeat('${fx.id}')">${EXP.has(fx.id)?'▲ HIDE':'▼ PLAYER SCORING HEATMAP'} · who scores, where</button>
+    </div>${heat}
+    <div class="pad" style="padding-top:0"><div class="src">${so} · <span class="v">measured:</span> real Elo (eloratings.net) · shots: StatsBomb open data · market: <b style="color:var(--cyan)">Robinhood / Kalshi ${esc(fx.kalshi||'')}</b></div></div>
+  </div>`;
+}
+/* convert the cents price you enter back to decimal odds and re-price the edge */
+function setCents(id,leg,v){const c=parseFloat(v);if(c>0&&c<100){FIX.find(f=>f.id==id).odds[leg]=100/c;render();}}
 
-        if (!reasons.length) reasons.push("Current source set is usable, but not strong enough to promote beyond watch mode.");
-        return { tier, tone, action, strongest, nonFavorite, drawPressure, lateGoal, scoreGap, fact, reasons };
-      }
+/* =================== render =================== */
+function render(){
+  document.getElementById('cards').innerHTML=FIX.map(fx=>card(evalFx(fx))).join('');
+}
+function tick(){
+  document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'})+" ET";
+}
 
-      function renderBettingPanel(match) {
-        const signal = bettingReadiness(match);
-        const missing = signal.fact.missing && signal.fact.missing.length ? signal.fact.missing.slice(0, 2).join(", ") : "None critical";
-        return '<section class="signal-panel ' + safe(signal.tone) + '">' +
-          '<div class="signal-top"><div><span class="tag">betting-readiness signal</span><p>' + safe(signal.action) + '</p></div><strong class="signal-tier">' + safe(signal.tier) + '</strong></div>' +
-          '<div class="signal-grid">' +
-            '<div><b>' + safe(signal.strongest.probability) + '%</b><span>Strongest outcome: ' + safe(signal.strongest.label) + '</span></div>' +
-            '<div><b>' + safe(signal.nonFavorite) + '%</b><span>Draw plus opponent share</span></div>' +
-            '<div><b>' + safe(signal.lateGoal) + '</b><span>Late-goal risk</span></div>' +
-            '<div><b>' + safe(signal.fact.score) + '%</b><span>Official data certainty</span></div>' +
-          '</div>' +
-          '<ul>' + signal.reasons.slice(0, 4).map((reason) => '<li>' + safe(reason) + '</li>').join("") + '</ul>' +
-          '<p class="fineprint">Missing or pending: ' + safe(missing) + '. Official facts can be certain; the outcome forecast remains probabilistic.</p>' +
-        '</section>';
-      }
-
-      function renderHero() {
-        const source = payload.liveSource || {};
-        const active = source.activeWindows && source.activeWindows.length;
-        $("source-mode").textContent = active ? "Match window" : "Daily watch";
-        $("source-mode").className = active ? "status-pill" : "status-pill warn";
-        $("hero-note").textContent = source.refreshMode || fallback.refreshStrategy && fallback.refreshStrategy.matchday_logic || "Source-backed daily watch.";
-        $("generated-at").textContent = "Checked: " + prettyCheck();
-        $("match-count").textContent = String((payload.matches || []).length) + " matches";
-        const tacticCount = (payload.matches || []).filter((match) => match.official && (match.official.homeTactics || match.official.awayTactics)).length;
-        const lineupSummary = tacticCount ? String(tacticCount) + " tactic set" + (tacticCount === 1 ? "" : "s") : "Pending";
-        const lineupNote = tacticCount ? "Tactics visible; starter names still caveated unless official/team source exposes them" : "Upgrade only when starter names or tactics are exposed";
-
-        $("window-grid").innerHTML = (payload.matches || []).map((match) =>
-          '<div class="time-box"><strong>' + safe(match.kickoffLabel || match.kickoff_label || "") + '</strong><span>' + safe((match.homeShort || match.home || "").slice(0, 3)) + ' vs ' + safe((match.awayShort || match.away || "").slice(0, 3)) + '</span></div>'
-        ).join("") + '<div class="time-box"><strong>15m</strong><span>active page poll</span></div>';
-
-        $("quality-strip").innerHTML = [
-          ["Official matches", source.officialMatchCount === undefined ? "Seed" : source.officialMatchCount, "FIFA calendar count for today"],
-          ["Active windows", active ? source.activeWindows.join(", ") : "None", "90 min before through 150 min after kickoff"],
-          ["Source error", source.sourceError ? "Yes" : "No", source.sourceError || "Live source reachable"],
-          ["Betting mode", "Signal", "Decision support, never guaranteed certainty"],
-          ["Lineups", lineupSummary, lineupNote]
-        ].map((item) => '<div><b>' + safe(item[1]) + '</b><span>' + safe(item[0]) + ': ' + safe(item[2]) + '</span></div>').join("");
-
-        $("tracking-summary").textContent = payload.movementLayer && payload.movementLayer.summary ? payload.movementLayer.summary : "";
-      }
-
-      function renderTabs() {
-        $("match-tabs").innerHTML = (payload.matches || []).map((match) => {
-          const active = match.id === selectedMatchId ? " active" : "";
-          return '<button type="button" class="tab-button' + active + '" data-match="' + safe(match.id) + '">' + safe(match.home) + ' vs ' + safe(match.away) + '</button>';
-        }).join("");
-        document.querySelectorAll("[data-match]").forEach((button) => {
-          button.addEventListener("click", () => {
-            selectedMatchId = button.getAttribute("data-match");
-            selectedPlayer = "";
-            render();
-          });
-        });
-      }
-
-      function probabilityBar(match) {
-        return '<div class="prob-bar" aria-label="Win draw loss probability">' +
-          '<div class="prob-segment home" style="width:' + pct(match.model.home) + '%"><strong>' + pct(match.model.home) + '%</strong><span>' + safe(match.home) + '</span></div>' +
-          '<div class="prob-segment draw" style="width:' + pct(match.model.draw) + '%"><strong>' + pct(match.model.draw) + '%</strong><span>Draw</span></div>' +
-          '<div class="prob-segment away" style="width:' + pct(match.model.away) + '%"><strong>' + pct(match.model.away) + '%</strong><span>' + safe(match.away) + '</span></div>' +
-          '</div>';
-      }
-
-      function renderMatchBoard() {
-        const match = currentMatch();
-        if (!match) return;
-        const official = match.official || {};
-        const archived = liveStatus(match);
-        const pattern = match.pattern || {};
-        const components = match.modelMethod && match.modelMethod.components ? match.modelMethod.components : [];
-        const resultPanel = archived
-          ? '<div class="subpanel result-panel"><h3>Official Result Audit</h3><div class="result-score"><b>' + safe(match.home) + '</b><strong>' + safe(archived.home_score) + '-' + safe(archived.away_score) + '</strong><b>' + safe(match.away) + '</b></div><p>' + safe(archived.status) + '</p><p>Observed: ' + safe(archived.observed_at_et) + ' | Time: ' + safe(archived.match_time) + ' | Tactics: ' + safe(archived.home_tactics) + ' / ' + safe(archived.away_tactics) + '</p><p class="fineprint">The probability bar remains the archived pre-match baseline, not an in-play or post-match forecast.</p></div>'
-          : "";
-        $("match-board").innerHTML =
-          '<article class="match-card">' +
-            '<div class="match-head">' +
-              '<div><span class="tag">' + safe(match.group) + '</span><h2>' + safe(match.home) + ' vs ' + safe(match.away) + '</h2>' +
-              '<p>' + safe(match.venue) + ' | ' + safe(match.kickoffLabel) + ' | ' + safe(scoreText(match)) + '</p></div>' +
-              '<span class="readiness">' + safe(match.readiness || "Pre-match baseline") + '</span>' +
-            '</div>' +
-            probabilityBar(match) +
-            '<div class="metric-grid">' +
-              '<div class="metric"><b>' + safe(pattern.nonFavoriteShare) + '%</b><span>Draw plus underdog</span></div>' +
-              '<div class="metric"><b>' + safe(pattern.drawPressureIndex) + '</b><span>Draw pressure</span></div>' +
-              '<div class="metric"><b>' + safe(pattern.lateGoalIndex) + '</b><span>Late-goal risk</span></div>' +
-              '<div class="metric"><b>' + safe(match.uncertaintyBand || 0) + '%</b><span>Uncertainty band</span></div>' +
-            '</div>' +
-            renderBettingPanel(match) +
-            '<div class="split">' +
-              '<section class="subpanel"><h3>Source Status</h3><p>' + safe(lineupText(match)) + '</p><p>Referee: ' + safe((official.referees || []).join(", ") || "Pending") + '</p><p>Tactics: ' + safe(official.homeTactics || "Pending") + ' / ' + safe(official.awayTactics || "Pending") + '</p></section>' +
-              '<section class="subpanel"><h3>Pattern Read</h3><p>' + safe(pattern.stance || "") + '</p><ul>' + (pattern.signals || []).slice(0, 3).map((signal) => '<li>' + safe(signal) + '</li>').join("") + '</ul></section>' +
-            '</div>' +
-            resultPanel +
-            '<div class="subpanel" style="margin-top:12px"><h3>Main Drivers</h3><ul>' + (match.drivers || []).map((driver) => '<li>' + safe(driver) + '</li>').join("") + '</ul></div>' +
-            '<div class="subpanel" style="margin-top:12px"><h3>Model Components</h3><table><thead><tr><th>Component</th><th>Weight</th><th>' + safe(match.home) + '</th><th>' + safe(match.away) + '</th></tr></thead><tbody>' +
-              components.map((component) => '<tr><td>' + safe(component.component) + '</td><td>' + safe(component.weight) + '%</td><td>' + safe(component.home_contribution) + '</td><td>' + safe(component.away_contribution) + '</td></tr>').join("") +
-            '</tbody></table></div>' +
-          '</article>';
-      }
-
-      function renderRecentForm() {
-        const match = currentMatch();
-        const home = formFor(match, "home");
-        const away = formFor(match, "away");
-        $("recent-form").innerHTML = '<div class="form-grid">' + [home, away].filter(Boolean).map((form) => {
-          return '<div class="form-card"><div class="form-title"><h4>' + safe(form.team) + '</h4><span>' + safe(form.record) + '</span></div>' +
-            '<div class="form-strip">' + (form.form_sequence || []).map((result) => '<span class="result-pill ' + safe(result).toLowerCase() + '">' + safe(result) + '</span>').join("") + '</div>' +
-            '<div class="form-stats"><div><b>' + safe(form.ppg) + '</b><span>Points per game</span></div><div><b>' + safe(form.goals_for) + '</b><span>Goals for</span></div><div><b>' + safe(form.goal_difference) + '</b><span>Goal difference</span></div></div>' +
-            '<div class="match-list">' + (form.matches || []).map((row) => '<div class="match-row"><span class="match-date">' + safe(row.date) + '</span><span><b>' + safe(row.opponent) + '</b><small>' + safe(row.competition) + '</small></span><span class="match-score">' + safe(row.score_for) + '-' + safe(row.score_against) + '</span></div>').join("") + '</div></div>';
-        }).join("") + '</div>';
-      }
-
-      function renderFormula() {
-        const match = currentMatch();
-        const method = match && match.modelMethod ? match.modelMethod : {};
-        const h2h = match && match.recentForm ? match.recentForm.head_to_head : null;
-        $("formula-panel").innerHTML =
-          '<div class="model-strip">' +
-            '<div><b>' + safe(method.version || "v0") + '</b><span>Model version</span></div>' +
-            '<div><b>' + safe(method.confidence || "medium-low") + '</b><span>Evidence confidence</span></div>' +
-            '<div><b>' + safe(method.score_diff || "") + '</b><span>Source score gap</span></div>' +
-            '<div><b>' + safe(method.draw_base || "") + '</b><span>Draw base</span></div>' +
-          '</div>' +
-          '<div class="subpanel" style="margin-top:12px"><h3>Formula Lane</h3><p>' + safe(method.form_lane || "Form lane uses reviewed public recent-form rows.") + '</p></div>' +
-          (h2h ? '<div class="subpanel" style="margin-top:12px"><h3>Head To Head</h3><p>' + safe(h2h.summary) + '</p><p>' + safe(h2h.weight_note) + '</p></div>' : "");
-      }
-
-      function renderDecisionFramework() {
-        const framework = payload.bettingFramework || fallback.bettingFramework || {};
-        const tiers = framework.tiers || [];
-        $("decision-framework-list").innerHTML = tiers.map((tier) =>
-          '<div><b>' + safe(tier.label) + '</b><span>' + safe(tier.use) + '</span></div>'
-        ).join("");
-        $("decision-framework-note").textContent = framework.summary || "Official data supports decision quality; it does not guarantee match outcomes.";
-      }
-
-      function playersForTeam(summary) {
-        const seen = new Set();
-        return ((summary.top_goals || []).concat(summary.top_caps || [])).filter((player) => {
-          const key = player.name + "|" + player.position;
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        });
-      }
-
-      function rolePoint(player, index, side, phase) {
-        const position = String(player.position || "").toUpperCase();
-        const attackRight = side === "home";
-        let x = 50;
-        let y = 28 + (index % 4) * 14;
-        if (position.indexOf("FW") >= 0) x = phase === "defense" ? 48 : 78;
-        else if (position.indexOf("MF") >= 0) x = phase === "defense" ? 42 : phase === "build" ? 55 : 64;
-        else if (position.indexOf("DF") >= 0) x = phase === "attack" ? 42 : 30;
-        else x = 16;
-        if (!attackRight) x = 100 - x;
-        return { x, y };
-      }
-
-      function renderMovement() {
-        const match = currentMatch();
-        if (!match) return;
-        const teamName = selectedSide === "home" ? match.home : match.away;
-        const summary = teamSummary(teamName);
-        const form = formFor(match, selectedSide) || {};
-        const players = playersForTeam(summary);
-        if (!selectedPlayer && players[0]) selectedPlayer = players[0].name;
-        $("side-home").textContent = match.home;
-        $("side-away").textContent = match.away;
-        document.querySelectorAll("[data-side]").forEach((button) => button.classList.toggle("active", button.getAttribute("data-side") === selectedSide));
-        document.querySelectorAll("[data-phase]").forEach((button) => button.classList.toggle("active", button.getAttribute("data-phase") === selectedPhase));
-        $("player-select").innerHTML = players.map((player) => '<option value="' + safe(player.name) + '"' + (player.name === selectedPlayer ? " selected" : "") + '>' + safe(player.name) + ' | ' + safe(player.position) + '</option>').join("");
-
-        const pitch = $("pitch");
-        pitch.querySelectorAll(".heat-spot,.player-dot").forEach((node) => node.remove());
-        const modelProb = selectedSide === "home" ? pct(match.model.home) : pct(match.model.away);
-        const shotIndex = Math.min(92, Math.round(modelProb * 0.72 + pct(summary.outfield_goals_per_player) * 7 + pct(form.goals_for) * 2.4));
-        const pressureIndex = Math.min(92, Math.round((pct(match.pattern && match.pattern.nonFavoriteShare) + pct(match.pattern && match.pattern.lateGoalIndex)) / 2));
-        const zoneX = selectedSide === "home" ? (selectedPhase === "defense" ? 28 : selectedPhase === "build" ? 52 : 78) : (selectedPhase === "defense" ? 72 : selectedPhase === "build" ? 48 : 22);
-        const zones = [
-          { x: zoneX, y: 50, s: 34 + shotIndex * 0.35 },
-          { x: selectedSide === "home" ? zoneX + 7 : zoneX - 7, y: 34, s: 25 + pressureIndex * 0.22 },
-          { x: selectedSide === "home" ? zoneX + 6 : zoneX - 6, y: 66, s: 24 + pct(summary.avg_goals) * 3 }
-        ];
-        zones.forEach((zone) => {
-          const spot = document.createElement("span");
-          spot.className = "heat-spot";
-          spot.style.left = zone.x + "%";
-          spot.style.top = zone.y + "%";
-          spot.style.width = zone.s + "%";
-          spot.style.height = zone.s + "%";
-          pitch.appendChild(spot);
-        });
-        players.slice(0, 8).forEach((player, index) => {
-          const point = rolePoint(player, index, selectedSide, selectedPhase);
-          const dot = document.createElement("span");
-          dot.className = player.name === selectedPlayer ? "player-dot active" : "player-dot";
-          dot.title = player.name;
-          dot.style.left = point.x + "%";
-          dot.style.top = point.y + "%";
-          pitch.appendChild(dot);
-        });
-        $("pitch-label").textContent = teamName + " | " + selectedPhase + " pressure";
-        $("field-legend").innerHTML =
-          '<div><b>' + shotIndex + '</b><span>Shot danger proxy</span></div>' +
-          '<div><b>' + pressureIndex + '</b><span>Match volatility proxy</span></div>' +
-          '<div><b>' + safe(payload.movementLayer.status) + '</b><span>Tracking source status</span></div>';
-
-        renderPlayerPanel(summary, players, shotIndex);
-      }
-
-      function renderPlayerPanel(summary, players, shotIndex) {
-        const focused = players.find((player) => player.name === selectedPlayer) || players[0] || {};
-        $("player-panel").innerHTML =
-          '<div class="model-strip">' +
-            '<div><b>' + safe(summary.avg_caps || "") + '</b><span>Avg caps</span></div>' +
-            '<div><b>' + safe(summary.avg_goals || "") + '</b><span>Avg goals</span></div>' +
-            '<div><b>' + safe(summary.total_goals || "") + '</b><span>Squad goals</span></div>' +
-            '<div><b>' + safe(shotIndex) + '</b><span>Shot proxy</span></div>' +
-          '</div>' +
-          '<div class="player-grid">' +
-            '<div class="player-card"><h3>Focus Player</h3><p><b>' + safe(focused.name || "Pending") + '</b></p><p>' + safe(focused.position || "") + ' | ' + safe(focused.club || "") + '</p><p>Caps: ' + safe(focused.caps || 0) + ' | Goals: ' + safe(focused.goals || 0) + '</p></div>' +
-            '<div class="player-card"><h3>Top Scorers</h3><ul>' + (summary.top_goals || []).slice(0, 4).map((player) => '<li>' + safe(player.name) + ': ' + safe(player.goals) + ' goals</li>').join("") + '</ul></div>' +
-          '</div>' +
-          '<p class="fineprint">The map estimates public movement pressure from roster roles and team context. It is not GPS or optical coordinate data.</p>';
-      }
-
-      function renderSources() {
-        $("source-list").innerHTML = (payload.sources || []).map((source) =>
-          '<div class="source-item"><h3><a href="' + safe(source.url) + '">' + safe(source.label) + '</a></h3><div><p>' + safe(source.use) + '</p>' + (source.status ? '<p>' + safe(source.status) + '</p>' : '') + '</div></div>'
-        ).join("");
-      }
-
-      function bindControls() {
-        document.querySelectorAll("[data-side]").forEach((button) => {
-          button.addEventListener("click", () => {
-            selectedSide = button.getAttribute("data-side");
-            selectedPlayer = "";
-            render();
-          });
-        });
-        document.querySelectorAll("[data-phase]").forEach((button) => {
-          button.addEventListener("click", () => {
-            selectedPhase = button.getAttribute("data-phase");
-            render();
-          });
-        });
-        $("player-select").addEventListener("change", (event) => {
-          selectedPlayer = event.target.value;
-          renderMovement();
-        });
-      }
-
-      function render() {
-        if (!matchById(selectedMatchId) && payload.matches && payload.matches[0]) selectedMatchId = payload.matches[0].id;
-        renderHero();
-        renderTabs();
-        renderMatchBoard();
-        renderRecentForm();
-        renderFormula();
-        renderDecisionFramework();
-        renderMovement();
-        renderSources();
-      }
-
-      async function refresh() {
-        try {
-          const response = await fetch("/api/matchday", { headers: { accept: "application/json" } });
-          if (response.ok) payload = await response.json();
-        } catch (error) {
-          payload = fallback;
-          payload.liveSource = payload.liveSource || {};
-          payload.liveSource.sourceError = error.message;
-        }
+/* ===== live sync: pull REAL FIFA data + model edges from /api/matchday, auto re-poll ===== */
+const ab=n=>(n||'').replace(/[^A-Za-z]/g,'').slice(0,3).toUpperCase();
+function mapServer(m){
+  const e=m.model;
+  return {
+    id:ab(m.home)+'-'+ab(m.away),
+    grp:`${m.group||''} · ${m.venue||''} · ${m.kickoffEt||''}`.replace(/·\s+·/g,'·'),
+    home:m.home, away:m.away, homeElo:m.homeElo, awayElo:m.awayElo, hadv:55, total:2.55, kalshi:'',
+    conf:!!m.lineupConfirmed, state:m.state, mn:m.minute||0, hs:m.homeScore||0, as:m.awayScore||0,
+    formationH:m.homeFormation, formationA:m.awayFormation,
+    lineupStatus:e.edges&&e.edges.lineup&&e.edges.lineup.home.status,
+    motiv:(e.edges&&e.edges.motivation&&(e.edges.motivation.home||e.edges.motivation.away))||null,
+    serverP:{home:e.home,draw:e.draw,away:e.away,over25:e.over25,btts:e.btts,top:e.top},
+    odds:{home:1/e.home,draw:1/e.draw,away:1/e.away}   // prefill price = model fair; you edit to your real price
+  };
+}
+async function loadLive(){
+  let next=60000;
+  try{
+    const res=await fetch('/api/matchday',{headers:{accept:'application/json'}});
+    if(res.ok){
+      const d=await res.json();
+      if(d&&d.matches&&d.matches.length){
+        FIX=d.matches.map(mapServer);
+        next=(d.refreshSeconds||60)*1000;
+        const day=d.matchdayDate?(' · '+d.matchdayDate):'';
+        document.getElementById('clock').textContent=(d.generatedAtEt||'')+' · LIVE'+day+(d.rolledForward?' (next matchday)':'');
         render();
-        const active = payload.liveSource && payload.liveSource.activeWindows && payload.liveSource.activeWindows.length > 0;
-        clearTimeout(refreshTimer);
-        refreshTimer = window.setTimeout(refresh, active ? 15 * 60 * 1000 : 60 * 60 * 1000);
       }
-
-      bindControls();
-      refresh();
-    }());
-  </script>
+    }
+  }catch(e){ /* offline or opened as a local file: keep embedded fixtures */ }
+  clearTimeout(window._poll); window._poll=setTimeout(loadLive,next);
+}
+render();tick();setInterval(tick,2000);
+loadLive();
+</script>
 </body>
 </html>
