@@ -158,6 +158,7 @@
   .prow{display:flex;align-items:center;gap:9px;margin-top:10px;flex-wrap:wrap}
   .pkl{font-size:11px;letter-spacing:.04em;color:var(--mut2)}.pkl b{color:var(--mut)}
   .prow .sin{width:84px;font-size:15px;padding:6px 7px}
+  .prow .sin.wide{width:120px}
   .clrp{font-family:var(--mono);font-size:10px;color:var(--mut2);background:transparent;border:1px solid var(--line2);border-radius:5px;padding:4px 7px;cursor:pointer}
   .clrp:hover{color:var(--red);border-color:var(--red)}
   .verdict{margin-top:11px;border-radius:9px;padding:12px 14px;border:1px solid var(--line2);background:#0a121a}
@@ -251,7 +252,9 @@
     <div class="grow"><b>Teams + ELO</b> — each side's strength rating (higher = stronger). H+55 = home-field bump.</div>
     <div class="grow"><b>Colored bar</b> — the model's chance of home win / draw / away win. The line under it is the uncertainty range.</div>
     <div class="grow"><b>Team chips</b> — the model already picks <b>who</b> to back: the side with the highest win chance (marked ★). It's selected for you. Tap another chip only if you want to price the draw or the underdog instead.</div>
-    <div class="grow"><b>Price box</b> — type the price you see on Robinhood / Kalshi for that team, <b>just the number</b> — <b>70</b>, <b>34.5</b>, or <b>0.70</b> all work (it's cents; 70 = the market's 70%). That's the only thing you enter.</div>
+    <div class="grow"><b>Two different numbers</b> — don't mix them up:<br>
+      &nbsp;&nbsp;<b>Price per share</b> = what <b>one</b> share costs on Robinhood / Kalshi. Always <b>under $1</b> (a 95¢ share pays $1 if it wins). Type <b>0.95</b> or <b>95</b>. This is what decides BET / NO BET.<br>
+      &nbsp;&nbsp;<b>Amount you invest</b> = how much money <b>you</b> put in — any size, <b>$100, $250, $1000</b>. This just shows your payout; it doesn't change the call.</div>
     <div class="grow"><b>The verdict</b> — one call, naming the team: <span class="gk t-strong">STRONG LEAN</span> / <span class="gk t-lean">LEAN</span> big-to-small value on the likely winner · <span class="gk t-watch">THIN</span> tiny edge, size down · <span class="gk t-no">NO BET</span> your price is too high. It shows the edge %, the payout if it hits, and your price vs the model's fair price. Green only ever appears on the likely winner — a long shot never lights up green.</div>
     <div class="grow"><b>Facts chips</b> — O2.5 (over 2.5 goals), top (likeliest score), formation, XI status, motivation flag.</div>
     <div class="grow"><b>Player heatmap</b> — tap it to see each player's chance of scoring and where on the pitch (real StatsBomb shots).</div>
@@ -539,13 +542,29 @@ function card(r){
     else if(ev<0.06){ t='LEAN'; vcls='lean'; }
     else { t='STRONG LEAN'; vcls='lean'; }
     vtier=`${t} · ${esc(selTeam)}`;
-    vsub=`edge <b>${ev>0?'+':''}${(ev*100).toFixed(1)}%</b> &middot; pays <b class="pos">+${(ret*100).toFixed(0)}%</b> if it hits &middot; your price <b>${showC}&cent;</b> ($${(yourC/100).toFixed(2)}) vs model fair <b>${fairC.toFixed(0)}&cent;</b>${!isFav?` &middot; <span style="color:var(--amb)">${(d.p*100).toFixed(0)}% to win — long shot</span>`:''}${!fx.conf?` &middot; <span style="color:var(--amb)">XI pending</span>`:''}`;
+    vsub=`edge <b>${ev>0?'+':''}${(ev*100).toFixed(1)}%</b> &middot; pays <b class="pos">+${(ret*100).toFixed(0)}%</b> if it hits &middot; your price <b>$${(yourC/100).toFixed(2)}</b> vs model fair <b>$${(fairC/100).toFixed(2)}</b>${!isFav?` &middot; <span style="color:var(--amb)">${(d.p*100).toFixed(0)}% to win — long shot</span>`:''}${!fx.conf?` &middot; <span style="color:var(--amb)">XI pending</span>`:''}`;
+  }
+  // ----- the two distinct numbers, kept clearly separate -----
+  const priceD=yourC/100;                 // price of ONE share (always under $1)
+  const stk=STAKE[fx.id];                 // how much YOU put in (any size: 100, 250, 1000...)
+  let stakeHtml='';
+  if(d.user){
+    if(stk>0 && priceD>0){
+      const shares=Math.floor(stk/priceD), cost=shares*priceD, payout=shares, profit=payout-cost;
+      stakeHtml=`<div class="prow"><span class="pkl">amount you invest</span>
+        <span class="oc2"><i>$</i><input class="sin wide" value="${stk}" inputmode="decimal" oninput="setStake('${fx.id}',this.value,false)" onchange="setStake('${fx.id}',this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();setStake('${fx.id}',this.value,true);}"></span></div>
+        <div class="scalc">$${stk.toFixed(2)} buys <b>${shares}</b> share${shares==1?'':'s'} at $${priceD.toFixed(2)} &middot; returns <b class="pos">$${payout.toFixed(2)}</b> if ${esc(selTeam)} wins &rarr; <b class="${profit>=0?'pos':'negv'}">${profit>=0?'+':''}$${profit.toFixed(2)} profit</b> &middot; you risk <b class="negv">-$${cost.toFixed(2)}</b> if not</div>`;
+    } else {
+      stakeHtml=`<div class="prow"><span class="pkl">amount you invest <span style="color:var(--mut2)">(any size — 100, 250, 1000…)</span></span>
+        <span class="oc2"><i>$</i><input class="sin wide" value="" placeholder="100" inputmode="decimal" oninput="setStake('${fx.id}',this.value,false)" onchange="setStake('${fx.id}',this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();setStake('${fx.id}',this.value,true);}"></span></div>`;
+    }
   }
   const pickPanel=`<div class="pickpanel">
     <div class="picks">${chips}</div>
-    <div class="prow"><span class="pkl">price you see for <b>${esc(selTeam)}</b> <span style="color:var(--mut2)">(the number, e.g. 70)</span></span>
-      <span class="oc2"><input class="sin" value="${d.user?showC:''}" placeholder="${fairC.toFixed(0)}" inputmode="decimal" oninput="setPrice('${fx.id}','${sl}',this.value,false)" onchange="setPrice('${fx.id}','${sl}',this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();setPrice('${fx.id}','${sl}',this.value,true);}"><i>&cent;</i>${d.user?`<button class="clrp" onclick="setPrice('${fx.id}','${sl}','',true)">clear</button>`:''}</span></div>
+    <div class="prow"><span class="pkl">price per share for <b>${esc(selTeam)}</b> <span style="color:var(--mut2)">(what 1 share costs — under $1, e.g. 0.95)</span></span>
+      <span class="oc2"><i>$</i><input class="sin" value="${d.user?priceD.toFixed(2):''}" placeholder="${(fairC/100).toFixed(2)}" inputmode="decimal" oninput="setPrice('${fx.id}','${sl}',this.value,false)" onchange="setPrice('${fx.id}','${sl}',this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();setPrice('${fx.id}','${sl}',this.value,true);}">${d.user?`<button class="clrp" onclick="setPrice('${fx.id}','${sl}','',true)">clear</button>`:''}</span></div>
     <div class="verdict v-${vcls}"><div class="vbig">${vtier}</div><div class="vsub">${vsub}</div></div>
+    ${stakeHtml}
   </div>`;
   const bt=`${esc(fx.home)} range <b>${(r.bd[0]*100).toFixed(0)}-${(r.bd[1]*100).toFixed(0)}%</b> · 10-90% band &plusmn;${(r.bw*100).toFixed(1)}pp`;
   const formFact=(fx.formationH||fx.formationA)?`<span class="fact">form <b>${esc(fx.formationH||'?')}</b> v <b>${esc(fx.formationA||'?')}</b></span>`:'';
