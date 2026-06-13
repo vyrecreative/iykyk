@@ -337,26 +337,39 @@ function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;",
 function heatBlob(x,y,r,col,op){return `<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" opacity="${op}" filter="url(#blur)"/>`;}
 function lastName(n){const t=String(n||'').trim().split(/\s+/);return t[t.length-1]||'';}
 /* real starting XI placed into formation bands by FIFA role (0 GK,1 back,2 mid,3 fwd).
-   FIFA does not expose exact x/y, so this is a role-based layout, not GPS positions. */
-function liveXISVG(fx){
+   Same pitch + orientation as the threat map: home defends/attacks one way, away the other,
+   and teams CHANGE ENDS after half-time (minute>45) exactly like the live shot map.
+   `side` honors the BOTH / per-team toggle. If FIFA ever exposes real x/y they are used;
+   otherwise this is a role-based layout, not GPS. */
+function liveXISVG(fx, side){
+  side=side||'both';
   const W=300,H=190, sx=v=>10+(v/100)*(W-20), sy=v=>16+(v/100)*(H-32);
+  const flip = fx.state=='live' && fx.mn>45 && fx.mn<=90;   // 2nd half: swap ends
   const bandX={0:8,1:27,2:50,3:74};
-  function place(arr,side){const byR={};arr.forEach(p=>{(byR[p.role]=byR[p.role]||[]).push(p);});const out=[];
+  function place(arr,sd){const byR={};(arr||[]).forEach(p=>{(byR[p.role]=byR[p.role]||[]).push(p);});const out=[];
     Object.keys(byR).forEach(role=>{const g=byR[role],n=g.length;g.forEach((p,i)=>{
-      const y=n===1?50:14+72*i/(n-1); let x=bandX[role]!=null?bandX[role]:55; if(side==='away')x=100-x;
-      out.push({...p,SX:sx(x),SY:sy(y),side});});});return out;}
-  const all=place(fx.lineupH,'home').concat(place(fx.lineupA,'away'));
+      let x,y;
+      if(isFinite(p.x)&&isFinite(p.y)&&(p.x>1||p.y>1)){ x=sd==='away'?100-p.x:p.x; y=p.y; }  // real FIFA coords if present
+      else { y=n===1?50:14+72*i/(n-1); x=bandX[role]!=null?bandX[role]:55; if(sd==='away')x=100-x; }
+      if(flip) x=100-x;                                     // teams change ends at half-time
+      out.push({...p,SX:sx(x),SY:sy(y),side:sd});});});return out;}
+  let all=[];
+  if(side!=='away') all=all.concat(place(fx.lineupH,'home'));
+  if(side!=='home') all=all.concat(place(fx.lineupA,'away'));
   const dots=all.map(p=>{const col=p.side==='home'?'#37a6ff':'#ff7a44';
     return `<g><circle cx="${p.SX}" cy="${p.SY}" r="7.5" fill="${col}" stroke="${p.captain?'#fff':'#04070a'}" stroke-width="${p.captain?2:1}"/>`
       +`<text x="${p.SX}" y="${p.SY+2.4}" fill="#04070a" font-size="6.5" font-weight="700" font-family="monospace" text-anchor="middle">${esc(String(p.shirt||''))}</text>`
       +`<text x="${p.SX}" y="${p.SY-9.5}" fill="#cfe3ef" font-size="5.8" font-family="monospace" text-anchor="middle">${esc(lastName(p.n))}</text></g>`;}).join('');
+  // direction labels follow the half-time flip so each side reads correctly
+  const leftTeam  = flip ? fx.home : fx.away;
+  const rightTeam = flip ? fx.away : fx.home;
   return `<svg class="pitch" viewBox="0 0 ${W} ${H}">
     <rect x="2" y="2" width="${W-4}" height="${H-4}" rx="6" fill="#0a2a18" stroke="#16432a"/>
     <line x1="${W/2}" y1="4" x2="${W/2}" y2="${H-4}" stroke="#1d5236"/><circle cx="${W/2}" cy="${H/2}" r="20" fill="none" stroke="#1d5236"/>
     <rect x="2" y="${H/2-30}" width="30" height="60" fill="none" stroke="#1d5236"/><rect x="${W-32}" y="${H/2-30}" width="30" height="60" fill="none" stroke="#1d5236"/>
     ${dots}
-    <text x="12" y="${H-6}" fill="#3f6b52" font-size="7" font-family="monospace">${esc(fx.away)} ◄</text>
-    <text x="${W-12}" y="${H-6}" fill="#3f6b52" font-size="7" font-family="monospace" text-anchor="end">► ${esc(fx.home)}</text>
+    <text x="12" y="${H-6}" fill="#3f6b52" font-size="7" font-family="monospace">${esc(leftTeam)} ◄</text>
+    <text x="${W-12}" y="${H-6}" fill="#3f6b52" font-size="7" font-family="monospace" text-anchor="end">► ${esc(rightTeam)}</text>
   </svg>`;
 }
 function pitchSVG(fx){
@@ -403,25 +416,29 @@ function pitchPanel(fx){
   const id=fx.id,side=PSIDE[id]||"both";const sel=PSEL[id];
   const hasH=(SQUADS[fx.home]||[]).length, hasA=(SQUADS[fx.away]||[]).length;
   const xiOut = (fx.lineupH&&fx.lineupH.length>=11 && fx.lineupA&&fx.lineupA.length>=11);
-  const xiBlock = xiOut ? `<div class="xilab">STARTING XI · <b>${esc(fx.formationH||'?')}</b> v <b>${esc(fx.formationA||'?')}</b><span>real names &amp; shirt numbers from FIFA, placed by role band (C = captain). FIFA exposes no exact x/y, so this is a role layout, not GPS.</span></div>${liveXISVG(fx)}` : '';
+  const swapped = fx.state=='live' && fx.mn>45 && fx.mn<=90;   // 2nd-half end swap
+  const xiNote = swapped ? 'sides swapped (2nd half), C = captain' : 'real names &amp; shirt numbers from FIFA, by role band (C = captain). FIFA exposes no exact x/y, so this is a role layout, not GPS.';
+  const xiBlock = xiOut ? `<div class="xilab">STARTING XI · <b>${esc(fx.formationH||'?')}</b> v <b>${esc(fx.formationA||'?')}</b><span>${xiNote}</span></div>${liveXISVG(fx,side)}` : '';
+  // BOTH / per-team toggle drives BOTH the XI and the threat map (shown whenever either has data)
+  const tabs = (xiOut||hasH||hasA) ? `<div class="ptabs">
+      <div class="ptab b ${side=='both'?'on':''}" onclick="setSide('${id}','both')">BOTH</div>
+      <div class="ptab h ${side=='home'?'on':''}" onclick="setSide('${id}','home')">${esc(fx.home)}</div>
+      <div class="ptab a ${side=='away'?'on':''}" onclick="setSide('${id}','away')">${esc(fx.away)}</div>
+    </div>` : '';
   if(!hasH && !hasA){
-    return `<div class="pitchwrap">${xiBlock}<div class="nodata">NO STATSBOMB SHOT DATA<br><span>${esc(fx.home)} and ${esc(fx.away)} are not in StatsBomb open data, so the scoring-threat map stays empty (no numbers invented).</span></div></div>`;
+    return `<div class="pitchwrap">${tabs}${xiBlock}${xiBlock?`<div class="heatcap">// XI is the published starting eleven (FIFA live feed); subs refresh each poll and ends swap at half-time. Per-player GPS heat needs a paid feed.</div>`:''}<div class="nodata">NO STATSBOMB SHOT DATA<br><span>${esc(fx.home)} and ${esc(fx.away)} are not in StatsBomb open data, so the scoring-threat map stays empty (no numbers invented).</span></div></div>`;
   }
   let det=liveCaption(fx)||`<span class="zn">Tap a player. Dot size and heat = scoring probability this match.${(!hasH||!hasA)?` Only ${hasH?fx.home:fx.away} has StatsBomb data; the other side shows no data.`:''}</span>`;
   if(sel){const arr=SQUADS[sel.team==="home"?fx.home:fx.away];const p=arr[sel.idx];const a=liveAdj(p,fx,sel.team);
     det=`<span class="hot">${esc(p.n)}</span> (${esc(p.p)}) · xG/shot ${p.xgs.toFixed(2)} · ${p.sh90} sh/90 · hot zone <span class="hot">${zoneLabel(a.x,p.y)}</span> · <span style="color:var(--grn)">scores ${fx.state=='live'?'from here':'this match'} ${(a.sp*100).toFixed(0)}%</span>`;}
   return `<div class="pitchwrap">
+    ${tabs}
     ${xiBlock}
     ${xiBlock?`<div class="xilab" style="margin-top:14px;border-top:1px solid var(--line2);padding-top:12px">SCORING THREAT MAP<span>who is most likely to score and where (StatsBomb shot history)</span></div>`:''}
-    <div class="ptabs">
-      <div class="ptab b ${side=='both'?'on':''}" onclick="setSide('${id}','both')">BOTH</div>
-      <div class="ptab h ${side=='home'?'on':''}" onclick="setSide('${id}','home')">${esc(fx.home)}</div>
-      <div class="ptab a ${side=='away'?'on':''}" onclick="setSide('${id}','away')">${esc(fx.away)}</div>
-    </div>
     ${pitchSVG(fx)}
     <div class="pdetail">${det}</div>
     <div class="threats">${threatList(fx)}</div>
-    <div class="heatcap">// REAL shot data: StatsBomb Open Data (World Cup 2022 / Euro 2024) recorded shots. threat = 1 minus e^(minus xG). The left/right shift with score is model logic on the live clock, not a data feed. True in-match shot updates need a paid feed (Opta / StatsBomb live / Sportradar).</div>
+    <div class="heatcap">// REAL shot data: StatsBomb Open Data (World Cup 2022 / Euro 2024) recorded shots. threat = 1 minus e^(minus xG). XI subs refresh each poll and ends swap at half-time; the left/right scoring shift is model logic on the live clock, not a data feed. True in-match shot GPS needs a paid feed (Opta / StatsBomb live / Sportradar).</div>
   </div>`;
 }
 
