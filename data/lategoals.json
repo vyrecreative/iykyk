@@ -1,0 +1,76 @@
+{
+ "_note": "REAL StatsBomb Open Data. Late = shots struck at minute>=80 in regulation (periods 1-2). Uncovered teams omitted -> 'no data'.",
+ "lateThreshold": 80,
+ "teams": {
+  "Brazil": {
+   "matches": 5,
+   "shots": 90,
+   "shots80": 23,
+   "goals": 7,
+   "goals80": 1,
+   "xg": 9.75,
+   "xg80": 2.19,
+   "lateXgShare": 0.225,
+   "lateShotShare": 0.256,
+   "lateGoalsPerMatch": 0.2,
+   "lateShotsPerMatch": 4.6,
+   "source": "FIFA World Cup 2022"
+  },
+  "Morocco": {
+   "matches": 7,
+   "shots": 60,
+   "shots80": 13,
+   "goals": 6,
+   "goals80": 1,
+   "xg": 5.41,
+   "xg80": 1.68,
+   "lateXgShare": 0.311,
+   "lateShotShare": 0.217,
+   "lateGoalsPerMatch": 0.14,
+   "lateShotsPerMatch": 1.86,
+   "source": "FIFA World Cup 2022"
+  },
+  "Switzerland": {
+   "matches": 4,
+   "shots": 37,
+   "shots80": 6,
+   "goals": 5,
+   "goals80": 0,
+   "xg": 6.09,
+   "xg80": 0.78,
+   "lateXgShare": 0.128,
+   "lateShotShare": 0.162,
+   "lateGoalsPerMatch": 0.0,
+   "lateShotsPerMatch": 1.5,
+   "source": "FIFA World Cup 2022"
+  },
+  "Qatar": {
+   "matches": 3,
+   "shots": 20,
+   "shots80": 5,
+   "goals": 1,
+   "goals80": 0,
+   "xg": 1.41,
+   "xg80": 0.2,
+   "lateXgShare": 0.142,
+   "lateShotShare": 0.25,
+   "lateGoalsPerMatch": 0.0,
+   "lateShotsPerMatch": 1.67,
+   "source": "FIFA World Cup 2022"
+  },
+  "Scotland": {
+   "matches": 3,
+   "shots": 17,
+   "shots80": 9,
+   "goals": 1,
+   "goals80": 0,
+   "xg": 1.02,
+   "xg80": 0.45,
+   "lateXgShare": 0.444,
+   "lateShotShare": 0.529,
+   "lateGoalsPerMatch": 0.0,
+   "lateShotsPerMatch": 3.0,
+   "source": "UEFA Euro 2024"
+  }
+ }
+}
