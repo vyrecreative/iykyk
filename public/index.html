@@ -154,6 +154,8 @@
   .threats .nm{color:var(--ink)} .threats .zn{color:var(--mut2)}
   .threats .pp{color:var(--grn);font-weight:700}
   .heatcap{font-size:10px;color:var(--mut2);margin-top:8px;font-family:var(--mono)}
+  .xilab{font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.06em;margin-bottom:8px}
+  .xilab b{color:var(--ink)} .xilab span{display:block;color:var(--mut2);letter-spacing:0;font-size:10px;margin-top:3px;line-height:1.5}
   .nodata{font-family:var(--mono);text-align:center;color:var(--mut);padding:26px 14px;font-size:13px;letter-spacing:.06em}
   .nodata span{display:block;margin-top:8px;font-size:11px;color:var(--mut2);letter-spacing:0;line-height:1.6}
 
@@ -246,7 +248,9 @@ function devig(o){const r={home:1/o.home,draw:1/o.draw,away:1/o.away};const s=r.
 function ek(p,od){const b=od-1,q=1-p;return{ev:p*od-1,kelly:b>0?Math.max(0,(b*p-q)/b):0};}
 let gs=7;function gauss(){gs=(gs*9301+49297)%233280;let u=gs/233280;gs=(gs*9301+49297)%233280;let v=gs/233280;return Math.sqrt(-2*Math.log(u+1e-9))*Math.cos(6.283*v);}
 function band(he,ae,h,t,r,n=200){let a=[];for(let k=0;k<n;k++){const[lh,la]=eloToGoals(he+gauss()*40,ae+gauss()*40,h,Math.min(3.6,Math.max(1.6,t+gauss()*.3)));a.push(outc(matrix(lh,la,r)).home);}a.sort((x,y)=>x-y);return[a[n/10|0],a[n*9/10|0]];}
-function tierOf(e,fav,dr,bw,conf,live){if(live)return"LIVE";if(!conf)return"Watch Only";if(e<0)return"No Bet";const hv=dr>=.30||bw>=.12;if(e>=.06&&fav>=.55&&!hv)return"Strong Lean";if(e>=.025)return hv?"High Volatility":"Lean";return"No Bet";}
+/* tier = the lean call. Works pre-match AND live (live XI is known, so no Watch-Only gate).
+   The "LIVE Nmin" state badge shows separately, so the tier stays a betting recommendation. */
+function tierOf(e,fav,dr,bw,conf,live){if(!live && !conf)return"Watch Only";if(e<0)return"No Bet";const hv=dr>=.30||bw>=.12;if(e>=.06&&fav>=.55&&!hv)return"Strong Lean";if(e>=.025)return hv?"High Volatility":"Lean";return"No Bet";}
 
 /* =================== ratings =================== */
 /* REAL national-team Elo - eloratings.net (World.tsv), pulled 2026-06-13. Not placeholders. */
@@ -331,6 +335,30 @@ function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;",
 
 /* =================== heatmap pitch =================== */
 function heatBlob(x,y,r,col,op){return `<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" opacity="${op}" filter="url(#blur)"/>`;}
+function lastName(n){const t=String(n||'').trim().split(/\s+/);return t[t.length-1]||'';}
+/* real starting XI placed into formation bands by FIFA role (0 GK,1 back,2 mid,3 fwd).
+   FIFA does not expose exact x/y, so this is a role-based layout, not GPS positions. */
+function liveXISVG(fx){
+  const W=300,H=190, sx=v=>10+(v/100)*(W-20), sy=v=>16+(v/100)*(H-32);
+  const bandX={0:8,1:27,2:50,3:74};
+  function place(arr,side){const byR={};arr.forEach(p=>{(byR[p.role]=byR[p.role]||[]).push(p);});const out=[];
+    Object.keys(byR).forEach(role=>{const g=byR[role],n=g.length;g.forEach((p,i)=>{
+      const y=n===1?50:14+72*i/(n-1); let x=bandX[role]!=null?bandX[role]:55; if(side==='away')x=100-x;
+      out.push({...p,SX:sx(x),SY:sy(y),side});});});return out;}
+  const all=place(fx.lineupH,'home').concat(place(fx.lineupA,'away'));
+  const dots=all.map(p=>{const col=p.side==='home'?'#37a6ff':'#ff7a44';
+    return `<g><circle cx="${p.SX}" cy="${p.SY}" r="7.5" fill="${col}" stroke="${p.captain?'#fff':'#04070a'}" stroke-width="${p.captain?2:1}"/>`
+      +`<text x="${p.SX}" y="${p.SY+2.4}" fill="#04070a" font-size="6.5" font-weight="700" font-family="monospace" text-anchor="middle">${esc(String(p.shirt||''))}</text>`
+      +`<text x="${p.SX}" y="${p.SY-9.5}" fill="#cfe3ef" font-size="5.8" font-family="monospace" text-anchor="middle">${esc(lastName(p.n))}</text></g>`;}).join('');
+  return `<svg class="pitch" viewBox="0 0 ${W} ${H}">
+    <rect x="2" y="2" width="${W-4}" height="${H-4}" rx="6" fill="#0a2a18" stroke="#16432a"/>
+    <line x1="${W/2}" y1="4" x2="${W/2}" y2="${H-4}" stroke="#1d5236"/><circle cx="${W/2}" cy="${H/2}" r="20" fill="none" stroke="#1d5236"/>
+    <rect x="2" y="${H/2-30}" width="30" height="60" fill="none" stroke="#1d5236"/><rect x="${W-32}" y="${H/2-30}" width="30" height="60" fill="none" stroke="#1d5236"/>
+    ${dots}
+    <text x="12" y="${H-6}" fill="#3f6b52" font-size="7" font-family="monospace">${esc(fx.away)} ◄</text>
+    <text x="${W-12}" y="${H-6}" fill="#3f6b52" font-size="7" font-family="monospace" text-anchor="end">► ${esc(fx.home)}</text>
+  </svg>`;
+}
 function pitchSVG(fx){
   const id=fx.id,side=PSIDE[id]||"both";
   const W=300,H=190;
@@ -374,13 +402,17 @@ function threatList(fx){
 function pitchPanel(fx){
   const id=fx.id,side=PSIDE[id]||"both";const sel=PSEL[id];
   const hasH=(SQUADS[fx.home]||[]).length, hasA=(SQUADS[fx.away]||[]).length;
+  const xiOut = (fx.lineupH&&fx.lineupH.length>=11 && fx.lineupA&&fx.lineupA.length>=11);
+  const xiBlock = xiOut ? `<div class="xilab">STARTING XI · <b>${esc(fx.formationH||'?')}</b> v <b>${esc(fx.formationA||'?')}</b><span>real names &amp; shirt numbers from FIFA, placed by role band (C = captain). FIFA exposes no exact x/y, so this is a role layout, not GPS.</span></div>${liveXISVG(fx)}` : '';
   if(!hasH && !hasA){
-    return `<div class="pitchwrap"><div class="nodata">NO SHOT DATA<br><span>${esc(fx.home)} and ${esc(fx.away)} are not in StatsBomb open data. No numbers are invented; the field stays empty until a covered/feed source exists.</span></div></div>`;
+    return `<div class="pitchwrap">${xiBlock}<div class="nodata">NO STATSBOMB SHOT DATA<br><span>${esc(fx.home)} and ${esc(fx.away)} are not in StatsBomb open data, so the scoring-threat map stays empty (no numbers invented).</span></div></div>`;
   }
   let det=liveCaption(fx)||`<span class="zn">Tap a player. Dot size and heat = scoring probability this match.${(!hasH||!hasA)?` Only ${hasH?fx.home:fx.away} has StatsBomb data; the other side shows no data.`:''}</span>`;
   if(sel){const arr=SQUADS[sel.team==="home"?fx.home:fx.away];const p=arr[sel.idx];const a=liveAdj(p,fx,sel.team);
     det=`<span class="hot">${esc(p.n)}</span> (${esc(p.p)}) · xG/shot ${p.xgs.toFixed(2)} · ${p.sh90} sh/90 · hot zone <span class="hot">${zoneLabel(a.x,p.y)}</span> · <span style="color:var(--grn)">scores ${fx.state=='live'?'from here':'this match'} ${(a.sp*100).toFixed(0)}%</span>`;}
   return `<div class="pitchwrap">
+    ${xiBlock}
+    ${xiBlock?`<div class="xilab" style="margin-top:14px;border-top:1px solid var(--line2);padding-top:12px">SCORING THREAT MAP<span>who is most likely to score and where (StatsBomb shot history)</span></div>`:''}
     <div class="ptabs">
       <div class="ptab b ${side=='both'?'on':''}" onclick="setSide('${id}','both')">BOTH</div>
       <div class="ptab h ${side=='home'?'on':''}" onclick="setSide('${id}','home')">${esc(fx.home)}</div>
@@ -477,6 +509,7 @@ function mapServer(m){
     home:m.home, away:m.away, homeElo:m.homeElo, awayElo:m.awayElo, hadv:55, total:2.55, kalshi:'',
     conf:!!m.lineupConfirmed, state:m.state, mn:m.minute||0, hs:m.homeScore||0, as:m.awayScore||0,
     formationH:m.homeFormation, formationA:m.awayFormation, coachH:m.homeCoach, coachA:m.awayCoach,
+    lineupH:m.lineupHome||[], lineupA:m.lineupAway||[],
     lineupStatus:e.edges&&e.edges.lineup&&e.edges.lineup.home.status,
     motiv:(e.edges&&e.edges.motivation&&(e.edges.motivation.home||e.edges.motivation.away))||null,
     serverP:{home:e.home,draw:e.draw,away:e.away,over25:e.over25,btts:e.btts,top:e.top},
