@@ -1,0 +1,312 @@
+{
+ "_note": "REAL shot maps from StatsBomb Open Data. Per-player: avg shot location, xG/shot, shots per match, aggregated from recorded shot events. eloImpact derived from share of team xG. Teams with no StatsBomb coverage are omitted and render as 'no data'.",
+ "_provenance": {
+  "Brazil": "FIFA World Cup 2022",
+  "Morocco": "FIFA World Cup 2022",
+  "Switzerland": "FIFA World Cup 2022",
+  "Qatar": "FIFA World Cup 2022",
+  "Scotland": "UEFA Euro 2024"
+ },
+ "squads": {
+  "Brazil": [
+   {
+    "n": "Neymar",
+    "full": "Neymar da Silva Santos Junior",
+    "p": "AM",
+    "x": 90.2,
+    "y": 38.4,
+    "sh90": 2.4,
+    "xgs": 0.177,
+    "eloImpact": 17
+   },
+   {
+    "n": "Richarlison",
+    "full": "Richarlison de Andrade",
+    "p": "ST",
+    "x": 91.6,
+    "y": 49.1,
+    "sh90": 1.6,
+    "xgs": 0.202,
+    "eloImpact": 15
+   },
+   {
+    "n": "Rodrygo",
+    "full": "Rodrygo Silva de Goes",
+    "p": "AM",
+    "x": 86.4,
+    "y": 46.0,
+    "sh90": 1.4,
+    "xgs": 0.178,
+    "eloImpact": 13
+   },
+   {
+    "n": "Pedro",
+    "full": "Pedro Guilherme Abreu dos Santos",
+    "p": "ST",
+    "x": 90.2,
+    "y": 53.2,
+    "sh90": 1.0,
+    "xgs": 0.243,
+    "eloImpact": 13
+   },
+   {
+    "n": "Casemiro",
+    "full": "Carlos Henrique Casimiro",
+    "p": "CM",
+    "x": 80.9,
+    "y": 45.3,
+    "sh90": 2.0,
+    "xgs": 0.114,
+    "eloImpact": 13
+   },
+   {
+    "n": "Raphinha",
+    "full": "Raphael Dias Belloli",
+    "p": "W",
+    "x": 85.0,
+    "y": 56.4,
+    "sh90": 1.6,
+    "xgs": 0.115,
+    "eloImpact": 12
+   }
+  ],
+  "Morocco": [
+   {
+    "n": "Hakim Ziyech",
+    "full": "Hakim Ziyech",
+    "p": "W",
+    "x": 79.7,
+    "y": 60.9,
+    "sh90": 1.57,
+    "xgs": 0.1,
+    "eloImpact": 16
+   },
+   {
+    "n": "Youssef En-Nesyri",
+    "full": "Youssef En-Nesyri",
+    "p": "ST",
+    "x": 93.4,
+    "y": 53.2,
+    "sh90": 1.57,
+    "xgs": 0.095,
+    "eloImpact": 15
+   },
+   {
+    "n": "Achraf Hakimi",
+    "full": "Achraf Hakimi Mouh",
+    "p": "DF",
+    "x": 82.4,
+    "y": 52.2,
+    "sh90": 0.71,
+    "xgs": 0.184,
+    "eloImpact": 14
+   },
+   {
+    "n": "Abdelhamid Sabiri",
+    "full": "Abdelhamid Sabiri",
+    "p": "CM",
+    "x": 75.5,
+    "y": 47.6,
+    "sh90": 0.57,
+    "xgs": 0.227,
+    "eloImpact": 14
+   },
+   {
+    "n": "Zakaria Aboukhlal",
+    "full": "Zakaria Aboukhlal",
+    "p": "ST",
+    "x": 88.5,
+    "y": 55.7,
+    "sh90": 0.43,
+    "xgs": 0.199,
+    "eloImpact": 12
+   },
+   {
+    "n": "Abderrazak Hamdallah",
+    "full": "Abderrazak Hamdallah",
+    "p": "ST",
+    "x": 96.9,
+    "y": 41.4,
+    "sh90": 0.29,
+    "xgs": 0.271,
+    "eloImpact": 12
+   }
+  ],
+  "Switzerland": [
+   {
+    "n": "Breel Embolo",
+    "full": "Breel-Donald Embolo",
+    "p": "ST",
+    "x": 91.9,
+    "y": 46.4,
+    "sh90": 1.5,
+    "xgs": 0.399,
+    "eloImpact": 28
+   },
+   {
+    "n": "Manuel Akanji",
+    "full": "Manuel Obafemi Akanji",
+    "p": "DF",
+    "x": 90.9,
+    "y": 53.3,
+    "sh90": 1.0,
+    "xgs": 0.221,
+    "eloImpact": 17
+   },
+   {
+    "n": "Remo Freuler",
+    "full": "Remo Freuler",
+    "p": "CM",
+    "x": 91.9,
+    "y": 50.5,
+    "sh90": 0.75,
+    "xgs": 0.182,
+    "eloImpact": 13
+   },
+   {
+    "n": "Xherdan Shaqiri",
+    "full": "Xherdan Shaqiri",
+    "p": "W",
+    "x": 84.2,
+    "y": 65.6,
+    "sh90": 1.0,
+    "xgs": 0.124,
+    "eloImpact": 13
+   },
+   {
+    "n": "Ruben Vargas",
+    "full": "Ruben Vargas",
+    "p": "W",
+    "x": 86.9,
+    "y": 48.0,
+    "sh90": 0.75,
+    "xgs": 0.099,
+    "eloImpact": 11
+   },
+   {
+    "n": "Granit Xhaka",
+    "full": "Granit Xhaka",
+    "p": "CM",
+    "x": 82.6,
+    "y": 44.7,
+    "sh90": 1.5,
+    "xgs": 0.049,
+    "eloImpact": 11
+   }
+  ],
+  "Qatar": [
+   {
+    "n": "Almoez Ali",
+    "full": "Almoez Ali Zainalabiddin Abdulla",
+    "p": "ST",
+    "x": 86.9,
+    "y": 50.0,
+    "sh90": 1.0,
+    "xgs": 0.161,
+    "eloImpact": 28
+   },
+   {
+    "n": "Ismaeel Mohammad",
+    "full": "Ismaeel Mohammad Mohammad",
+    "p": "W",
+    "x": 86.3,
+    "y": 49.9,
+    "sh90": 0.67,
+    "xgs": 0.179,
+    "eloImpact": 23
+   },
+   {
+    "n": "Abdelkarim Hassan",
+    "full": "Abdelkarim Hassan Al Haj Fadlalla",
+    "p": "DF",
+    "x": 81.6,
+    "y": 42.2,
+    "sh90": 2.0,
+    "xgs": 0.046,
+    "eloImpact": 20
+   },
+   {
+    "n": "Mohammed Muntari",
+    "full": "Mohammed Muntari",
+    "p": "ST",
+    "x": 89.1,
+    "y": 55.6,
+    "sh90": 1.0,
+    "xgs": 0.062,
+    "eloImpact": 16
+   },
+   {
+    "n": "Pedro Miguel Correia",
+    "full": "Pedro Miguel Correia",
+    "p": "DF",
+    "x": 81.4,
+    "y": 62.9,
+    "sh90": 0.67,
+    "xgs": 0.019,
+    "eloImpact": 10
+   },
+   {
+    "n": "Akram Afif",
+    "full": "Akram Hassan Afif",
+    "p": "ST",
+    "x": 76.9,
+    "y": 40.4,
+    "sh90": 0.67,
+    "xgs": 0.015,
+    "eloImpact": 9
+   }
+  ],
+  "Scotland": [
+   {
+    "n": "Scott McTominay",
+    "full": "Scott McTominay",
+    "p": "AM",
+    "x": 89.2,
+    "y": 51.2,
+    "sh90": 1.33,
+    "xgs": 0.061,
+    "eloImpact": 23
+   },
+   {
+    "n": "Callum McGregor",
+    "full": "Callum McGregor",
+    "p": "CM",
+    "x": 84.8,
+    "y": 43.4,
+    "sh90": 1.0,
+    "xgs": 0.047,
+    "eloImpact": 16
+   },
+   {
+    "n": "Che Adams",
+    "full": "Che Adams",
+    "p": "ST",
+    "x": 88.7,
+    "y": 45.7,
+    "sh90": 0.67,
+    "xgs": 0.062,
+    "eloImpact": 15
+   },
+   {
+    "n": "Billy Gilmour",
+    "full": "Billy Gilmour",
+    "p": "CM",
+    "x": 84.0,
+    "y": 49.2,
+    "sh90": 0.67,
+    "xgs": 0.044,
+    "eloImpact": 13
+   },
+   {
+    "n": "Scott McKenna",
+    "full": "Scott McKenna",
+    "p": "DF",
+    "x": 89.7,
+    "y": 55.1,
+    "sh90": 0.67,
+    "xgs": 0.043,
+    "eloImpact": 13
+   }
+  ]
+ }
+}
