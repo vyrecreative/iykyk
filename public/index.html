@@ -475,7 +475,7 @@ function cashOut(bid){const b=LOG.find(x=>x.id===bid);if(!b)return;
   if(c==null){ b.sold=null; if(b.status==='sold')b.status='pending'; } else { b.sold=c; b.status='sold'; }
   saveState();renderLog();}
 function delBet(bid){LOG=LOG.filter(x=>x.id!==bid);saveState();renderLog();}
-function betCalc(b){const pd=b.price/100; const shares=Math.floor(b.stake/pd); const cost=shares*pd;
+function betCalc(b){const pd=b.price/100; const shares=b.stake/pd; const cost=b.stake;   // Coinbase fills fractional contracts -> your full stake buys stake/price shares
   const edge=b.model-pd;                                  // model% minus price you paid (your edge taken)
   let pnl=0;
   if(b.status==='win')pnl=shares-cost;
@@ -779,10 +779,10 @@ function card(r){
   let stakeHtml='';
   if(d.user){
     if(stk>0 && priceD>0){
-      const shares=Math.floor(stk/priceD), cost=shares*priceD, payout=shares, profit=payout-cost;
+      const shares=stk/priceD, cost=stk, payout=shares, profit=payout-cost;
       stakeHtml=`<div class="prow"><span class="pkl">amount you invest</span>
         <span class="oc2"><i>$</i><input class="sin wide" value="${stk}" inputmode="decimal" oninput="setStake('${fx.id}',this.value,false)" onchange="setStake('${fx.id}',this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();setStake('${fx.id}',this.value,true);}"></span></div>
-        <div class="scalc">$${stk.toFixed(2)} buys <b>${shares}</b> share${shares==1?'':'s'} at $${priceD.toFixed(2)} &middot; returns <b class="pos">$${payout.toFixed(2)}</b> if ${esc(selTeam)} wins &rarr; <b class="${profit>=0?'pos':'negv'}">${profit>=0?'+':''}$${profit.toFixed(2)} profit</b> &middot; you risk <b class="negv">-$${cost.toFixed(2)}</b> if not</div>`;
+        <div class="scalc">$${stk.toFixed(2)} buys <b>${shares.toFixed(2)}</b> shares at $${priceD.toFixed(2)} &middot; returns <b class="pos">$${payout.toFixed(2)}</b> if ${esc(selTeam)} wins &rarr; <b class="${profit>=0?'pos':'negv'}">${profit>=0?'+':''}$${profit.toFixed(2)} profit</b> &middot; you risk <b class="negv">-$${cost.toFixed(2)}</b> if not <span class="lbsub">(before fees)</span></div>`;
     } else {
       stakeHtml=`<div class="prow"><span class="pkl">amount you invest <span style="color:var(--mut2)">(any size — 100, 250, 1000…)</span></span>
         <span class="oc2"><i>$</i><input class="sin wide" value="" placeholder="100" inputmode="decimal" oninput="setStake('${fx.id}',this.value,false)" onchange="setStake('${fx.id}',this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();setStake('${fx.id}',this.value,true);}"></span></div>`;
