@@ -1,6 +1,7 @@
 {
-  "_source": "eloratings.net World.tsv, pulled 2026-06-13. Real national-team Elo, not placeholder.",
+  "_source": "eloratings.net World.tsv, base pull 2026-06-13; 9 WC2026 teams added/aliased from live World.tsv 2026-06-14 (Sweden, Tunisia, Iraq, Curacao, Czechia, Congo DR, Cote d'Ivoire, IR Iran, Cabo Verde). Real national-team Elo, not placeholder.",
   "ratings": {
+    "Sweden": 1712, "Tunisia": 1628, "Iraq": 1607, "Curaçao": 1434, "Czechia": 1712, "Congo DR": 1652, "Côte d'Ivoire": 1695, "IR Iran": 1772, "Cabo Verde": 1578,
     "Spain": 2157, "Argentina": 2115, "France": 2063, "England": 2024, "Brazil": 1991,
     "Portugal": 1989, "Colombia": 1982, "Netherlands": 1948, "Ecuador": 1938, "Germany": 1932,
     "Norway": 1914, "Croatia": 1912, "Turkiye": 1911, "Japan": 1906, "Belgium": 1894,
