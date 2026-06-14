@@ -525,9 +525,9 @@ function renderLog(){
   const tEl=document.getElementById('lb_table'), sEl=document.getElementById('lb_summary'), rEl=document.querySelector('#betlog .lbrules');
   if(!tEl)return;
   if(!LOG.length){ tEl.innerHTML='<div class="lbempty">No bets logged yet. Log your first one above.</div>'; sEl.innerHTML=''; if(rEl)rEl.innerHTML=RULES; return; }
-  let staked=0,realized=0,settled=0,wins=0,losses=0,edgeSum=0,clvSum=0,clvN=0,clvPos=0;
+  let staked=0,realized=0,settled=0,wins=0,losses=0,edgeSum=0,edgePos=0,clvSum=0,clvN=0,clvPos=0;
   const rows=LOG.map(b=>{const c=betCalc(b);
-    edgeSum+=c.edge; if(b.status!=='pending'){settled++;staked+=c.cost;realized+=c.pnl;if(b.status==='win')wins++;else if(b.status==='loss')losses++;}
+    edgeSum+=c.edge; if(c.edge>=0)edgePos++; if(b.status!=='pending'){settled++;staked+=c.cost;realized+=c.pnl;if(b.status==='win')wins++;else if(b.status==='loss')losses++;}
     if(c.clv!=null){clvSum+=c.clv;clvN++;if(c.clv>=0)clvPos++;}
     const pnlStr=b.status==='pending'?'—':((c.pnl>=0?'+':'')+'$'+c.pnl.toFixed(2)+(b.status==='sold'?` <span class="lbsub">sold $${(b.sold/100).toFixed(2)}</span>`:''));
     const le=liveEdge(b);
@@ -542,20 +542,20 @@ function renderLog(){
       <span class="lbbtns"><button class="lbw ${b.status==='win'?'on':''}" onclick="setBetStatus(${b.id},'win')" title="won">W</button><button class="lbl ${b.status==='loss'?'on':''}" onclick="setBetStatus(${b.id},'loss')" title="lost">L</button><button class="lbc ${b.status==='sold'?'on':''}" onclick="cashOut(${b.id})" title="sold / cashed out early">$</button><button class="lbx" onclick="delBet(${b.id})" title="delete">✕</button></span>
     </div>`;}).join('');
   tEl.innerHTML=`<div class="lbrow lbhead"><span>BET</span><span>YOUR $</span><span>MODEL</span><span>EDGE</span><span>STAKE</span><span>CLOSE / CLV</span><span>PnL</span><span>W / L / $ sold</span></div>${rows}`;
-  const decisive=wins+losses, roi=staked>0?realized/staked:0, wr=decisive>0?wins/decisive:0, avgEdge=LOG.length?edgeSum/LOG.length:0, avgClv=clvN?clvSum/clvN:null, pctPos=clvN?clvPos/clvN:null;
-  const clvCls=avgClv==null?'':(avgClv>=0?'pos':'negv');
-  sEl.innerHTML=`<div class="lbhero ${clvCls}">
-      <div class="lbhk">AVG CLV <span class="lbsub">— did you beat the closing line? (the metric that proves the edge)</span></div>
-      <div class="lbhv ${clvCls}">${avgClv==null?'—':(avgClv>=0?'+':'')+avgClv.toFixed(1)+'¢'}</div>
-      <div class="lbhsub">${pctPos==null?'log a close price to start scoring CLV':`<b class="${pctPos>=0.5?'pos':'negv'}">${(pctPos*100).toFixed(0)}%</b> of bets beat the close <span class="lbsub">(${clvPos}/${clvN}) · target &gt;55%</span>`}</div>
-      <div class="lbhnote">${clvN<20?`<b>${clvN}</b> scored — need ~20-30 before CLV is meaningful. Keep logging.`:`CLV converges fast; this is now a real read on your edge.`}</div>
+  const decisive=wins+losses, roi=staked>0?realized/staked:0, wr=decisive>0?wins/decisive:0, avgEdge=LOG.length?edgeSum/LOG.length:0, avgClv=clvN?clvSum/clvN:null, edgePct=LOG.length?edgePos/LOG.length:0;
+  const edCls=avgEdge>=0?'pos':'negv';
+  sEl.innerHTML=`<div class="lbhero ${edCls}">
+      <div class="lbhk">AVG EDGE TAKEN <span class="lbsub">— your entry price vs the live model % at that moment (the skill signal for in-play betting)</span></div>
+      <div class="lbhv ${edCls}">${avgEdge>=0?'+':''}${(avgEdge*100).toFixed(1)}%</div>
+      <div class="lbhsub"><b class="${edgePct>=0.5?'pos':'negv'}">${(edgePct*100).toFixed(0)}%</b> of bets entered at a positive edge <span class="lbsub">(${edgePos}/${LOG.length})</span></div>
+      <div class="lbhnote">${LOG.length<20?`<b>${LOG.length}</b> logged — need ~20-30 before this is a firm read on your edge. Keep logging.`:`enough sample to trust the read.`}</div>
     </div>
     <div class="lbsum lbsum2">
-    <span>Avg edge taken <b class="${avgEdge>=0?'pos':'negv'}">${avgEdge>=0?'+':''}${(avgEdge*100).toFixed(1)}%</b></span>
-    <span class="lbsub2">— below are outcome stats: mostly noise until the sample is large —</span>
+    <span class="lbsub2">— outcome stats below: mostly noise until the sample is large —</span>
     <span>Realized PnL <b class="${realized>=0?'pos':'negv'}">${realized>=0?'+':''}$${realized.toFixed(2)}</b></span>
     <span>ROI <b class="${roi>=0?'pos':'negv'}">${(roi*100).toFixed(1)}%</b></span>
     <span>Win rate <b>${(wr*100).toFixed(0)}%</b> <span class="lbsub">(${wins}/${decisive})</span></span>
+    <span>Avg CLV <b class="${avgClv==null?'':(avgClv>=0?'pos':'negv')}">${avgClv==null?'— (needs real closing prices)':(avgClv>=0?'+':'')+avgClv.toFixed(1)+'¢'}</b></span>
     <span class="lbsub">${LOG.length} logged · ${settled} settled · staked $${staked.toFixed(0)}</span></div>`;
   if(rEl)rEl.innerHTML=RULES;
 }
