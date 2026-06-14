@@ -47,6 +47,36 @@
   .grow b{color:var(--ink)}
   .gk{font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin:0 1px}
 
+  /* ---- bet log & PnL ---- */
+  .betlog{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line2);border-radius:10px;padding:13px 15px;margin-bottom:16px;font-family:var(--mono)}
+  .lbform{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+  .lbsel{background:#05080b;border:1px solid var(--line2);color:var(--ink);border-radius:6px;padding:7px 8px;font-family:var(--mono);font-size:12px}
+  .lbin{display:flex;align-items:center;gap:2px;background:#05080b;border:1px solid var(--line2);border-radius:6px;padding:0 6px}
+  .lbin i{font-style:normal;color:var(--mut2)} .lbin input{width:92px;background:transparent;border:0;color:var(--cyan);padding:7px 2px;font-family:var(--mono);font-size:13px}
+  .lbin input:focus{outline:none}
+  .lbadd{background:var(--grn);color:#04070a;font-weight:800;border:0;border-radius:6px;padding:8px 12px;font-family:var(--mono);font-size:12px;cursor:pointer}
+  .lbhint{font-size:11px;color:var(--mut2);line-height:1.55;margin-top:9px}.lbhint b{color:var(--mut)}
+  .lbsum{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:12px;color:var(--mut)}
+  .lbsum b{color:var(--ink)} .lbsub{color:var(--mut2);font-size:11px}
+  .lbrow{display:grid;grid-template-columns:2.3fr .8fr .7fr .8fr .7fr 1.3fr .95fr 1.05fr;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:11.5px;color:var(--mut)}
+  .lbrow>span{text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lbrow .lbm{text-align:left;color:var(--ink);white-space:normal}.lbm b{color:var(--ink)}
+  .lbhead{color:var(--mut2);font-size:10px;letter-spacing:.05em;border-top:0}
+  .lbclv{display:flex;align-items:center;justify-content:flex-end;gap:4px}
+  .lbclv input{width:46px;background:#05080b;border:1px solid var(--line2);color:var(--cyan);border-radius:4px;padding:3px;font-family:var(--mono);font-size:11px;text-align:right}
+  .lbclv i{font-style:normal;font-size:10px}
+  .lbbtns{display:flex;gap:3px;justify-content:flex-end}
+  .lbbtns button{background:#05080b;border:1px solid var(--line2);color:var(--mut2);border-radius:4px;width:22px;height:22px;cursor:pointer;font-family:var(--mono);font-size:11px;padding:0}
+  .lbw.on{background:var(--grn);color:#04070a;border-color:var(--grn);font-weight:800} .lbl.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:800}
+  .lbx:hover{border-color:var(--red);color:var(--red)}
+  .lbempty{font-size:12px;color:var(--mut2);padding:12px 0;text-align:center}
+  .lbrulebox{margin-top:13px;border-top:1px solid var(--line);padding-top:11px}
+  .lbrt{font-size:11px;letter-spacing:.06em;color:var(--cyan);margin-bottom:7px}
+  .lbrulebox ol{margin:0;padding-left:18px} .lbrulebox li{font-size:12px;color:var(--mut);line-height:1.6;margin-bottom:5px}.lbrulebox li b{color:var(--ink)}
+  .lbnote{font-size:11px;color:var(--mut2);line-height:1.55;margin-top:9px;border-top:1px solid var(--line);padding-top:8px}
+  @media(max-width:560px){.lbrow{grid-template-columns:1.9fr .8fr .9fr 1.1fr;font-size:11px}
+    .lbrow>span:nth-child(2),.lbrow>span:nth-child(3),.lbrow>span:nth-child(5),.lbrow>span:nth-child(6){display:none}}
+
   /* ---- control deck ---- */
   .deck{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line2);border-radius:10px;
     padding:12px 14px;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px 18px}
@@ -275,6 +305,21 @@
     <div class="grow" style="color:var(--ink)"><b>How to act:</b> wait for the XI to confirm → type the price you see → back it only on a green <b>LEAN</b> / <b>STRONG LEAN</b>. NO BET means pass. Your price is saved, so you can lock it pre-match. How much you stake is entirely your call — the app never sizes the bet.</div>
   </div>
 
+  <button class="gtoggle" id="ltoggle" onclick="toggleLog()" style="margin-top:-6px">▸ BET LOG &amp; PnL · track your edge</button>
+  <div class="betlog" id="betlog" style="display:none">
+    <div class="lbform">
+      <select id="lb_match" class="lbsel"><option value="">match…</option></select>
+      <select id="lb_side" class="lbsel"><option value="home">Home</option><option value="draw">Draw</option><option value="away">Away</option></select>
+      <span class="lbin"><i>$</i><input id="lb_price" placeholder="price 0.80" inputmode="decimal"></span>
+      <span class="lbin"><i>$</i><input id="lb_stake" placeholder="stake 100" inputmode="decimal"></span>
+      <button class="lbadd" onclick="logBet()">+ log bet</button>
+    </div>
+    <div class="lbhint">Log the bet you placed on Coinbase/Kalshi: pick the match &amp; side, your entry price (share price, under $1), and stake. The model % at log time is captured automatically so your <b>edge taken</b> is recorded. Mark Win/Loss when it settles; enter the <b>close</b> price to score your CLV.</div>
+    <div id="lb_summary"></div>
+    <div id="lb_table"></div>
+    <div class="lbrules"></div>
+  </div>
+
   <div id="cards"></div>
 
   <div class="foot">
@@ -361,9 +406,11 @@ const PSIDE={}, PSEL={};                   // pitch side + selected player per f
    kickoff, and even a page reload - so you can bet early and watch the edge move against YOUR entry. */
 let STAKE={};      // USD amount you choose to put in, per fixture id
 let UPRICE={};     // the real contract price YOU see, in cents, per fixture id + leg (overrides model-fair)
+let LOG=[];        // your bet log: each entry records the model edge at log time, for PnL + CLV tracking
 try{ STAKE=JSON.parse(localStorage.getItem('cupedge_stake')||'{}')||{}; }catch(e){ STAKE={}; }
 try{ UPRICE=JSON.parse(localStorage.getItem('cupedge_uprice')||'{}')||{}; }catch(e){ UPRICE={}; }
-function saveState(){ try{ localStorage.setItem('cupedge_stake',JSON.stringify(STAKE)); localStorage.setItem('cupedge_uprice',JSON.stringify(UPRICE)); }catch(e){} }
+try{ LOG=JSON.parse(localStorage.getItem('cupedge_betlog')||'[]')||[]; }catch(e){ LOG=[]; }
+function saveState(){ try{ localStorage.setItem('cupedge_stake',JSON.stringify(STAKE)); localStorage.setItem('cupedge_uprice',JSON.stringify(UPRICE)); localStorage.setItem('cupedge_betlog',JSON.stringify(LOG)); }catch(e){} }
 function setOdds(id,leg,v){const fx=FIX.find(f=>f.id==id);const n=parseFloat(v);if(n>1)fx.odds[leg]=n;render();}
 /* you type the dollars you want to put in; we translate the contract price into a real-money outcome.
    Pure arithmetic on YOUR number - it never sizes the bet for you. */
@@ -388,6 +435,80 @@ function toggleHeat(id){EXP.has(id)?EXP.delete(id):EXP.add(id);render();}
 function toggleGuide(){const g=document.getElementById('guide'),t=document.getElementById('gtoggle');
   const open=g.style.display==='none';g.style.display=open?'block':'none';
   t.textContent=(open?'▾':'▸')+' HOW TO READ THIS PAGE';}
+
+/* =================== bet log & PnL =================== */
+function toggleLog(){const g=document.getElementById('betlog'),t=document.getElementById('ltoggle');
+  const open=g.style.display==='none';g.style.display=open?'block':'none';
+  t.innerHTML=(open?'▾':'▸')+' BET LOG &amp; PnL · track your edge';
+  if(open){fillMatchOptions();renderLog();}}
+function fillMatchOptions(){const s=document.getElementById('lb_match');if(!s)return;const cur=s.value;
+  s.innerHTML='<option value="">match…</option>'+FIX.map(f=>`<option value="${esc(f.id)}">${esc(f.home)} v ${esc(f.away)}</option>`).join('');
+  if([...s.options].some(o=>o.value===cur))s.value=cur;}
+function parsePriceCents(v){let n=parseFloat(String(v).replace(/[^0-9.]/g,''));return (!isFinite(n)||n<=0)?null:(n<1?n*100:n);}
+function logBet(){
+  const id=document.getElementById('lb_match').value, side=document.getElementById('lb_side').value;
+  const price=parsePriceCents(document.getElementById('lb_price').value);
+  const stake=parseFloat(String(document.getElementById('lb_stake').value).replace(/[^0-9.]/g,''));
+  const fx=FIX.find(f=>f.id===id);
+  if(!fx){alert('Pick a match.');return;}
+  if(!(price>0&&price<100)){alert('Enter the share price you paid, e.g. 0.80 or 80.');return;}
+  if(!(stake>0)){alert('Enter your stake in $.');return;}
+  const r=evalFx(fx); const modelP=r.legs[side].p;       // model probability at log time
+  LOG.unshift({id:Date.now(), match:fx.id, mkt:fx.home+' v '+fx.away, side, team:nm(fx,side),
+    price, model:modelP, stake, status:'pending', close:null, ts:new Date().toISOString().slice(0,10)});
+  saveState();
+  document.getElementById('lb_price').value=''; document.getElementById('lb_stake').value='';
+  renderLog();
+}
+function setBetStatus(bid,st){const b=LOG.find(x=>x.id===bid);if(b){b.status=(b.status===st?'pending':st);saveState();renderLog();}}
+function setBetClose(bid,v){const b=LOG.find(x=>x.id===bid);if(b){b.close=parsePriceCents(v);saveState();renderLog();}}
+function delBet(bid){LOG=LOG.filter(x=>x.id!==bid);saveState();renderLog();}
+function betCalc(b){const pd=b.price/100; const shares=Math.floor(b.stake/pd); const cost=shares*pd;
+  const edge=b.model-pd;                                  // model% minus price you paid (your edge taken)
+  const pnl=b.status==='win'?(shares-cost):(b.status==='loss'?-cost:0);
+  const clv=(b.close!=null)?(b.close-b.price):null;       // +cents = you beat the close (bought cheaper)
+  return {shares,cost,edge,pnl,clv};}
+function renderLog(){
+  const tEl=document.getElementById('lb_table'), sEl=document.getElementById('lb_summary'), rEl=document.querySelector('#betlog .lbrules');
+  if(!tEl)return;
+  if(!LOG.length){ tEl.innerHTML='<div class="lbempty">No bets logged yet. Log your first one above.</div>'; sEl.innerHTML=''; if(rEl)rEl.innerHTML=RULES; return; }
+  let staked=0,realized=0,settled=0,wins=0,edgeSum=0,clvSum=0,clvN=0;
+  const rows=LOG.map(b=>{const c=betCalc(b);
+    edgeSum+=c.edge; if(b.status!=='pending'){settled++;staked+=c.cost;realized+=c.pnl;if(b.status==='win')wins++;}
+    if(c.clv!=null){clvSum+=c.clv;clvN++;}
+    const stCls=b.status==='win'?'lbwin':b.status==='loss'?'lbloss':'lbpend';
+    return `<div class="lbrow">
+      <span class="lbm">${esc(b.ts)} · <b>${esc(b.team)}</b> <span class="lbsub">${esc(b.mkt)}</span></span>
+      <span>$${(b.price/100).toFixed(2)}</span>
+      <span>${(b.model*100).toFixed(0)}%</span>
+      <span class="${c.edge>0?'pos':'negv'}">${c.edge>0?'+':''}${(c.edge*100).toFixed(1)}%</span>
+      <span>$${b.stake.toFixed(0)}</span>
+      <span class="lbclv"><input value="${b.close!=null?(b.close/100).toFixed(2):''}" placeholder="close" onchange="setBetClose(${b.id},this.value)">${c.clv!=null?`<i class="${c.clv>=0?'pos':'negv'}">${c.clv>=0?'+':''}${c.clv.toFixed(0)}¢</i>`:''}</span>
+      <span class="${b.status==='win'?'pos':b.status==='loss'?'negv':''} ${stCls}">${b.status==='pending'?'—':(c.pnl>=0?'+':'')+'$'+c.pnl.toFixed(2)}</span>
+      <span class="lbbtns"><button class="lbw ${b.status==='win'?'on':''}" onclick="setBetStatus(${b.id},'win')">W</button><button class="lbl ${b.status==='loss'?'on':''}" onclick="setBetStatus(${b.id},'loss')">L</button><button class="lbx" onclick="delBet(${b.id})">✕</button></span>
+    </div>`;}).join('');
+  tEl.innerHTML=`<div class="lbrow lbhead"><span>BET</span><span>YOUR $</span><span>MODEL</span><span>EDGE</span><span>STAKE</span><span>CLOSE / CLV</span><span>PnL</span><span>RESULT</span></div>${rows}`;
+  const roi=staked>0?realized/staked:0, wr=settled>0?wins/settled:0, avgEdge=LOG.length?edgeSum/LOG.length:0, avgClv=clvN?clvSum/clvN:null;
+  sEl.innerHTML=`<div class="lbsum">
+    <span>Realized PnL <b class="${realized>=0?'pos':'negv'}">${realized>=0?'+':''}$${realized.toFixed(2)}</b></span>
+    <span>ROI <b class="${roi>=0?'pos':'negv'}">${(roi*100).toFixed(1)}%</b></span>
+    <span>Win rate <b>${(wr*100).toFixed(0)}%</b> <span class="lbsub">(${wins}/${settled})</span></span>
+    <span>Avg edge taken <b class="${avgEdge>=0?'pos':'negv'}">${avgEdge>=0?'+':''}${(avgEdge*100).toFixed(1)}%</b></span>
+    <span>Avg CLV <b class="${avgClv==null?'':(avgClv>=0?'pos':'negv')}">${avgClv==null?'—':(avgClv>=0?'+':'')+avgClv.toFixed(1)+'¢'}</b></span>
+    <span class="lbsub">${LOG.length} logged · ${settled} settled · staked $${staked.toFixed(0)}</span></div>`;
+  if(rEl)rEl.innerHTML=RULES;
+}
+const RULES=`<div class="lbrulebox"><div class="lbrt">THE RULEBOOK · how to actually be the edge</div>
+  <ol>
+   <li><b>One outcome per match.</b> Never buy two sides (or all three) of the same game — that just pays the market's margin. Back only the single outcome the card shows green (LEAN / STRONG LEAN).</li>
+   <li><b>Edge, not favorite.</b> A favorite at a fair price is NO BET. The bet is whichever outcome the model rates higher than your price — often the draw or underdog, not the leader.</li>
+   <li><b>Size by edge.</b> Of your 10% cap: STRONG LEAN ≈ 2%, LEAN ≈ 1%, on the +edge side only. If nothing's green, stake 0% — cash is a position.</li>
+   <li><b>DCA the same thesis.</b> Add to the SAME +edge bet only if its price drops further below model fair (edge grows). Never average into a different outcome.</li>
+   <li><b>Draw / late goals early &amp; cheap.</b> Use the Late Surge sector pre-match: take a draw-prone, strong-late matchup's draw while it's 15–25¢ — not at 80¢ after it's 1-1.</li>
+   <li><b>Chase CLV, not wins.</b> Log the close price; positive average CLV (you bought cheaper than the line closed) is the real proof you have an edge. A handful of results is just variance.</li>
+   <li><b>Stop-loss the day, not the bet.</b> Once your 10% is deployed, you're done for the slate. No revenge "chip-ins."</li>
+  </ol>
+  <div class="lbnote">Reality check: the market has a built-in margin and most bettors are net-negative. Positive PnL needs a real, repeated edge + low churn + discipline — and still has losing stretches. Only stake what you can afford to lose. This is analysis, not financial advice.</div></div>`;
 function setSide(id,s){PSIDE[id]=s;PSEL[id]=null;render();}
 function pick(id,team,idx){PSEL[id]={team,idx};render();}
 const PPICK={};   // which outcome (home/draw/away) you're pricing on a card; defaults to the model's pick
@@ -695,6 +816,7 @@ async function loadLive(){
         const day=d.matchdayDate?(' · '+d.matchdayDate):'';
         SYNC=' · LIVE'+day+(d.rolledForward?' (next matchday)':'');
         render();
+        if(document.getElementById('betlog').style.display!=='none'){ fillMatchOptions(); renderLog(); }
       }
     }
   }catch(e){ /* offline or opened as a local file: keep embedded fixtures */ }
