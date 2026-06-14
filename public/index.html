@@ -322,7 +322,7 @@
       <button class="lbadd" onclick="logBet()">+ log bet</button>
     </div>
     <div class="lbhint">Log the bet you placed on Coinbase/Kalshi: pick the match &amp; side, your entry price (share price, under $1), and stake. The model % at log time is captured automatically so your <b>edge taken</b> is recorded. Mark Win/Loss when it settles; enter the <b>close</b> price to score your CLV.</div>
-    <div class="lbfee">your exchange fee <span class="lbin" style="padding:0 5px"><input id="lb_fee" inputmode="decimal" onchange="setFee(this.value)" onkeydown="if(event.key==='Enter')setFee(this.value)"></span> % — every BET/NO&nbsp;BET call and your logged PnL are shown <b>net of this</b>, so a side only turns green if it still beats the fee.</div>
+    <div class="lbfee">fees are modeled <b>per price</b> from your real Coinbase receipts — roughly <b>4.9%</b> at 42&cent;, <b>3.1%</b> at 70&cent;, <b>2.0%</b> at 90&cent; (highest on toss-ups, lowest on heavy favorites). Every BET / NO&nbsp;BET call and your logged PnL are <b>net of this</b>, so cheap/coin-flip prices get a stricter green bar.</div>
     <div id="lb_summary"></div>
     <div id="lb_table"></div>
     <div class="lbrules"></div>
@@ -418,13 +418,15 @@ const PSIDE={}, PSEL={};                   // pitch side + selected player per f
 let STAKE={};      // USD amount you choose to put in, per fixture id
 let UPRICE={};     // the real contract price YOU see, in cents, per fixture id + leg (overrides model-fair)
 let LOG=[];        // your bet log: each entry records the model edge at log time, for PnL + CLV tracking
-let FEE=0.025;     // your exchange fee (fraction). Edges and PnL are shown NET of this.
+/* Exchange fee modeled from your REAL Coinbase receipts: a fraction of STAKE that is highest on
+   cheap/toss-up prices and lowest on heavy favorites (~4.9% at 42c, ~3.1% at 70c, ~2.0% at 90c).
+   Fit to your 11 trades to the cent. Applied to every net-edge call and your logged PnL. */
+const FEE_A=0.0149, FEE_B=0.0537;
+function feeRate(priceCents){ const p=Math.max(1,Math.min(99,priceCents))/100; return FEE_A+FEE_B*(1-p); }
 try{ STAKE=JSON.parse(localStorage.getItem('cupedge_stake')||'{}')||{}; }catch(e){ STAKE={}; }
 try{ UPRICE=JSON.parse(localStorage.getItem('cupedge_uprice')||'{}')||{}; }catch(e){ UPRICE={}; }
 try{ LOG=JSON.parse(localStorage.getItem('cupedge_betlog')||'[]')||[]; }catch(e){ LOG=[]; }
-try{ const f=parseFloat(localStorage.getItem('cupedge_fee')); if(isFinite(f)&&f>=0&&f<0.2) FEE=f; }catch(e){}
-function saveState(){ try{ localStorage.setItem('cupedge_stake',JSON.stringify(STAKE)); localStorage.setItem('cupedge_uprice',JSON.stringify(UPRICE)); localStorage.setItem('cupedge_betlog',JSON.stringify(LOG)); localStorage.setItem('cupedge_fee',String(FEE)); }catch(e){} }
-function setFee(v){ let n=parseFloat(String(v).replace(/[^0-9.]/g,'')); if(!isFinite(n)) n=0; if(n>1) n=n/100; FEE=Math.min(0.2,Math.max(0,n)); saveState(); render(true); if(document.getElementById('betlog').style.display!=='none')renderLog(); }
+function saveState(){ try{ localStorage.setItem('cupedge_stake',JSON.stringify(STAKE)); localStorage.setItem('cupedge_uprice',JSON.stringify(UPRICE)); localStorage.setItem('cupedge_betlog',JSON.stringify(LOG)); }catch(e){} }
 function setOdds(id,leg,v){const fx=FIX.find(f=>f.id==id);const n=parseFloat(v);if(n>1)fx.odds[leg]=n;render();}
 /* you type the dollars you want to put in; we translate the contract price into a real-money outcome.
    Pure arithmetic on YOUR number - it never sizes the bet for you. */
@@ -486,11 +488,11 @@ function cashOut(bid){const b=LOG.find(x=>x.id===bid);if(!b)return;
 function delBet(bid){LOG=LOG.filter(x=>x.id!==bid);saveState();renderLog();}
 function betCalc(b){const pd=b.price/100; const shares=b.stake/pd; const cost=b.stake;   // Coinbase fills fractional contracts -> your full stake buys stake/price shares
   const edge=b.model-pd;                                  // model% minus price you paid (your edge taken)
-  const fee=(typeof FEE==='number'?FEE:0), entryFee=cost*fee;   // exchange fee paid on the buy
+  const entryFee=cost*feeRate(b.price);   // price-dependent exchange fee paid on the buy
   let pnl=0;
   if(b.status==='win')pnl=shares-cost-entryFee;
   else if(b.status==='loss')pnl=-cost-entryFee;
-  else if(b.status==='sold'&&b.sold!=null){const proceeds=shares*(b.sold/100);pnl=proceeds-cost-entryFee-proceeds*fee;}   // sold: buy fee + sell fee
+  else if(b.status==='sold'&&b.sold!=null){const proceeds=shares*(b.sold/100);pnl=proceeds-cost-entryFee-proceeds*feeRate(b.sold);}   // sold: buy fee + sell fee
   const clv=(b.close!=null)?(b.close-b.price):null;       // +cents = you beat the close (bought cheaper)
   return {shares,cost,edge,pnl,clv};}
 /* LIVE edge on an OPEN bet: current model % (re-priced every poll, incl. live score) minus the price
@@ -515,7 +517,6 @@ function liveEdge(b){
 function renderLog(){
   const tEl=document.getElementById('lb_table'), sEl=document.getElementById('lb_summary'), rEl=document.querySelector('#betlog .lbrules');
   if(!tEl)return;
-  const fe=document.getElementById('lb_fee'); if(fe&&document.activeElement!==fe) fe.value=+(FEE*100).toFixed(2);
   if(!LOG.length){ tEl.innerHTML='<div class="lbempty">No bets logged yet. Log your first one above.</div>'; sEl.innerHTML=''; if(rEl)rEl.innerHTML=RULES; return; }
   let staked=0,realized=0,settled=0,wins=0,losses=0,edgeSum=0,clvSum=0,clvN=0;
   const rows=LOG.map(b=>{const c=betCalc(b);
@@ -605,7 +606,7 @@ function evalFx(fx){
   let bl="home"; ["draw","away"].forEach(l=>{ if(P[l]>P[bl]) bl=l; });
   const be=legs[bl].ev;
   const bd=live?[P.home,P.home]:band(he,ae,fx.hadv,fx.total,-.05);const bw=(bd[1]-bd[0])/2;
-  const fav=Math.max(P.home,P.draw,P.away);const tr=tierOf(be-(typeof FEE==='number'?FEE:0),fav,P.draw,bw,fx.conf,live);
+  const fav=Math.max(P.home,P.draw,P.away);const tr=tierOf(be-feeRate(100/legs[bl].od),fav,P.draw,bw,fx.conf,live);
   const full=fx.serverP?fx.serverP:(live?null:outc(matrix(lh,la)));
   return{fx,he,ae,P,fair,legs,be,bl,bd,bw,tr,live,o25:full?full.over25:null,top:full?full.top:null,vig:fair.vig};
 }
@@ -775,7 +776,7 @@ function card(r){
     vtier=`MODEL PICK · ${esc(favTeam)}`; vcls='wait';
     vsub=`Model backs <b>${esc(favTeam)}</b> at <b>${(r.legs[favLeg].p*100).toFixed(0)}%</b>. Type the price you see for ${esc(selTeam)} on Robinhood / Kalshi &mdash; just the number, e.g. <b>70</b> or <b>34.5</b> &mdash; for an instant LEAN / NO&nbsp;BET call.`;
   } else {
-    const fee=(typeof FEE==='number'?FEE:0), nev=ev-fee;   // edge NET of your exchange fee
+    const fee=feeRate(yourC), nev=ev-fee;   // edge NET of the price-dependent exchange fee
     let t;
     if(nev<=0){ t='NO BET'; vcls='no'; }
     else if(!isFav){ t='VALUE · UNDERDOG'; vcls='th'; }   // positive edge but not the likely winner — never green
