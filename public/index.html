@@ -56,6 +56,8 @@
   .lbin input:focus{outline:none}
   .lbadd{background:var(--grn);color:#04070a;font-weight:800;border:0;border-radius:6px;padding:8px 12px;font-family:var(--mono);font-size:12px;cursor:pointer}
   .lbhint{font-size:11px;color:var(--mut2);line-height:1.55;margin-top:9px}.lbhint b{color:var(--mut)}
+  .lbfee{font-size:11px;color:var(--mut);margin-top:8px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}.lbfee b{color:var(--grn)}
+  .lbfee .lbin input{width:46px;text-align:right;color:var(--amb);font-size:12px}
   .lbsum{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:12px;color:var(--mut)}
   .lbsum b{color:var(--ink)} .lbsub{color:var(--mut2);font-size:11px}
   .lbrow{display:grid;grid-template-columns:2.1fr .75fr .65fr .75fr .65fr 1.2fr 1.15fr 1.25fr;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:11.5px;color:var(--mut)}
@@ -320,6 +322,7 @@
       <button class="lbadd" onclick="logBet()">+ log bet</button>
     </div>
     <div class="lbhint">Log the bet you placed on Coinbase/Kalshi: pick the match &amp; side, your entry price (share price, under $1), and stake. The model % at log time is captured automatically so your <b>edge taken</b> is recorded. Mark Win/Loss when it settles; enter the <b>close</b> price to score your CLV.</div>
+    <div class="lbfee">your exchange fee <span class="lbin" style="padding:0 5px"><input id="lb_fee" inputmode="decimal" onchange="setFee(this.value)" onkeydown="if(event.key==='Enter')setFee(this.value)"></span> % — every BET/NO&nbsp;BET call and your logged PnL are shown <b>net of this</b>, so a side only turns green if it still beats the fee.</div>
     <div id="lb_summary"></div>
     <div id="lb_table"></div>
     <div class="lbrules"></div>
@@ -374,7 +377,10 @@ const ELO={Brazil:1991,Morocco:1827,Switzerland:1891,Scotland:1782,Qatar:1421,Ha
 const SQUADS={"Brazil":[{"n":"Neymar","p":"AM","x":90.2,"y":38.4,"sh90":2.4,"xgs":0.177,"eloImpact":17},{"n":"Richarlison","p":"ST","x":91.6,"y":49.1,"sh90":1.6,"xgs":0.202,"eloImpact":15},{"n":"Rodrygo","p":"AM","x":86.4,"y":46.0,"sh90":1.4,"xgs":0.178,"eloImpact":13},{"n":"Pedro","p":"ST","x":90.2,"y":53.2,"sh90":1.0,"xgs":0.243,"eloImpact":13},{"n":"Casemiro","p":"CM","x":80.9,"y":45.3,"sh90":2.0,"xgs":0.114,"eloImpact":13},{"n":"Raphinha","p":"W","x":85.0,"y":56.4,"sh90":1.6,"xgs":0.115,"eloImpact":12}],"Morocco":[{"n":"Hakim Ziyech","p":"W","x":79.7,"y":60.9,"sh90":1.57,"xgs":0.1,"eloImpact":16},{"n":"Youssef En-Nesyri","p":"ST","x":93.4,"y":53.2,"sh90":1.57,"xgs":0.095,"eloImpact":15},{"n":"Achraf Hakimi","p":"DF","x":82.4,"y":52.2,"sh90":0.71,"xgs":0.184,"eloImpact":14},{"n":"Abdelhamid Sabiri","p":"CM","x":75.5,"y":47.6,"sh90":0.57,"xgs":0.227,"eloImpact":14},{"n":"Zakaria Aboukhlal","p":"ST","x":88.5,"y":55.7,"sh90":0.43,"xgs":0.199,"eloImpact":12},{"n":"Abderrazak Hamdallah","p":"ST","x":96.9,"y":41.4,"sh90":0.29,"xgs":0.271,"eloImpact":12}],"Switzerland":[{"n":"Breel Embolo","p":"ST","x":91.9,"y":46.4,"sh90":1.5,"xgs":0.399,"eloImpact":28},{"n":"Manuel Akanji","p":"DF","x":90.9,"y":53.3,"sh90":1.0,"xgs":0.221,"eloImpact":17},{"n":"Remo Freuler","p":"CM","x":91.9,"y":50.5,"sh90":0.75,"xgs":0.182,"eloImpact":13},{"n":"Xherdan Shaqiri","p":"W","x":84.2,"y":65.6,"sh90":1.0,"xgs":0.124,"eloImpact":13},{"n":"Ruben Vargas","p":"W","x":86.9,"y":48.0,"sh90":0.75,"xgs":0.099,"eloImpact":11},{"n":"Granit Xhaka","p":"CM","x":82.6,"y":44.7,"sh90":1.5,"xgs":0.049,"eloImpact":11}],"Qatar":[{"n":"Almoez Ali","p":"ST","x":86.9,"y":50.0,"sh90":1.0,"xgs":0.161,"eloImpact":28},{"n":"Ismaeel Mohammad","p":"W","x":86.3,"y":49.9,"sh90":0.67,"xgs":0.179,"eloImpact":23},{"n":"Abdelkarim Hassan","p":"DF","x":81.6,"y":42.2,"sh90":2.0,"xgs":0.046,"eloImpact":20},{"n":"Mohammed Muntari","p":"ST","x":89.1,"y":55.6,"sh90":1.0,"xgs":0.062,"eloImpact":16},{"n":"Pedro Miguel Correia","p":"DF","x":81.4,"y":62.9,"sh90":0.67,"xgs":0.019,"eloImpact":10},{"n":"Akram Afif","p":"ST","x":76.9,"y":40.4,"sh90":0.67,"xgs":0.015,"eloImpact":9}],"Scotland":[{"n":"Scott McTominay","p":"AM","x":89.2,"y":51.2,"sh90":1.33,"xgs":0.061,"eloImpact":23},{"n":"Callum McGregor","p":"CM","x":84.8,"y":43.4,"sh90":1.0,"xgs":0.047,"eloImpact":16},{"n":"Che Adams","p":"ST","x":88.7,"y":45.7,"sh90":0.67,"xgs":0.062,"eloImpact":15},{"n":"Billy Gilmour","p":"CM","x":84.0,"y":49.2,"sh90":0.67,"xgs":0.044,"eloImpact":13},{"n":"Scott McKenna","p":"DF","x":89.7,"y":55.1,"sh90":0.67,"xgs":0.043,"eloImpact":13}]};
 /* REAL StatsBomb late-game scoring profile (shots struck at minute>=80, regulation). Descriptive only, NOT in the price.
    lx=share of the team's shot xG struck after 80' · g80=late goals · g=total goals · m=matches · lsh=late shots/match. */
-const LATE={"Brazil":{lx:0.225,g80:1,g:7,m:5,lsh:4.6,src:"WC2022"},"Morocco":{lx:0.311,g80:1,g:6,m:7,lsh:1.86,src:"WC2022"},"Switzerland":{lx:0.128,g80:0,g:5,m:4,lsh:1.5,src:"WC2022"},"Qatar":{lx:0.142,g80:0,g:1,m:3,lsh:1.67,src:"WC2022"},"Scotland":{lx:0.444,g80:0,g:1,m:3,lsh:3.0,src:"Euro2024"}};
+const LATE={"Albania":{lx:0.318,g80:1,g:3,m:3,lsh:3.0,src:"Euro2024"},"Argentina":{lx:0.149,g80:1,g:14,m:7,lsh:2.43,src:"WC2022"},"Australia":{lx:0.241,g80:0,g:3,m:4,lsh:1.0,src:"WC2022"},"Austria":{lx:0.144,g80:0,g:6,m:4,lsh:2.0,src:"Euro2024"},"Belgium":{lx:0.22,g80:0,g:3,m:7,lsh:2.29,src:"WC2022"},"Brazil":{lx:0.225,g80:1,g:7,m:5,lsh:4.6,src:"WC2022"},"Cameroon":{lx:0.047,g80:1,g:4,m:3,lsh:1.33,src:"WC2022"},"Canada":{lx:0.06,g80:0,g:1,m:3,lsh:1.33,src:"WC2022"},"Costa Rica":{lx:0.097,g80:1,g:2,m:3,lsh:0.33,src:"WC2022"},"Croatia":{lx:0.114,g80:1,g:9,m:10,lsh:1.5,src:"WC2022"},"Czech Republic":{lx:0.055,g80:0,g:3,m:3,lsh:1.67,src:"Euro2024"},"Denmark":{lx:0.164,g80:0,g:3,m:7,lsh:2.43,src:"WC2022"},"Ecuador":{lx:0.069,g80:0,g:4,m:3,lsh:1.67,src:"WC2022"},"England":{lx:0.221,g80:3,g:20,m:12,lsh:2.0,src:"WC2022"},"France":{lx:0.115,g80:3,g:17,m:13,lsh:2.38,src:"WC2022"},"Georgia":{lx:0.206,g80:0,g:4,m:4,lsh:1.25,src:"Euro2024"},"Germany":{lx:0.204,g80:6,g:17,m:8,lsh:3.88,src:"WC2022"},"Ghana":{lx:0.136,g80:1,g:5,m:3,lsh:2.33,src:"WC2022"},"Hungary":{lx:0.266,g80:1,g:2,m:3,lsh:2.33,src:"Euro2024"},"Iran":{lx:0.543,g80:3,g:4,m:3,lsh:3.67,src:"WC2022"},"Italy":{lx:0.069,g80:1,g:3,m:4,lsh:1.5,src:"Euro2024"},"Japan":{lx:0.042,g80:1,g:5,m:4,lsh:0.75,src:"WC2022"},"Mexico":{lx:0.092,g80:0,g:2,m:3,lsh:1.67,src:"WC2022"},"Morocco":{lx:0.311,g80:1,g:6,m:7,lsh:1.86,src:"WC2022"},"Netherlands":{lx:0.205,g80:8,g:19,m:11,lsh:1.55,src:"WC2022"},"Poland":{lx:0.306,g80:2,g:6,m:7,lsh:2.43,src:"WC2022"},"Portugal":{lx:0.238,g80:3,g:15,m:10,lsh:2.7,src:"WC2022"},"Qatar":{lx:0.142,g80:0,g:1,m:3,lsh:1.67,src:"WC2022"},"Romania":{lx:0.107,g80:0,g:4,m:4,lsh:0.75,src:"Euro2024"},"Saudi Arabia":{lx:0.195,g80:1,g:3,m:3,lsh:1.33,src:"WC2022"},"Scotland":{lx:0.444,g80:0,g:1,m:3,lsh:3.0,src:"Euro2024"},"Senegal":{lx:0.162,g80:1,g:5,m:4,lsh:3.0,src:"WC2022"},"Serbia":{lx:0.169,g80:1,g:6,m:6,lsh:3.0,src:"WC2022"},"Slovakia":{lx:0.067,g80:0,g:4,m:4,lsh:1.5,src:"Euro2024"},"Slovenia":{lx:0.011,g80:0,g:2,m:4,lsh:0.5,src:"Euro2024"},"South Korea":{lx:0.239,g80:1,g:5,m:4,lsh:3.0,src:"WC2022"},"Spain":{lx:0.161,g80:4,g:22,m:11,lsh:2.45,src:"WC2022"},"Switzerland":{lx:0.151,g80:1,g:13,m:9,lsh:1.67,src:"WC2022"},"Tunisia":{lx:0.116,g80:0,g:1,m:3,lsh:1.67,src:"WC2022"},"Turkey":{lx:0.258,g80:2,g:8,m:5,lsh:3.0,src:"Euro2024"},"Ukraine":{lx:0.16,g80:0,g:2,m:3,lsh:2.67,src:"Euro2024"},"United States":{lx:0.077,g80:0,g:3,m:4,lsh:1.5,src:"WC2022"},"Uruguay":{lx:0.093,g80:0,g:2,m:3,lsh:2.33,src:"WC2022"},"Wales":{lx:0.51,g80:1,g:1,m:3,lsh:3.33,src:"WC2022"}};
+/* FIFA feed sometimes names a team differently than StatsBomb. Map FIFA -> StatsBomb key. */
+const LATE_ALIAS={"Turkiye":"Turkey","Türkiye":"Turkey","Korea Republic":"South Korea","IR Iran":"Iran","Iran (Islamic Republic of)":"Iran","Czechia":"Czech Republic","USA":"United States","United States of America":"United States","Republic of Ireland":"Ireland"};
+function lateGet(team){ return LATE[team] || LATE[LATE_ALIAS[team]] || null; }
 function scoreProb(pl){return 1-Math.exp(-(pl.sh90*pl.xgs));}
 function zoneLabel(x,y){const depth=x>=82?"in the box":x>=72?"box edge":"top of D";
   const lane=y<=33?"left channel":y>=67?"right channel":"central";return lane+", "+depth;}
@@ -412,10 +418,13 @@ const PSIDE={}, PSEL={};                   // pitch side + selected player per f
 let STAKE={};      // USD amount you choose to put in, per fixture id
 let UPRICE={};     // the real contract price YOU see, in cents, per fixture id + leg (overrides model-fair)
 let LOG=[];        // your bet log: each entry records the model edge at log time, for PnL + CLV tracking
+let FEE=0.025;     // your exchange fee (fraction). Edges and PnL are shown NET of this.
 try{ STAKE=JSON.parse(localStorage.getItem('cupedge_stake')||'{}')||{}; }catch(e){ STAKE={}; }
 try{ UPRICE=JSON.parse(localStorage.getItem('cupedge_uprice')||'{}')||{}; }catch(e){ UPRICE={}; }
 try{ LOG=JSON.parse(localStorage.getItem('cupedge_betlog')||'[]')||[]; }catch(e){ LOG=[]; }
-function saveState(){ try{ localStorage.setItem('cupedge_stake',JSON.stringify(STAKE)); localStorage.setItem('cupedge_uprice',JSON.stringify(UPRICE)); localStorage.setItem('cupedge_betlog',JSON.stringify(LOG)); }catch(e){} }
+try{ const f=parseFloat(localStorage.getItem('cupedge_fee')); if(isFinite(f)&&f>=0&&f<0.2) FEE=f; }catch(e){}
+function saveState(){ try{ localStorage.setItem('cupedge_stake',JSON.stringify(STAKE)); localStorage.setItem('cupedge_uprice',JSON.stringify(UPRICE)); localStorage.setItem('cupedge_betlog',JSON.stringify(LOG)); localStorage.setItem('cupedge_fee',String(FEE)); }catch(e){} }
+function setFee(v){ let n=parseFloat(String(v).replace(/[^0-9.]/g,'')); if(!isFinite(n)) n=0; if(n>1) n=n/100; FEE=Math.min(0.2,Math.max(0,n)); saveState(); render(true); if(document.getElementById('betlog').style.display!=='none')renderLog(); }
 function setOdds(id,leg,v){const fx=FIX.find(f=>f.id==id);const n=parseFloat(v);if(n>1)fx.odds[leg]=n;render();}
 /* you type the dollars you want to put in; we translate the contract price into a real-money outcome.
    Pure arithmetic on YOUR number - it never sizes the bet for you. */
@@ -477,10 +486,11 @@ function cashOut(bid){const b=LOG.find(x=>x.id===bid);if(!b)return;
 function delBet(bid){LOG=LOG.filter(x=>x.id!==bid);saveState();renderLog();}
 function betCalc(b){const pd=b.price/100; const shares=b.stake/pd; const cost=b.stake;   // Coinbase fills fractional contracts -> your full stake buys stake/price shares
   const edge=b.model-pd;                                  // model% minus price you paid (your edge taken)
+  const fee=(typeof FEE==='number'?FEE:0), entryFee=cost*fee;   // exchange fee paid on the buy
   let pnl=0;
-  if(b.status==='win')pnl=shares-cost;
-  else if(b.status==='loss')pnl=-cost;
-  else if(b.status==='sold'&&b.sold!=null)pnl=shares*(b.sold/100)-cost;   // sold early: locked (sell - buy)
+  if(b.status==='win')pnl=shares-cost-entryFee;
+  else if(b.status==='loss')pnl=-cost-entryFee;
+  else if(b.status==='sold'&&b.sold!=null){const proceeds=shares*(b.sold/100);pnl=proceeds-cost-entryFee-proceeds*fee;}   // sold: buy fee + sell fee
   const clv=(b.close!=null)?(b.close-b.price):null;       // +cents = you beat the close (bought cheaper)
   return {shares,cost,edge,pnl,clv};}
 /* LIVE edge on an OPEN bet: current model % (re-priced every poll, incl. live score) minus the price
@@ -505,6 +515,7 @@ function liveEdge(b){
 function renderLog(){
   const tEl=document.getElementById('lb_table'), sEl=document.getElementById('lb_summary'), rEl=document.querySelector('#betlog .lbrules');
   if(!tEl)return;
+  const fe=document.getElementById('lb_fee'); if(fe&&document.activeElement!==fe) fe.value=+(FEE*100).toFixed(2);
   if(!LOG.length){ tEl.innerHTML='<div class="lbempty">No bets logged yet. Log your first one above.</div>'; sEl.innerHTML=''; if(rEl)rEl.innerHTML=RULES; return; }
   let staked=0,realized=0,settled=0,wins=0,losses=0,edgeSum=0,clvSum=0,clvN=0;
   const rows=LOG.map(b=>{const c=betCalc(b);
@@ -582,7 +593,7 @@ function evalFx(fx){
   const he=ELO[fx.home]??fx.homeElo??1700,ae=ELO[fx.away]??fx.awayElo??1700;const[lh,la]=eloToGoals(he,ae,fx.hadv,fx.total);
   const live=fx.state=="live";
   // serverP = probabilities computed server-side from REAL FIFA data + lineup/motivation edges
-  const P=fx.serverP?fx.serverP:(live?inPlay(lh,la,fx.mn,fx.hs,fx.as,-0.05,(LATE[fx.home]||{}).lx,(LATE[fx.away]||{}).lx):outc(matrix(lh,la)));
+  const P=fx.serverP?fx.serverP:(live?inPlay(lh,la,fx.mn,fx.hs,fx.as,-0.05,(lateGet(fx.home)||{}).lx,(lateGet(fx.away)||{}).lx):outc(matrix(lh,la)));
   // effective price per leg: YOUR locked entry (UPRICE, in cents) if you typed one, else the model-fair prefill.
   const up=UPRICE[fx.id]||{};
   const O={}; ["home","draw","away"].forEach(l=>{O[l]=(up[l]!=null)?100/up[l]:fx.odds[l];});
@@ -594,7 +605,7 @@ function evalFx(fx){
   let bl="home"; ["draw","away"].forEach(l=>{ if(P[l]>P[bl]) bl=l; });
   const be=legs[bl].ev;
   const bd=live?[P.home,P.home]:band(he,ae,fx.hadv,fx.total,-.05);const bw=(bd[1]-bd[0])/2;
-  const fav=Math.max(P.home,P.draw,P.away);const tr=tierOf(be,fav,P.draw,bw,fx.conf,live);
+  const fav=Math.max(P.home,P.draw,P.away);const tr=tierOf(be-(typeof FEE==='number'?FEE:0),fav,P.draw,bw,fx.conf,live);
   const full=fx.serverP?fx.serverP:(live?null:outc(matrix(lh,la)));
   return{fx,he,ae,P,fair,legs,be,bl,bd,bw,tr,live,o25:full?full.over25:null,top:full?full.top:null,vig:fair.vig};
 }
@@ -714,7 +725,7 @@ function pitchPanel(fx){
 /* =================== late-surge sector (80'+) =================== */
 /* who scores late, from REAL StatsBomb shots struck at minute>=80. Descriptive, not in the price. */
 function lateRow(team, side, lean){
-  const d=LATE[team];
+  const d=lateGet(team);
   if(!d) return `<div class="ltrow"><span class="ltnm"><span class="dotc ${side}"></span>${esc(team)}</span><span class="ltno">no StatsBomb data</span></div>`;
   const pct=(d.lx*100).toFixed(0);
   return `<div class="ltrow ${lean?'ltlean':''}">
@@ -723,7 +734,7 @@ function lateRow(team, side, lean){
     <span class="ltval"><b>${pct}%</b> of threat after 80' &middot; ${d.g80} late goal${d.g80==1?'':'s'} in ${d.m} &middot; ${d.lsh} late shots/match</span></div>`;
 }
 function latePanel(fx){
-  const H=LATE[fx.home], A=LATE[fx.away];
+  const H=lateGet(fx.home), A=lateGet(fx.away);
   if(!H && !A) return '';
   let leanH=false, leanA=false;
   if(H && A){ if(H.lx>=A.lx) leanH=true; else leanA=true; }
@@ -764,14 +775,15 @@ function card(r){
     vtier=`MODEL PICK · ${esc(favTeam)}`; vcls='wait';
     vsub=`Model backs <b>${esc(favTeam)}</b> at <b>${(r.legs[favLeg].p*100).toFixed(0)}%</b>. Type the price you see for ${esc(selTeam)} on Robinhood / Kalshi &mdash; just the number, e.g. <b>70</b> or <b>34.5</b> &mdash; for an instant LEAN / NO&nbsp;BET call.`;
   } else {
+    const fee=(typeof FEE==='number'?FEE:0), nev=ev-fee;   // edge NET of your exchange fee
     let t;
-    if(ev<=0){ t='NO BET'; vcls='no'; }
+    if(nev<=0){ t='NO BET'; vcls='no'; }
     else if(!isFav){ t='VALUE · UNDERDOG'; vcls='th'; }   // positive edge but not the likely winner — never green
-    else if(ev<0.025){ t='THIN LEAN'; vcls='th'; }
-    else if(ev<0.06){ t='LEAN'; vcls='lean'; }
+    else if(nev<0.025){ t='THIN LEAN'; vcls='th'; }
+    else if(nev<0.06){ t='LEAN'; vcls='lean'; }
     else { t='STRONG LEAN'; vcls='lean'; }
     vtier=`${t} · ${esc(selTeam)}`;
-    vsub=`edge <b>${ev>0?'+':''}${(ev*100).toFixed(1)}%</b> &middot; pays <b class="pos">+${(ret*100).toFixed(0)}%</b> if it hits &middot; your price <b>$${(yourC/100).toFixed(2)}</b> vs model fair <b>$${(fairC/100).toFixed(2)}</b>${!isFav?` &middot; <span style="color:var(--amb)">${(d.p*100).toFixed(0)}% to win — long shot</span>`:''}${!fx.conf?` &middot; <span style="color:var(--amb)">XI pending</span>`:''}`;
+    vsub=`net edge <b>${nev>0?'+':''}${(nev*100).toFixed(1)}%</b> <span class="lbsub">(after ${(fee*100).toFixed(1)}% fee)</span> &middot; pays <b class="pos">+${(ret*100).toFixed(0)}%</b> if it hits &middot; your price <b>$${(yourC/100).toFixed(2)}</b> vs model fair <b>$${(fairC/100).toFixed(2)}</b>${!isFav?` &middot; <span style="color:var(--amb)">${(d.p*100).toFixed(0)}% to win — long shot</span>`:''}${!fx.conf?` &middot; <span style="color:var(--amb)">XI pending</span>`:''}`;
   }
   // ----- the two distinct numbers, kept clearly separate -----
   const priceD=yourC/100;                 // price of ONE share (always under $1)
