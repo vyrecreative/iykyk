@@ -73,7 +73,8 @@
   .lbempty{font-size:12px;color:var(--mut2);padding:12px 0;text-align:center}
   .lbrulebox{margin-top:13px;border-top:1px solid var(--line);padding-top:11px}
   .lbrt{font-size:11px;letter-spacing:.06em;color:var(--cyan);margin-bottom:7px}
-  .lbrulebox ol{margin:0;padding-left:18px} .lbrulebox li{font-size:12px;color:var(--mut);line-height:1.6;margin-bottom:5px}.lbrulebox li b{color:var(--ink)}
+  .lbrulebox ol,.lbrulebox ul{margin:0;padding-left:18px} .lbrulebox li{font-size:12.5px;color:var(--mut);line-height:1.6;margin-bottom:4px}.lbrulebox li b{color:var(--ink)}
+  .lbgrp{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--cyan);margin:12px 0 5px}
   .lbnote{font-size:11px;color:var(--mut2);line-height:1.55;margin-top:9px;border-top:1px solid var(--line);padding-top:8px}
   @media(max-width:560px){.lbrow{grid-template-columns:1.9fr .8fr .9fr 1.1fr;font-size:11px}
     .lbrow>span:nth-child(2),.lbrow>span:nth-child(3),.lbrow>span:nth-child(5),.lbrow>span:nth-child(6){display:none}}
@@ -509,17 +510,42 @@ function renderLog(){
     <span class="lbsub">${LOG.length} logged · ${settled} settled · staked $${staked.toFixed(0)}</span></div>`;
   if(rEl)rEl.innerHTML=RULES;
 }
-const RULES=`<div class="lbrulebox"><div class="lbrt">THE RULEBOOK · how to actually be the edge</div>
-  <ol>
-   <li><b>One outcome per match.</b> Never buy two sides (or all three) of the same game — that just pays the market's margin. Back only the single outcome the card shows green (LEAN / STRONG LEAN).</li>
-   <li><b>Edge, not favorite.</b> A favorite at a fair price is NO BET. The bet is whichever outcome the model rates higher than your price — often the draw or underdog, not the leader.</li>
-   <li><b>Size by edge.</b> Of your 10% cap: STRONG LEAN ≈ 2%, LEAN ≈ 1%, on the +edge side only. If nothing's green, stake 0% — cash is a position.</li>
-   <li><b>DCA the same thesis.</b> Add to the SAME +edge bet only if its price drops further below model fair (edge grows). Never average into a different outcome.</li>
-   <li><b>Draw / late goals early &amp; cheap.</b> Use the Late Surge sector pre-match: take a draw-prone, strong-late matchup's draw while it's 15–25¢ — not at 80¢ after it's 1-1.</li>
-   <li><b>Chase CLV, not wins.</b> Log the close price; positive average CLV (you bought cheaper than the line closed) is the real proof you have an edge. A handful of results is just variance.</li>
-   <li><b>Stop-loss the day, not the bet.</b> Once your 10% is deployed, you're done for the slate. No revenge "chip-ins."</li>
-  </ol>
-  <div class="lbnote">Reality check: the market has a built-in margin and most bettors are net-negative. Positive PnL needs a real, repeated edge + low churn + discipline — and still has losing stretches. Only stake what you can afford to lose. This is analysis, not financial advice.</div></div>`;
+const RULES=`<div class="lbrulebox"><div class="lbrt">THE PLAYBOOK · plain and simple</div>
+
+  <div class="lbgrp">① WHAT THE NUMBERS MEAN</div>
+  <ul>
+   <li>The <b>%</b> on each team = the model's real chance it wins (from Elo + stats).</li>
+   <li>The <b>price</b> = what 1 share costs on Coinbase/Kalshi, always under $1. A 60¢ share pays you $1 if it wins.</li>
+   <li><b>Green = good deal</b> — the price is cheaper than the real chance. That's the only time you bet.</li>
+  </ul>
+
+  <div class="lbgrp">② WHEN TO BET</div>
+  <ul>
+   <li>Bet only on a <b style="color:var(--grn)">green LEAN / STRONG LEAN</b>. If it says <b>NO BET</b>, skip it — even the favorite.</li>
+   <li><b>One side per match.</b> Never buy two teams (or a team + the draw) in the same game — you'd just pay the house twice.</li>
+   <li>No green anywhere? <b>Bet nothing.</b> Sitting out is a winning move.</li>
+  </ul>
+
+  <div class="lbgrp">③ HOW MUCH</div>
+  <ul>
+   <li>Of the money you'll risk in a day: about <b>2%</b> on a STRONG LEAN, <b>1%</b> on a LEAN. Stop at <b>10% total</b>.</li>
+   <li>Price drops even lower (better deal)? You can add a little to the <b>same</b> bet — never to a different team.</li>
+  </ul>
+
+  <div class="lbgrp">④ WHEN THE GAME IS LIVE (after a goal)</div>
+  <ul>
+   <li>A goal changes everything — re-check the card. Still <b style="color:var(--grn)">green</b>? Hold. Turned <b style="color:var(--red)">NO BET / red</b>? Tap <b>$</b> and sell.</li>
+   <li>Losing and the price crashed? Sell for what's left. <b>Never buy more of a losing team</b> to "lower your cost."</li>
+   <li>Want the draw? Buy it <b>early and cheap (15–25¢)</b> — not at 80¢ after it's already 1-1.</li>
+  </ul>
+
+  <div class="lbgrp">⑤ KEEP SCORE</div>
+  <ul>
+   <li>Log every bet. Mark <b>W</b>/<b>L</b>, or <b>$</b> if you sold early. Type the <b>close</b> price to score your CLV.</li>
+   <li>Judge yourself on <b>edge</b> and <b>CLV</b>, not one win. A few bets is luck; many bets shows skill.</li>
+  </ul>
+
+  <div class="lbnote">Reality: the market takes a small cut and most people lose over time. Staying positive needs a real edge, few bets, and discipline — and still has losing runs. Only bet what you can afford to lose. This is a tool, not financial advice.</div></div>`;
 function setSide(id,s){PSIDE[id]=s;PSEL[id]=null;render();}
 function pick(id,team,idx){PSEL[id]={team,idx};render();}
 const PPICK={};   // which outcome (home/draw/away) you're pricing on a card; defaults to the model's pick
