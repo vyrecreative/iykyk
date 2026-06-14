@@ -60,12 +60,13 @@
   .lbfee .lbin input{width:46px;text-align:right;color:var(--amb);font-size:12px}
   .lbsum{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:12px;color:var(--mut)}
   .lbsum b{color:var(--ink)} .lbsub{color:var(--mut2);font-size:11px}
-  .lbhero{margin-top:12px;padding:14px 16px;border:1px solid var(--line2);border-left:3px solid var(--cyan);border-radius:6px;background:linear-gradient(180deg,rgba(0,200,255,.05),transparent)}
-  .lbhero.negv{border-left-color:var(--red);background:linear-gradient(180deg,rgba(255,80,80,.05),transparent)}
-  .lbhk{font-size:11px;letter-spacing:.08em;color:var(--mut);text-transform:uppercase}
-  .lbhv{font-family:var(--mono);font-size:34px;font-weight:700;line-height:1.1;color:var(--cyan)}
-  .lbhv.pos{color:var(--grn)} .lbhv.negv{color:var(--red)}
-  .lbhsub{font-size:12px;color:var(--mut);margin-top:2px} .lbhnote{font-size:11px;color:var(--mut2);margin-top:6px}
+  .lbhero{display:block;margin-top:12px;padding:14px 16px;border:1px solid var(--line2);border-left:3px solid var(--cyan);border-radius:6px;background:linear-gradient(180deg,rgba(0,200,255,.05),transparent)}
+  .lbhero.neg{border-left-color:var(--red);background:linear-gradient(180deg,rgba(255,80,80,.05),transparent)}
+  .lbhk{display:block;font-size:11px;letter-spacing:.08em;color:var(--mut);text-transform:uppercase;line-height:1.45}
+  .lbhv{display:block;font-family:var(--mono);font-size:34px;font-weight:700;line-height:1.15;margin-top:6px;color:var(--cyan)}
+  .lbhv.lbup{color:var(--grn)} .lbhv.lbdn{color:var(--red)}
+  .lbhsub{display:block;font-size:12.5px;color:var(--mut);margin-top:4px} .lbhnote{display:block;font-size:11px;color:var(--mut2);margin-top:7px}
+  .lbup{color:var(--grn);font-weight:700} .lbdn{color:var(--red);font-weight:700}
   .lbsum2{opacity:.78;font-size:11px} .lbsum2 .lbsub2{color:var(--mut2);font-style:italic;font-size:10px;flex-basis:100%}
   .lbrow{display:grid;grid-template-columns:2.1fr .75fr .65fr .75fr .65fr 1.2fr 1.15fr 1.25fr;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:11.5px;color:var(--mut)}
   .lbrow>span{text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -266,9 +267,9 @@
   .kpi .v{font-family:var(--mono);font-size:18px;font-weight:800;margin-top:2px}
   .kpi .v.g{color:var(--grn)} .kpi .v.r{color:var(--red)} .kpi .v.n{color:var(--ink)}
   .poss{padding:8px 14px 12px}
-  .pos{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:11px;padding:6px 0;border-top:1px solid var(--line)}
-  .pos:first-child{border-top:0}
-  .pos .lf{color:var(--mut)}.pos .lf b{color:var(--ink)}
+  .posrow{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:11px;padding:6px 0;border-top:1px solid var(--line)}
+  .posrow:first-child{border-top:0}
+  .posrow .lf{color:var(--mut)}.posrow .lf b{color:var(--ink)}
   .stat{font-size:9px;padding:2px 6px;border-radius:4px;margin-left:8px}
   .st-open{background:rgba(55,166,255,.14);color:var(--home)} .st-won{background:rgba(25,224,138,.16);color:var(--grn)} .st-lost{background:rgba(255,77,77,.14);color:var(--red)}
   .empty{font-family:var(--mono);font-size:11px;color:var(--mut2);padding:6px 0}
@@ -543,11 +544,11 @@ function renderLog(){
     </div>`;}).join('');
   tEl.innerHTML=`<div class="lbrow lbhead"><span>BET</span><span>YOUR $</span><span>MODEL</span><span>EDGE</span><span>STAKE</span><span>CLOSE / CLV</span><span>PnL</span><span>W / L / $ sold</span></div>${rows}`;
   const decisive=wins+losses, roi=staked>0?realized/staked:0, wr=decisive>0?wins/decisive:0, avgEdge=LOG.length?edgeSum/LOG.length:0, avgClv=clvN?clvSum/clvN:null, edgePct=LOG.length?edgePos/LOG.length:0;
-  const edCls=avgEdge>=0?'pos':'negv';
-  sEl.innerHTML=`<div class="lbhero ${edCls}">
-      <div class="lbhk">AVG EDGE TAKEN <span class="lbsub">— your entry price vs the live model % at that moment (the skill signal for in-play betting)</span></div>
-      <div class="lbhv ${edCls}">${avgEdge>=0?'+':''}${(avgEdge*100).toFixed(1)}%</div>
-      <div class="lbhsub"><b class="${edgePct>=0.5?'pos':'negv'}">${(edgePct*100).toFixed(0)}%</b> of bets entered at a positive edge <span class="lbsub">(${edgePos}/${LOG.length})</span></div>
+  const up=avgEdge>=0;
+  sEl.innerHTML=`<div class="lbhero${up?'':' neg'}">
+      <div class="lbhk">AVG EDGE TAKEN — your entry price vs the live model % at that moment <span class="lbsub">(the skill signal for in-play betting)</span></div>
+      <div class="lbhv ${up?'lbup':'lbdn'}">${up?'+':''}${(avgEdge*100).toFixed(1)}%</div>
+      <div class="lbhsub"><b class="${edgePct>=0.5?'lbup':'lbdn'}">${(edgePct*100).toFixed(0)}%</b> of bets entered at a positive edge <span class="lbsub">(${edgePos}/${LOG.length})</span></div>
       <div class="lbhnote">${LOG.length<20?`<b>${LOG.length}</b> logged — need ~20-30 before this is a firm read on your edge. Keep logging.`:`enough sample to trust the read.`}</div>
     </div>
     <div class="lbsum lbsum2">
