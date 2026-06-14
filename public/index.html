@@ -58,7 +58,7 @@
   .lbhint{font-size:11px;color:var(--mut2);line-height:1.55;margin-top:9px}.lbhint b{color:var(--mut)}
   .lbsum{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:12px;color:var(--mut)}
   .lbsum b{color:var(--ink)} .lbsub{color:var(--mut2);font-size:11px}
-  .lbrow{display:grid;grid-template-columns:2.3fr .8fr .7fr .8fr .7fr 1.3fr .95fr 1.05fr;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:11.5px;color:var(--mut)}
+  .lbrow{display:grid;grid-template-columns:2.1fr .75fr .65fr .75fr .65fr 1.2fr 1.15fr 1.25fr;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:11.5px;color:var(--mut)}
   .lbrow>span{text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .lbrow .lbm{text-align:left;color:var(--ink);white-space:normal}.lbm b{color:var(--ink)}
   .lbhead{color:var(--mut2);font-size:10px;letter-spacing:.05em;border-top:0}
@@ -66,8 +66,9 @@
   .lbclv input{width:46px;background:#05080b;border:1px solid var(--line2);color:var(--cyan);border-radius:4px;padding:3px;font-family:var(--mono);font-size:11px;text-align:right}
   .lbclv i{font-style:normal;font-size:10px}
   .lbbtns{display:flex;gap:3px;justify-content:flex-end}
-  .lbbtns button{background:#05080b;border:1px solid var(--line2);color:var(--mut2);border-radius:4px;width:22px;height:22px;cursor:pointer;font-family:var(--mono);font-size:11px;padding:0}
+  .lbbtns button{background:#05080b;border:1px solid var(--line2);color:var(--mut2);border-radius:4px;width:20px;height:22px;cursor:pointer;font-family:var(--mono);font-size:11px;padding:0}
   .lbw.on{background:var(--grn);color:#04070a;border-color:var(--grn);font-weight:800} .lbl.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:800}
+  .lbc.on{background:var(--amb);color:#04070a;border-color:var(--amb);font-weight:800}
   .lbx:hover{border-color:var(--red);color:var(--red)}
   .lbempty{font-size:12px;color:var(--mut2);padding:12px 0;text-align:center}
   .lbrulebox{margin-top:13px;border-top:1px solid var(--line);padding-top:11px}
@@ -460,23 +461,33 @@ function logBet(){
   document.getElementById('lb_price').value=''; document.getElementById('lb_stake').value='';
   renderLog();
 }
-function setBetStatus(bid,st){const b=LOG.find(x=>x.id===bid);if(b){b.status=(b.status===st?'pending':st);saveState();renderLog();}}
+function setBetStatus(bid,st){const b=LOG.find(x=>x.id===bid);if(b){b.status=(b.status===st?'pending':st);if(b.status!=='sold')b.sold=null;saveState();renderLog();}}
 function setBetClose(bid,v){const b=LOG.find(x=>x.id===bid);if(b){b.close=parsePriceCents(v);saveState();renderLog();}}
+/* SELL / cash out early (you rotated out of A, or took profit / cut the position before it resolved).
+   Records the price you sold at; PnL = (sell - buy) per share. This is how A->B rotations get logged. */
+function cashOut(bid){const b=LOG.find(x=>x.id===bid);if(!b)return;
+  const v=prompt('Sold "'+b.team+'" at what share price? (e.g. 0.72 or 72)', b.sold!=null?(b.sold/100).toFixed(2):'');
+  if(v==null)return; const c=parsePriceCents(v);
+  if(c==null){ b.sold=null; if(b.status==='sold')b.status='pending'; } else { b.sold=c; b.status='sold'; }
+  saveState();renderLog();}
 function delBet(bid){LOG=LOG.filter(x=>x.id!==bid);saveState();renderLog();}
 function betCalc(b){const pd=b.price/100; const shares=Math.floor(b.stake/pd); const cost=shares*pd;
   const edge=b.model-pd;                                  // model% minus price you paid (your edge taken)
-  const pnl=b.status==='win'?(shares-cost):(b.status==='loss'?-cost:0);
+  let pnl=0;
+  if(b.status==='win')pnl=shares-cost;
+  else if(b.status==='loss')pnl=-cost;
+  else if(b.status==='sold'&&b.sold!=null)pnl=shares*(b.sold/100)-cost;   // sold early: locked (sell - buy)
   const clv=(b.close!=null)?(b.close-b.price):null;       // +cents = you beat the close (bought cheaper)
   return {shares,cost,edge,pnl,clv};}
 function renderLog(){
   const tEl=document.getElementById('lb_table'), sEl=document.getElementById('lb_summary'), rEl=document.querySelector('#betlog .lbrules');
   if(!tEl)return;
   if(!LOG.length){ tEl.innerHTML='<div class="lbempty">No bets logged yet. Log your first one above.</div>'; sEl.innerHTML=''; if(rEl)rEl.innerHTML=RULES; return; }
-  let staked=0,realized=0,settled=0,wins=0,edgeSum=0,clvSum=0,clvN=0;
+  let staked=0,realized=0,settled=0,wins=0,losses=0,edgeSum=0,clvSum=0,clvN=0;
   const rows=LOG.map(b=>{const c=betCalc(b);
-    edgeSum+=c.edge; if(b.status!=='pending'){settled++;staked+=c.cost;realized+=c.pnl;if(b.status==='win')wins++;}
+    edgeSum+=c.edge; if(b.status!=='pending'){settled++;staked+=c.cost;realized+=c.pnl;if(b.status==='win')wins++;else if(b.status==='loss')losses++;}
     if(c.clv!=null){clvSum+=c.clv;clvN++;}
-    const stCls=b.status==='win'?'lbwin':b.status==='loss'?'lbloss':'lbpend';
+    const pnlStr=b.status==='pending'?'—':((c.pnl>=0?'+':'')+'$'+c.pnl.toFixed(2)+(b.status==='sold'?` <span class="lbsub">sold $${(b.sold/100).toFixed(2)}</span>`:''));
     return `<div class="lbrow">
       <span class="lbm">${esc(b.ts)} · <b>${esc(b.team)}</b> <span class="lbsub">${esc(b.mkt)}</span></span>
       <span>$${(b.price/100).toFixed(2)}</span>
@@ -484,15 +495,15 @@ function renderLog(){
       <span class="${c.edge>0?'pos':'negv'}">${c.edge>0?'+':''}${(c.edge*100).toFixed(1)}%</span>
       <span>$${b.stake.toFixed(0)}</span>
       <span class="lbclv"><input value="${b.close!=null?(b.close/100).toFixed(2):''}" placeholder="close" onchange="setBetClose(${b.id},this.value)">${c.clv!=null?`<i class="${c.clv>=0?'pos':'negv'}">${c.clv>=0?'+':''}${c.clv.toFixed(0)}¢</i>`:''}</span>
-      <span class="${b.status==='win'?'pos':b.status==='loss'?'negv':''} ${stCls}">${b.status==='pending'?'—':(c.pnl>=0?'+':'')+'$'+c.pnl.toFixed(2)}</span>
-      <span class="lbbtns"><button class="lbw ${b.status==='win'?'on':''}" onclick="setBetStatus(${b.id},'win')">W</button><button class="lbl ${b.status==='loss'?'on':''}" onclick="setBetStatus(${b.id},'loss')">L</button><button class="lbx" onclick="delBet(${b.id})">✕</button></span>
+      <span class="${c.pnl>0?'pos':c.pnl<0?'negv':''}">${pnlStr}</span>
+      <span class="lbbtns"><button class="lbw ${b.status==='win'?'on':''}" onclick="setBetStatus(${b.id},'win')" title="won">W</button><button class="lbl ${b.status==='loss'?'on':''}" onclick="setBetStatus(${b.id},'loss')" title="lost">L</button><button class="lbc ${b.status==='sold'?'on':''}" onclick="cashOut(${b.id})" title="sold / cashed out early">$</button><button class="lbx" onclick="delBet(${b.id})" title="delete">✕</button></span>
     </div>`;}).join('');
-  tEl.innerHTML=`<div class="lbrow lbhead"><span>BET</span><span>YOUR $</span><span>MODEL</span><span>EDGE</span><span>STAKE</span><span>CLOSE / CLV</span><span>PnL</span><span>RESULT</span></div>${rows}`;
-  const roi=staked>0?realized/staked:0, wr=settled>0?wins/settled:0, avgEdge=LOG.length?edgeSum/LOG.length:0, avgClv=clvN?clvSum/clvN:null;
+  tEl.innerHTML=`<div class="lbrow lbhead"><span>BET</span><span>YOUR $</span><span>MODEL</span><span>EDGE</span><span>STAKE</span><span>CLOSE / CLV</span><span>PnL</span><span>W / L / $ sold</span></div>${rows}`;
+  const decisive=wins+losses, roi=staked>0?realized/staked:0, wr=decisive>0?wins/decisive:0, avgEdge=LOG.length?edgeSum/LOG.length:0, avgClv=clvN?clvSum/clvN:null;
   sEl.innerHTML=`<div class="lbsum">
     <span>Realized PnL <b class="${realized>=0?'pos':'negv'}">${realized>=0?'+':''}$${realized.toFixed(2)}</b></span>
     <span>ROI <b class="${roi>=0?'pos':'negv'}">${(roi*100).toFixed(1)}%</b></span>
-    <span>Win rate <b>${(wr*100).toFixed(0)}%</b> <span class="lbsub">(${wins}/${settled})</span></span>
+    <span>Win rate <b>${(wr*100).toFixed(0)}%</b> <span class="lbsub">(${wins}/${decisive})</span></span>
     <span>Avg edge taken <b class="${avgEdge>=0?'pos':'negv'}">${avgEdge>=0?'+':''}${(avgEdge*100).toFixed(1)}%</b></span>
     <span>Avg CLV <b class="${avgClv==null?'':(avgClv>=0?'pos':'negv')}">${avgClv==null?'—':(avgClv>=0?'+':'')+avgClv.toFixed(1)+'¢'}</b></span>
     <span class="lbsub">${LOG.length} logged · ${settled} settled · staked $${staked.toFixed(0)}</span></div>`;
