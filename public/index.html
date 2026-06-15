@@ -496,11 +496,11 @@ function cashOut(bid){const b=LOG.find(x=>x.id===bid);if(!b)return;
 function delBet(bid){LOG=LOG.filter(x=>x.id!==bid);saveState();renderLog();}
 function betCalc(b){const pd=b.price/100; const shares=b.stake/pd; const cost=b.stake;   // Coinbase fills fractional contracts -> your full stake buys stake/price shares
   const edge=b.model-pd;                                  // model% minus price you paid (your edge taken)
-  const entryFee=cost*feeRate(b.price);   // price-dependent exchange fee paid on the buy
+  const entryFee=(b.feeIn!=null)?b.feeIn:cost*feeRate(b.price);   // actual receipt fee if logged, else price-dependent model
   let pnl=0;
   if(b.status==='win')pnl=shares-cost-entryFee;
   else if(b.status==='loss')pnl=-cost-entryFee;
-  else if(b.status==='sold'&&b.sold!=null){const proceeds=shares*(b.sold/100);pnl=proceeds-cost-entryFee-proceeds*feeRate(b.sold);}   // sold: buy fee + sell fee
+  else if(b.status==='sold'&&b.sold!=null){const proceeds=shares*(b.sold/100);const sellFee=(b.feeOut!=null)?b.feeOut:proceeds*feeRate(b.sold);pnl=proceeds-cost-entryFee-sellFee;}   // sold: buy fee + sell fee (actual if logged)
   const clv=(b.close!=null)?(b.close-b.price):null;       // +cents = you beat the close (bought cheaper)
   return {shares,cost,edge,pnl,clv};}
 /* LIVE edge on an OPEN bet: current model % (re-priced every poll, incl. live score) minus the price
