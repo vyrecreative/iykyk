@@ -67,6 +67,7 @@
   .lbhv.lbup{color:var(--grn)} .lbhv.lbdn{color:var(--red)}
   .lbhsub{display:block;font-size:12.5px;color:var(--mut);margin-top:4px} .lbhnote{display:block;font-size:11px;color:var(--mut2);margin-top:7px}
   .lbup{color:var(--grn);font-weight:700} .lbdn{color:var(--red);font-weight:700}
+  .altflag{display:inline-block;margin-left:8px;padding:2px 7px;border:1px solid var(--amb);border-radius:5px;background:rgba(255,176,0,.08);color:var(--amb);font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;white-space:nowrap;vertical-align:middle;cursor:help}
   .lbsum2{opacity:.78;font-size:11px} .lbsum2 .lbsub2{color:var(--mut2);font-style:italic;font-size:10px;flex-basis:100%}
   .lbrow{display:grid;grid-template-columns:2.1fr .75fr .65fr .75fr .65fr 1.2fr 1.15fr 1.25fr;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:11.5px;color:var(--mut)}
   .lbrow>span{text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -832,7 +833,7 @@ function card(r){
   const so=fx.conf?`<span class="v">&check; FIFA fixture + XI</span>`:`<span style="color:var(--amb)">XI publishes ~75 min pre-KO</span>`;
   const heat=EXP.has(fx.id)?pitchPanel(fx):"";
   return `<div class="card"><div class="pad">
-    <div class="crow"><div class="code">[<b>${esc(fx.id)}</b>] ${esc(fx.grp)}${etRef}</div>${badge}</div>
+    <div class="crow"><div class="code">[<b>${esc(fx.id)}</b>] ${esc(fx.grp)}${etRef}</div>${altFlag(fx)}${badge}</div>
     <div class="tiers"><span class="tier ${TC[r.tr]}">${r.tr.toUpperCase()}</span></div>
     <div class="teams"><div class="team"><div class="tn">${esc(fx.home)}</div><div class="telo">ELO ${r.he}${fx.hadv?` H+${fx.hadv}`:''}</div></div>
       ${mid}<div class="team r"><div class="tn">${esc(fx.away)}</div><div class="telo">ELO ${r.ae}</div></div></div>
@@ -877,11 +878,28 @@ function tick(){
 
 /* ===== live sync: pull REAL FIFA data + model edges from /api/matchday, auto re-poll ===== */
 const ab=n=>(n||'').replace(/[^A-Za-z]/g,'').slice(0,3).toUpperCase();
+/* Venue altitude — REAL stadium elevations (ft), verified from public sources (Wikipedia, FIFA venue
+   guides, whatismyelevation.com). DESCRIPTIVE ONLY — shown as match context, NEVER in the model price.
+   Only WC2026 sites above the ~4,900 ft sports-science threshold (Mexico City, Guadalajara) flag;
+   every other host venue is effectively sea level (Monterrey ~1,600 ft, Atlanta ~1,050 ft, rest lower). */
+const ALT=[
+  { k:["mexico city","azteca","banorte"], ft:7200, place:"Mexico City" },   // Estadio Azteca
+  { k:["guadalajara","akron"],            ft:5138, place:"Guadalajara" },    // Estadio Akron
+  { k:["monterrey","bbva"],               ft:1600, place:"Monterrey" }       // Estadio BBVA (below flag threshold)
+];
+function altFlag(fx){
+  const s=((fx.city||"")+" "+(fx.venue||"")).toLowerCase();
+  const hit=ALT.find(a=>a.k.some(w=>s.includes(w)));
+  if(!hit || hit.ft<4500) return "";
+  const tier = hit.ft>=6500 ? "VERY HIGH ALTITUDE" : "HIGH ALTITUDE";
+  return `<span class="altflag" title="Descriptive context only — NOT in the model price. Thin air tires both sides late and makes the ball carry/keepers misjudge; watch live legs, especially after 70'.">&#9968; ${tier} &middot; ${esc(hit.place)} ${hit.ft.toLocaleString()} ft</span>`;
+}
 function mapServer(m){
   const e=m.model;
   return {
     id:ab(m.home)+'-'+ab(m.away),
     grp:`${m.group||''} · ${m.venue||''}`.replace(/·\s+·/g,'·'), koEt:m.kickoffEt, koUtc:m.kickoffUtc,
+    venue:m.venue||'', city:m.city||'',
     home:m.home, away:m.away, homeElo:m.homeElo, awayElo:m.awayElo, hadv:55, total:2.55, kalshi:'',
     conf:!!m.lineupConfirmed, state:m.state, mn:m.minute||0, hs:m.homeScore||0, as:m.awayScore||0,
     formationH:m.homeFormation, formationA:m.awayFormation, coachH:m.homeCoach, coachA:m.awayCoach,
